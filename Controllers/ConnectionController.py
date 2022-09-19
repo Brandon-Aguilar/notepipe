@@ -7,22 +7,28 @@ from Models.errorHandler import sendError
 
 
 HOST_KEYS = {str : str}
-STUDENT_KEYS = set()
-JOINED = {}
+JOINED = {str : list}
 
 async def createStudentKey():
     studentKey = secrets.token_urlsafe(16)
-    while studentKey in STUDENT_KEYS:
+    while studentKey in JOINED:
         studentKey = secrets.token_urlsafe(16)
-    STUDENT_KEYS.add(studentKey)
     return studentKey
 
-async def initializeHost(websocket):
+async def createHostKey():
     hostKey = secrets.token_urlsafe(16)
     while hostKey in HOST_KEYS:
         hostKey = secrets.token_urlsafe(16)
+    return hostKey
 
+
+async def initializeHost(websocket):
+    """ Create keys and initialize a room """
+    hostKey = await createHostKey()
     studentKey = await createStudentKey()
+
+    # associate host key with student key
+    # Store list of connections to be broadcasted to
     HOST_KEYS[hostKey] = studentKey
     JOINED[studentKey] = {websocket}
 
@@ -36,10 +42,10 @@ async def initializeHost(websocket):
     finally:
         # this will need to be changed to allow a reconnect. this drops connections as soon as host loses connection
         del HOST_KEYS[hostKey]
-        STUDENT_KEYS.remove(studentKey)
 
     
 async def hostConnection(websocket, hostKey, studentKey):
+    """Process messages for a host connection, loops until disconnected"""
     async for message in websocket:
         messageJSON = json.loads(message)
         match messageJSON["type"]:
@@ -47,6 +53,7 @@ async def hostConnection(websocket, hostKey, studentKey):
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
 
 async def initializeStudent(websocket, studentKey):
+    """Check for valid key and add connection to host's connections"""
     try:
         connected = JOINED[studentKey]
     except KeyError:
@@ -58,14 +65,16 @@ async def initializeStudent(websocket, studentKey):
     response = initializeStudentSuccess()
     response.studentKey = studentKey
 
-    await websocket.send(response.toJson())
 
     try:
+        await websocket.send(response.toJson())
         await studentConnection(websocket, studentKey)
     finally:
         connected.remove(websocket)
 
 async def studentConnection(websocket, studentKey):
+    """Process messages for a student connection, loops until disconnected"""
+
     async for message in websocket:
         messageJSON = json.loads(message)
         match messageJSON["type"]:

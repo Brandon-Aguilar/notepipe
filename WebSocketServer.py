@@ -9,6 +9,7 @@ from Controllers.ConnectionController import initializeHost, initializeStudent
 from Models.errorHandler import sendError
 
 async def handler(websocket):
+    """Handle initial connections to websocket"""
     while True:
         try:
             message = await websocket.recv()

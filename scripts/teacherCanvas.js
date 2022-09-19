@@ -1,9 +1,11 @@
+// Connect to websocket
 serverURL = "ws://localhost:8001/";
 
 // DO NOT LAUNCH THIS INTO A PROD ENVIRONMENT WITH "rejectUnauthorized: false"
 var websocket = new WebSocket(serverURL, "json", { rejectUnauthorized: false });
 console.log("Connected to Websocket");
 
+// Copied canvas code
 // create canvas element and append it to document body
 var canvas = document.createElement('canvas');
 canvas.setAttribute("id", "drawingCanvas");
@@ -25,15 +27,19 @@ document.addEventListener('mousemove', draw);
 document.addEventListener('mousedown', setPosition);
 document.addEventListener('mouseenter', setPosition);
 document.addEventListener('click', sendUpdate);
+
+// Listen for websocket messages and when initialization finished
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeHost)
 
 pageNumber = 0;
 
+// get html elements
 updateMessageElement = document.getElementById("updateStatus");
 studentLinkElement = document.getElementById("studentLink");
 studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 
+// more copied drawing canvas code
 // new position from mouse event
 function setPosition(e) {
     var rect = canvas.getBoundingClientRect(); pos.x = e.clientX - rect.left; pos.y = e.clientY - rect.top; 
@@ -65,11 +71,13 @@ function draw(e) {
   ctx.stroke(); // draw it!
 }
 
+// Initialize connection to host
 function initializeHost() {
     const event = { type: "initializeHost" };
     websocket.send(JSON.stringify(event))
 }
 
+// Send canvas updates, triggered by click end
 function sendUpdate() {
     console.log("Sending canvas")
     var imageURL = canvas.toDataURL();
@@ -81,6 +89,7 @@ function sendUpdate() {
     websocket.send(JSON.stringify(message))
 }
 
+// Handle messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
     console.log(event)
@@ -94,5 +103,6 @@ function processMessage({ data }) {
             link = "/student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
+            break;
     }
 }

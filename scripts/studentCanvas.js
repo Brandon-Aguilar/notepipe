@@ -1,3 +1,4 @@
+// Fetch url params, interested in key
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 
@@ -6,10 +7,13 @@ const studentKey = urlParams.get("key");
 
 serverURL = "ws://localhost:8001/";
 
+// connect to web socket
 // DO NOT LAUNCH THIS INTO A PROD ENVIRONMENT WITH "rejectUnauthorized: false"
 var websocket = new WebSocket(serverURL, "json", { rejectUnauthorized: false });
 console.log("Connected to Websocket");
 
+
+// Copied canvas code
 // create canvas element and append it to document body
 var canvas = document.createElement('canvas');
 canvas.setAttribute("id", "viewingCanvas");
@@ -24,7 +28,7 @@ var ctx = canvas.getContext('2d');
 var image = new Image();
 resize();
 
-
+// Event listeners to trigger functions
 window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
@@ -34,9 +38,10 @@ image.onload = function() {
 
 pageNumber = 0;
 
-updateMessageElement = document.getElementById("updateStatus");
-studentLinkElement = document.getElementById("studentLink");
-studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
+// Fetch HTML elements to be updated
+var updateMessageElement = document.getElementById("updateStatus");
+var studentLinkElement = document.getElementById("studentLink");
+var studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 
 
 // resize canvas
@@ -45,13 +50,13 @@ function resize() {
   ctx.canvas.height = window.innerHeight;
 }
 
-
+// Initialize connection
 function initializeStudent() {
     const event = { type: "initializeStudent",  studentKey: studentKey};
     websocket.send(JSON.stringify(event))
 }
 
-
+// Handle valid messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
     console.log(event)

@@ -1,5 +1,7 @@
 import json
 
+# Templates for sending information to clients
+
 class response: 
     def toJson(self):
         return json.dumps(self.__dict__)
