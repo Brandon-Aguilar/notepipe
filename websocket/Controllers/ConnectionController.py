@@ -6,14 +6,16 @@ from Models.responses import initializeHostSuccess, initializeStudentSuccess
 from Models.errorHandler import sendError
 
 
-HOST_KEYS = {str : str}
-JOINED = {str : list}
+HOST_KEYS = {str: str}
+JOINED = {str: list}
+
 
 async def createStudentKey():
     studentKey = secrets.token_urlsafe(16)
     while studentKey in JOINED:
         studentKey = secrets.token_urlsafe(16)
     return studentKey
+
 
 async def createHostKey():
     hostKey = secrets.token_urlsafe(16)
@@ -40,10 +42,11 @@ async def initializeHost(websocket):
         await websocket.send(response.toJson())
         await hostConnection(websocket, hostKey, studentKey)
     finally:
-        # this will need to be changed to allow a reconnect. this drops connections as soon as host loses connection
+        # this will need to be changed to allow a reconnect.
+        # this drops connections as soon as host loses connection
         del HOST_KEYS[hostKey]
 
-    
+
 async def hostConnection(websocket, hostKey, studentKey):
     """Process messages for a host connection, loops until disconnected"""
     async for message in websocket:
@@ -51,6 +54,7 @@ async def hostConnection(websocket, hostKey, studentKey):
         match messageJSON["type"]:
             case "canvasUpdate":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
+
 
 async def initializeStudent(websocket, studentKey):
     """Check for valid key and add connection to host's connections"""
@@ -65,12 +69,12 @@ async def initializeStudent(websocket, studentKey):
     response = initializeStudentSuccess()
     response.studentKey = studentKey
 
-
     try:
         await websocket.send(response.toJson())
         await studentConnection(websocket, studentKey)
     finally:
         connected.remove(websocket)
+
 
 async def studentConnection(websocket, studentKey):
     """Process messages for a student connection, loops until disconnected"""
@@ -79,5 +83,5 @@ async def studentConnection(websocket, studentKey):
         messageJSON = json.loads(message)
         match messageJSON["type"]:
             # Button events
-            case default:
+            case "placeholder":
                 message = "placeholder"

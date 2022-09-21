@@ -1,10 +1,9 @@
-import json
-import string
 import websockets
 
 from Models.responses import canvasBroadcast, canvasUpdateSuccess
 
-async def canvasUpdate(websocket, messageJSON, connected, studentKey: string):
+
+async def canvasUpdate(websocket, messageJSON, connected, studentKey: str):
     """Save updated canvas to redis and send update to students"""
     # send image to redis
     # send updates to students

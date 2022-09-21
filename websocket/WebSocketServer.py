@@ -7,17 +7,17 @@ import websockets
 from Controllers.ConnectionController import initializeHost, initializeStudent
 from Models.errorHandler import sendError
 
+
 async def handler(websocket):
     """Handle initial connections to websocket"""
     while True:
         try:
             message = await websocket.recv()
             messageJSON = json.loads(message)
-        
 
             match messageJSON["type"]:
                 case "initializeHost":
-                     await initializeHost(websocket)
+                    await initializeHost(websocket)
                 case "initializeStudent":
                     await initializeStudent(websocket, messageJSON["studentKey"])
 
@@ -26,9 +26,6 @@ async def handler(websocket):
         except KeyError:
             await sendError(websocket, "Missing required key/value pair")
             return
-
-
-
 #   SSL stuff, does not work since we don't have a valid SSL certificate
 #   ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 #   localhost_pem = pathlib.Path(__file__).with_name("localhost.cer")

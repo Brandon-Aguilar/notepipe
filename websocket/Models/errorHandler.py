@@ -1,5 +1,6 @@
 from Models.responses import error
 
+
 async def sendError(websocket, message):
     """Send an error response with message"""
     event = error()
