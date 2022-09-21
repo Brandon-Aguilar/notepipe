@@ -4,7 +4,6 @@ import asyncio
 import json
 import websockets
 
-
 from Controllers.ConnectionController import initializeHost, initializeStudent
 from Models.errorHandler import sendError
 
