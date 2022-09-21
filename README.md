@@ -7,11 +7,7 @@ Check requirements.txt for more info
 * Python 3.10.6
 
 # How to Run
-Run ```Python3 WebSocketServer.py``` to launch the web socket server. It will launch on ```127.0.0.1:8001``` by default.
-
-Launch a local web server and connect to ```teacher.html```. It should connect and provide the URL to connect to the room as a student at the top right.
-
-Use another window and connect to the URL. You should now be able to see all the drawings from the teacher.
+Run ```build.sh``` to start docker for the application. It will launch the website on the port specified, default port 80.
 
 # TODO
 
