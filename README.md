@@ -3,6 +3,7 @@ Barebones prototype of note livestreaming, does not include most features.
 
 # Requirements
 Check requirements.txt for more info
+
 * websockets 10.3
 * Python 3.10.6
 
