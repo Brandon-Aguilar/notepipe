@@ -15,7 +15,7 @@ document.body.appendChild(canvas);
 document.body.style.margin = 0;
 canvas.style.position = 'absolute';
 
-// get canvas 2D context and set him correct size
+// get canvas 2D ctx and set him correct size
 var ctx = canvas.getContext('2d');
 resize();
 
@@ -23,10 +23,8 @@ resize();
 var pos = { x: 0, y: 0 };
 
 window.addEventListener('resize', resize);
-document.addEventListener('mousemove', draw);
-document.addEventListener('mousedown', setPosition);
-document.addEventListener('mouseenter', setPosition);
-document.addEventListener('click', sendUpdate);
+document.addEventListener('mousemove', move);
+document.addEventListener('click', attemptUpdate);
 
 // Listen for websocket messages and when initialization finished
 websocket.addEventListener('message', processMessage);
@@ -39,11 +37,6 @@ updateMessageElement = document.getElementById("updateStatus");
 studentLinkElement = document.getElementById("studentLink");
 studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 
-// more copied drawing canvas code
-// new position from mouse event
-function setPosition(e) {
-    var rect = canvas.getBoundingClientRect(); pos.x = e.clientX - rect.left; pos.y = e.clientY - rect.top; 
-}
 
 // resize canvas
 function resize() {
@@ -51,24 +44,64 @@ function resize() {
   ctx.canvas.height = window.innerHeight;
 }
 
-function draw(e) {
-  // mouse left button must be pressed
-  if (e.buttons !== 1) return;
+var lastPoint = undefined;
+var force = 1;
+var color = "red";
+var drawInstructions = [];
 
-  updateMessageElement.textContent="Content Not Sent";
+function attemptUpdate(){
+        websocket.send(JSON.stringify({
+            type: 'canvasDrawUpdate',
+            drawData: drawInstructions
+        }));
+        drawInstructions = [];
+        console.log("Sent Batch Update");
+}
 
 
-  ctx.beginPath(); // begin
+function draw(data) {
+    ctx.beginPath();
+    ctx.moveTo(data.lastPoint.x, data.lastPoint.y);
+    ctx.lineTo(data.x, data.y);
+    ctx.strokeStyle = data.color;
+    ctx.lineWidth = Math.pow(data.force || 1, 4) * 2;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+}
 
-  ctx.lineWidth = 5;
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = '#c0392b';
+function move(e) {
+    if (e.buttons) {
+        if (typeof lastPoint == 'undefined') {
+            lastPoint = { x: e.offsetX, y: e.offsetY };
+            return;
+        }
+        if (Math.abs(e.offsetX - lastPoint.x) < 1 || Math.abs(e.offsetY - lastPoint.y) < 1){
+            return;
+        }
 
-  ctx.moveTo(pos.x, pos.y); // from
-  setPosition(e);
-  ctx.lineTo(pos.x, pos.y); // to
+        draw({
+            lastPoint,
+            x: e.offsetX,
+            y: e.offsetY,
+            force: force,
+            color: color || 'green'
+        });
 
-  ctx.stroke(); // draw it!
+        drawData = JSON.stringify({
+            lastPoint,
+            x: e.offsetX,
+            y: e.offsetY,
+            color: color || 'green',
+            force: force
+        });
+
+        drawInstructions.push(drawData);
+        //attemptUpdate();
+
+        lastPoint = { x: e.offsetX, y: e.offsetY };
+    } else {
+        lastPoint = undefined;
+    }
 }
 
 // Initialize connection to host
@@ -80,7 +113,7 @@ function initializeHost() {
 // Send canvas updates, triggered by click end
 function sendUpdate() {
     console.log("Sending canvas")
-    var imageURL = canvas.toDataURL();
+    var imageURL = canvas.toDataURL("image/png", 0.2);
     var message = {
         type: "canvasUpdate",
         page: pageNumber,

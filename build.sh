@@ -4,8 +4,9 @@ socketImage=socketserver
 webImage=pythonwebserver
 
 # Change this to something like 8080 or 8081 if port 80 is taken
-webPort=80
+webPort=8080
 
+export DOCKER_SCAN_SUGGEST=false
 
 echo "\n\nCreating Network"
 docker network inspect $networkName >/dev/null 2>&1 || docker network create --driver bridge $networkName
@@ -14,8 +15,11 @@ echo "\n\nBuilding Fresh Images"
 docker build --no-cache -t $webImage -f ./docker/web.Dockerfile .    
 docker build --no-cache -t $socketImage -f ./docker/socket.Dockerfile . 
 
+containers=$(docker ps -q)
 echo "\n\nCleaning containers"
-docker kill $(docker ps -q)
+if [ ! -z "$containers" ]; then
+    docker kill $containers
+fi
 
 echo "\n\nStarting containers"
 docker run --rm -d -it --name "$webImage-container" -p $webPort:7000 --network $networkName $webImage

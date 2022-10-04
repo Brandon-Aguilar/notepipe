@@ -39,6 +39,12 @@ class canvasBroadcast(response):
         self.imageURL = imageURL
         self.page = page
 
+class canvasDrawUpdateBroadcast(response):
+    def __init__(self, drawData=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.drawData = drawData
+
 
 class error(response):
     def __init__(self) -> None:

@@ -1,6 +1,6 @@
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate
 
 from Models.responses import initializeHostSuccess, initializeStudentSuccess
 from Models.errorHandler import sendError
@@ -54,6 +54,8 @@ async def hostConnection(websocket, hostKey, studentKey):
         match messageJSON["type"]:
             case "canvasUpdate":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
+            case "canvasDrawUpdate":
+                await canvasDrawUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
 
 
 async def initializeStudent(websocket, studentKey):
