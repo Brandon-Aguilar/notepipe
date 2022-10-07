@@ -24,6 +24,8 @@ fi
 echo "\n\nStarting containers"
 docker run --rm -d -it --name "$webImage-container" -p $webPort:7000 --network $networkName $webImage
 docker run --rm -d -it --name "$socketImage-container" -p 8001:8001 --network $networkName $socketImage
+docker run --rm -d -it --name "redis-container" -p 8002:6379 --network $networkName --rm redis redis-server --save 60 1
+
 
 echo "\n\nDeleting Dangling Images. Say 'N' if you have dangling images you want to keep. Otherwise say y to remove dangling images."
 docker image prune

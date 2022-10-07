@@ -24,7 +24,7 @@ var pos = { x: 0, y: 0 };
 
 window.addEventListener('resize', resize);
 document.addEventListener('mousemove', move);
-document.addEventListener('click', attemptUpdate);
+document.addEventListener('click', sendStroke);
 
 // Listen for websocket messages and when initialization finished
 websocket.addEventListener('message', processMessage);
@@ -49,13 +49,30 @@ var force = 1;
 var color = "red";
 var drawInstructions = [];
 
-function attemptUpdate(){
-        websocket.send(JSON.stringify({
-            type: 'canvasDrawUpdate',
-            drawData: drawInstructions
-        }));
-        drawInstructions = [];
-        console.log("Sent Batch Update");
+function sendStroke(){
+    sendDrawUpdate();
+    sendUpdate();
+}
+
+function sendDrawUpdate(){
+    websocket.send(JSON.stringify({
+        type: 'canvasDrawUpdate',
+        drawData: drawInstructions
+    }));
+    drawInstructions = [];
+    console.log("Sent Batch Draw Update");
+}
+
+// Send canvas updates, triggered by click end
+function sendUpdate() {
+    console.log("Sending canvas")
+    var imageURL = canvas.toDataURL("image/png", 0.2);
+    var message = {
+        type: "canvasUpdate",
+        pageNumber: pageNumber,
+        imageURL,
+    }
+    websocket.send(JSON.stringify(message))
 }
 
 
@@ -73,9 +90,6 @@ function move(e) {
     if (e.buttons) {
         if (typeof lastPoint == 'undefined') {
             lastPoint = { x: e.offsetX, y: e.offsetY };
-            return;
-        }
-        if (Math.abs(e.offsetX - lastPoint.x) < 1 || Math.abs(e.offsetY - lastPoint.y) < 1){
             return;
         }
 
@@ -110,17 +124,6 @@ function initializeHost() {
     websocket.send(JSON.stringify(event))
 }
 
-// Send canvas updates, triggered by click end
-function sendUpdate() {
-    console.log("Sending canvas")
-    var imageURL = canvas.toDataURL("image/png", 0.2);
-    var message = {
-        type: "canvasUpdate",
-        page: pageNumber,
-        imageURL,
-    }
-    websocket.send(JSON.stringify(message))
-}
 
 // Handle messages sent to client
 function processMessage({ data }) {

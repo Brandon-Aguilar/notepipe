@@ -82,10 +82,11 @@ function processMessage({ data }) {
             studentLinkAnchorElement.href=link;
             break;
         case "canvasDrawUpdateBroadcast":
+            console.log("Drawing data");
             event.drawData.forEach(element => {
                 element = JSON.parse(element);
                 draw(element);
             });
-            
+            break;
     }   
 }

@@ -5,4 +5,5 @@ COPY requirements.txt /
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 EXPOSE 8001
+ENV PYTHONUNBUFFERED definitely
 CMD python3 WebSocketServer.py
