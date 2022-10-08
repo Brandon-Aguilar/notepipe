@@ -110,7 +110,9 @@ function move(e) {
         });
 
         drawInstructions.push(drawData);
-        //attemptUpdate();
+        if(drawInstructions.length >= 100){
+            sendDrawUpdate();
+        }
 
         lastPoint = { x: e.offsetX, y: e.offsetY };
     } else {

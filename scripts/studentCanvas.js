@@ -42,6 +42,13 @@ pageNumber = 0;
 var updateMessageElement = document.getElementById("updateStatus");
 var studentLinkElement = document.getElementById("studentLink");
 var studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
+var drawAnimationsCheckboxElement = document.getElementById("drawAnimationsCheckbox");
+
+var drawAnimations = drawAnimationsCheckboxElement.checked;
+drawAnimationsCheckboxElement.addEventListener("change", () => {
+    drawAnimations = drawAnimationsCheckboxElement.checked;
+    console.log(drawAnimations);
+});
 
 
 // resize canvas
@@ -63,7 +70,7 @@ function draw(data) {
     ctx.strokeStyle = data.color;
     ctx.lineWidth = Math.pow(data.force || 1, 4) * 2;
     ctx.lineCap = 'round';
-    ctx.stroke();
+    ctx.stroke();    
 }
 
 // Handle valid messages sent to client
@@ -83,9 +90,13 @@ function processMessage({ data }) {
             break;
         case "canvasDrawUpdateBroadcast":
             console.log("Drawing data");
-            event.drawData.forEach(element => {
+            event.drawData.forEach((element, i) => {
                 element = JSON.parse(element);
-                draw(element);
+                if(drawAnimations){
+                    setTimeout(draw, i, element);
+                } else {
+                    draw(element);
+                }
             });
             break;
     }   
