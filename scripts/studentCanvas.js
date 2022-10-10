@@ -42,6 +42,13 @@ pageNumber = 0;
 var updateMessageElement = document.getElementById("updateStatus");
 var studentLinkElement = document.getElementById("studentLink");
 var studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
+var drawAnimationsCheckboxElement = document.getElementById("drawAnimationsCheckbox");
+
+var drawAnimations = drawAnimationsCheckboxElement.checked;
+drawAnimationsCheckboxElement.addEventListener("change", () => {
+    drawAnimations = drawAnimationsCheckboxElement.checked;
+    console.log(drawAnimations);
+});
 
 
 // resize canvas
@@ -56,19 +63,41 @@ function initializeStudent() {
     websocket.send(JSON.stringify(event))
 }
 
+function draw(data) {
+    ctx.beginPath();
+    ctx.moveTo(data.lastPoint.x, data.lastPoint.y);
+    ctx.lineTo(data.x, data.y);
+    ctx.strokeStyle = data.color;
+    ctx.lineWidth = Math.pow(data.force || 1, 4) * 2;
+    ctx.lineCap = 'round';
+    ctx.stroke();    
+}
+
 // Handle valid messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
     console.log(event)
     switch(event.__type__){
-        case "canvasBroadcast":
-            updateMessageElement.textContent="Content Received";
-            image.src = event.imageURL;
-            break;
+        //case "canvasBroadcast":
+        //    updateMessageElement.textContent="Content Received";
+        //    image.src = event.imageURL;
+         //   break;
         case "initializeStudentSuccess":
             console.log("Successfully initialized Student");
             link = "/student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
-    }
+            break;
+        case "canvasDrawUpdateBroadcast":
+            console.log("Drawing data");
+            event.drawData.forEach((element, i) => {
+                element = JSON.parse(element);
+                if(drawAnimations){
+                    setTimeout(draw, i, element);
+                } else {
+                    draw(element);
+                }
+            });
+            break;
+    }   
 }
