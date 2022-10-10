@@ -5,6 +5,7 @@ import json
 import websockets
 import logging
 import sys
+import os
 
 from Controllers.ConnectionController import initializeHost, initializeStudent
 from Models.errorHandler import sendError
@@ -49,7 +50,8 @@ async def handler(websocket):
 
 
 async def main():
-    async with websockets.serve(handler, "", 8001, subprotocols=["json"], logger=LoggerAdapter(logging.getLogger("websockets.server"))):
+    host = os.environ.get("HOST")
+    async with websockets.serve(handler, "0.0.0.0", 8001, subprotocols=["json"], logger=LoggerAdapter(logging.getLogger("websockets.server")), origins=[host]):
         await asyncio.Future()  # run forever
 
 
