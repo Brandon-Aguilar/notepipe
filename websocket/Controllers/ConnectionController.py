@@ -1,10 +1,12 @@
+import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate
 
 from Models.responses import initializeHostSuccess, initializeStudentSuccess
 from Models.errorHandler import sendError
 
+log = logging.getLogger(__name__)
 
 HOST_KEYS = {str: str}
 JOINED = {str: list}
@@ -28,6 +30,7 @@ async def initializeHost(websocket):
     """ Create keys and initialize a room """
     hostKey = await createHostKey()
     studentKey = await createStudentKey()
+    log.info("Created keys for websocket %s", websocket.id)
 
     # associate host key with student key
     # Store list of connections to be broadcasted to
@@ -40,6 +43,7 @@ async def initializeHost(websocket):
 
     try:
         await websocket.send(response.toJson())
+        log.info("Successfully opened connection with host %s", websocket.id)
         await hostConnection(websocket, hostKey, studentKey)
     finally:
         # this will need to be changed to allow a reconnect.
@@ -51,9 +55,13 @@ async def hostConnection(websocket, hostKey, studentKey):
     """Process messages for a host connection, loops until disconnected"""
     async for message in websocket:
         messageJSON = json.loads(message)
+        log.info("Received message from host websocket %s with message type %s", websocket.id, messageJSON["type"])
         match messageJSON["type"]:
             case "canvasUpdate":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
+            case "canvasDrawUpdate":
+                await canvasDrawUpdate(websocket, messageJSON, JOINED[studentKey],
+                                       HOST_KEYS[hostKey])
 
 
 async def initializeStudent(websocket, studentKey):
@@ -71,6 +79,7 @@ async def initializeStudent(websocket, studentKey):
 
     try:
         await websocket.send(response.toJson())
+        log.info("Successfully opened connection with student %s", websocket.id)
         await studentConnection(websocket, studentKey)
     finally:
         connected.remove(websocket)
@@ -81,6 +90,9 @@ async def studentConnection(websocket, studentKey):
 
     async for message in websocket:
         messageJSON = json.loads(message)
+        log.info("Received message from student websocket %s with message type %s",
+                 websocket.id, messageJSON["type"])
+
         match messageJSON["type"]:
             # Button events
             case "placeholder":
