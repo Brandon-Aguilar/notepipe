@@ -2,8 +2,9 @@ import websockets
 import logging
 import redis
 import json
+import os
 
-redisServer = redis.Redis(host="172.18.0.4",port=6379)
+redisServer = redis.Redis(host=os.environ.get("REDIS_URL"),port=6379, db=0)
 
 from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast
 from Models.redisObjects import hostPages, loadHostPagesFromJSON
