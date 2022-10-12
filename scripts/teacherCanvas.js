@@ -44,22 +44,23 @@ function resize() {
   ctx.canvas.height = window.innerHeight;
 }
 
+//default settings for marker
 var lastPoint = undefined;
-var force = 1;
-var color = "red";
+var force = 1;//marker thickness
+var color = "red";//marker color
 var drawInstructions = [];
 
 function sendStroke(){
-    sendDrawUpdate();
-    sendUpdate();
+    sendDrawUpdate();//will send strokes to clients
+    sendUpdate();//store canvas image to redis 
 }
 
 function sendDrawUpdate(){
-    websocket.send(JSON.stringify({
+    websocket.send(JSON.stringify({//send array containing x,y corrdinate of strokes
         type: 'canvasDrawUpdate',
         drawData: drawInstructions
     }));
-    drawInstructions = [];
+    drawInstructions = [];//reset the array for next use
     console.log("Sent Batch Draw Update");
 }
 
@@ -78,25 +79,25 @@ function sendUpdate() {
 
 function draw(data) {
     ctx.beginPath();
-    ctx.moveTo(data.lastPoint.x, data.lastPoint.y);
-    ctx.lineTo(data.x, data.y);
-    ctx.strokeStyle = data.color;
-    ctx.lineWidth = Math.pow(data.force || 1, 4) * 2;
+    ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
+    ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
+    ctx.strokeStyle = data.color;//stroke color 
+    ctx.lineWidth = Math.pow(data.force || 1, 4) * 2;//stroke width
     ctx.lineCap = 'round';
-    ctx.stroke();
+    ctx.stroke();//outlines the current or given path with the current stroke style
 }
 
 function move(e) {
     if (e.buttons) {
         if (typeof lastPoint == 'undefined') {
-            lastPoint = { x: e.offsetX, y: e.offsetY };
+            lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
             return;
         }
 
         draw({
-            lastPoint,
-            x: e.offsetX,
-            y: e.offsetY,
+            lastPoint,//the x,y coordinate of the last stroke
+            x: e.offsetX,//x-coordinate of the mouse pointer relative to the document
+            y: e.offsetY,//y-coordinate of the mouse pointer relative to the document
             force: force,
             color: color || 'green'
         });
@@ -109,14 +110,14 @@ function move(e) {
             force: force
         });
 
-        drawInstructions.push(drawData);
-        if(drawInstructions.length >= 100){
+        drawInstructions.push(drawData);//store drawData in drawInstructions
+        if(drawInstructions.length >= 100){//when drawInstruction has 100 entries, send the array
             sendDrawUpdate();
         }
 
-        lastPoint = { x: e.offsetX, y: e.offsetY };
+        lastPoint = { x: e.offsetX, y: e.offsetY };//update lastPoint to be the stroke we just processed 
     } else {
-        lastPoint = undefined;
+        lastPoint = undefined;//mouse button has been released, this will trigger sendStroke so reset lastpoint
     }
 }
 

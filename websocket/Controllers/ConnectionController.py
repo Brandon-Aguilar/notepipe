@@ -57,9 +57,9 @@ async def hostConnection(websocket, hostKey, studentKey):
         messageJSON = json.loads(message)
         log.info("Received message from host websocket %s with message type %s", websocket.id, messageJSON["type"])
         match messageJSON["type"]:
-            case "canvasUpdate":
+            case "canvasUpdate":#image
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
-            case "canvasDrawUpdate":
+            case "canvasDrawUpdate":#array
                 await canvasDrawUpdate(websocket, messageJSON, JOINED[studentKey],
                                        HOST_KEYS[hostKey])
 

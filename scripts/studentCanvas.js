@@ -63,6 +63,7 @@ function initializeStudent() {
     websocket.send(JSON.stringify(event))
 }
 
+//same as teacher draw function
 function draw(data) {
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);
@@ -88,14 +89,14 @@ function processMessage({ data }) {
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
             break;
-        case "canvasDrawUpdateBroadcast":
+        case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Drawing data");
-            event.drawData.forEach((element, i) => {
+            event.drawData.forEach((element, i) => {//loop through each value
                 element = JSON.parse(element);
                 if(drawAnimations){
-                    setTimeout(draw, i, element);
+                    setTimeout(draw, i, element);//animate the stroke 
                 } else {
-                    draw(element);
+                    draw(element);//just output the stroke 
                 }
             });
             break;

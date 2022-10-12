@@ -36,7 +36,7 @@ async def canvasUpdate(websocket, messageJSON, connected, studentKey: str):
     log.info("Set image in redis for studentKey %s", studentKey)
 
     response = canvasUpdateSuccess()
-    await websocket.send(response.toJson())
+    await websocket.send(response.toJson())#send canvas updated "Successfully processed canvas update"
 
 
 async def canvasDrawUpdate(websocket, messageJSON, connected, studentKey: str):
@@ -46,9 +46,9 @@ async def canvasDrawUpdate(websocket, messageJSON, connected, studentKey: str):
     log.info("Sending out stroke on key %s, with websocket id %s",
              studentKey, websocket.id)
 
-    broadcast = canvasDrawUpdateBroadcast()
-    broadcast.drawData = messageJSON["drawData"]
+    broadcast = canvasDrawUpdateBroadcast() #broadcast.type="canvasDrawUpdateBroadcast"
+    broadcast.drawData = messageJSON["drawData"]#broadcast.drawData=drawInstruction array from teacher
     websockets.broadcast(connected, broadcast.toJson())
 
     response = canvasUpdateSuccess()
-    await websocket.send(response.toJson())
+    await websocket.send(response.toJson())#send canvas updated "Successfully processed canvas update"
