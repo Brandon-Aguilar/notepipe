@@ -77,15 +77,15 @@ function sendUpdate() {
 }
 
 //Stroke color selection based off HTML button choice
-function changeColor(color) {
-    ctx.strokeStyle = color;
+function changeColor(newColor) {
+    color = newColor;
   };
 
 function draw(data) {
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
     ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
-    //ctx.strokeStyle = data.color;//original default stroke color 
+    ctx.strokeStyle = data.color;//original default stroke color 
     ctx.lineWidth = Math.pow(data.force || 1, 4) * 2;//stroke width
     ctx.lineCap = 'round';
     ctx.stroke();//outlines the current or given path with the current stroke style
