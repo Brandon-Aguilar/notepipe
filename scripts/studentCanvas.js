@@ -1,7 +1,7 @@
 // Fetch url params, interested in key
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-
+const download = document.getElementById('download');
 const studentKey = urlParams.get("key");
 // add error handling for params
 
@@ -32,6 +32,7 @@ resize();
 window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
+download.addEventListener('click', downloadbutton);
 image.onload = function() {
     ctx.drawImage(image, 0, 0);
 }
@@ -74,6 +75,15 @@ function draw(data) {
     ctx.stroke();    
 }
 
+//Download the current page
+ function downloadbutton(e) {
+    console.log(canvas.toDataURL());
+    const link = document.createElement('a');
+    link.download = 'download.png';
+    link.href = canvas.toDataURL();
+    link.click();
+    link.delete;
+  };
 // Handle valid messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
