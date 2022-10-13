@@ -59,7 +59,7 @@ function resize() {
 
 // Initialize connection
 function initializeStudent() {
-    const event = { type: "initializeStudent",  studentKey: studentKey};
+    const event = { type: "initializeStudent",  studentKey: studentKey, image: image};
     websocket.send(JSON.stringify(event))
 }
 
@@ -85,6 +85,7 @@ function processMessage({ data }) {
          //   break;
         case "initializeStudentSuccess":
             console.log("Successfully initialized Student");
+            image.src = event.imageURL;
             link = "/student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;

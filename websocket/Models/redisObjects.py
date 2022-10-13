@@ -31,5 +31,9 @@ class hostPages(redisObject):
             self.pages[pageNumber] = imageURL
 
 
+    def getPage(self,pageNumber):
+        return self.pages[pageNumber]
+
+
 def loadHostPagesFromJSON(data) -> hostPages:
     return json.loads(data, object_hook=lambda d: hostPages(**d))

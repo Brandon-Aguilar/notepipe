@@ -1,7 +1,7 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage
 
 from Models.responses import initializeHostSuccess, initializeStudentSuccess
 from Models.errorHandler import sendError
@@ -64,7 +64,7 @@ async def hostConnection(websocket, hostKey, studentKey):
                                        HOST_KEYS[hostKey])
 
 
-async def initializeStudent(websocket, studentKey):
+async def initializeStudent(websocket, studentKey, image):
     """Check for valid key and add connection to host's connections"""
     try:
         connected = JOINED[studentKey]
@@ -76,6 +76,7 @@ async def initializeStudent(websocket, studentKey):
 
     response = initializeStudentSuccess()
     response.studentKey = studentKey
+    await retrieveImage(studentKey,response)
 
     try:
         await websocket.send(response.toJson())

@@ -18,11 +18,12 @@ class initializeHostSuccess(response):
 
 
 class initializeStudentSuccess(response):
-    def __init__(self, studentKey=None) -> None:
+    def __init__(self, studentKey=None, imageURL=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Successfully initialized student"
         self.studentKey = studentKey
+        self.imageURL= imageURL
 
 
 class canvasUpdateSuccess(response):
