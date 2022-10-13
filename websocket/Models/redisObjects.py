@@ -7,7 +7,7 @@ class redisObject:
     def toJson(self):
         return json.dumps(self.__dict__)
 
-
+localPageNumber=0
 class hostPages(redisObject):
     """
     List of all pages for a host to store in redis. 
@@ -25,10 +25,15 @@ class hostPages(redisObject):
 
         if pageNumber >= len(self.pages): 
             log.info("Added a new page")
-            self.pages.append = imageURL
+            self.pages.append (imageURL)
+            localPageNumber+=localPageNumber
         else:
             log.info("Updating page")
             self.pages[pageNumber] = imageURL
+
+
+    def getPage(self,pageNumber):
+        return self.pages[localPageNumber]
 
 
 def loadHostPagesFromJSON(data) -> hostPages:

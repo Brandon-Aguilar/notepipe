@@ -1,7 +1,7 @@
 // Fetch url params, interested in key
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-
+const download = document.getElementById('download');
 const studentKey = urlParams.get("key");
 // add error handling for params
 
@@ -32,6 +32,7 @@ resize();
 window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
+download.addEventListener('click', downloadbutton);
 image.onload = function() {
     ctx.drawImage(image, 0, 0);
 }
@@ -59,10 +60,11 @@ function resize() {
 
 // Initialize connection
 function initializeStudent() {
-    const event = { type: "initializeStudent",  studentKey: studentKey};
+    const event = { type: "initializeStudent",  studentKey: studentKey, image: image};
     websocket.send(JSON.stringify(event))
 }
 
+//same as teacher draw function
 function draw(data) {
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);
@@ -73,6 +75,15 @@ function draw(data) {
     ctx.stroke();    
 }
 
+//Download the current page
+ function downloadbutton(e) {
+    console.log(canvas.toDataURL());
+    const link = document.createElement('a');
+    link.download = 'download.png';
+    link.href = canvas.toDataURL();
+    link.click();
+    link.delete;
+  };
 // Handle valid messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
@@ -84,18 +95,19 @@ function processMessage({ data }) {
          //   break;
         case "initializeStudentSuccess":
             console.log("Successfully initialized Student");
+            image.src = event.imageURL;
             link = "/student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
             break;
-        case "canvasDrawUpdateBroadcast":
+        case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Drawing data");
-            event.drawData.forEach((element, i) => {
+            event.drawData.forEach((element, i) => {//loop through each value
                 element = JSON.parse(element);
                 if(drawAnimations){
-                    setTimeout(draw, i, element);
+                    setTimeout(draw, i, element);//animate the stroke 
                 } else {
-                    draw(element);
+                    draw(element);//just output the stroke 
                 }
             });
             break;
