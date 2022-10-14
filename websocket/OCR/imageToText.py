@@ -2,17 +2,17 @@ import os, io
 from google.cloud import vision_v1
 from binascii import a2b_base64
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"./ServiceAccountToken.json"
+# GOOGLE_APPLICATION_CREDENTIALS environment variable 
+# needs to be set for this to work properly
 
 # Instantiate the OCR client
 client = vision_v1.ImageAnnotatorClient()
 
 def readImage(uri):
-    """ Triggers an api call through the OCR client
+    """ Triggers an api call through the OCR client;
+        Recieves, formats, and displays response
     Args:
         uri (file): The image to be scanned (base64 encoded)
-    Returns:
-        text_list (list); a list of words/characters recognized & metadata
     """
     text_list = []
     
@@ -103,4 +103,4 @@ def outputText(formatted_text):
         final_text += "\n"
     return final_text
 
-readImage(img)
+# readImage(img)
