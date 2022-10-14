@@ -23,20 +23,41 @@ resize();
 var pos = { x: 0, y: 0 };
 
 window.addEventListener('resize', resize);
-document.addEventListener('mousemove', move);
-document.addEventListener('click', sendStroke);
+var drawCanvas=document.getElementById("drawingCanvas");
+drawCanvas.addEventListener('mousemove', move);
+drawCanvas.addEventListener('click', sendStroke);
 
 // Listen for websocket messages and when initialization finished
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeHost)
 
-pageNumber = 0;
+var pageNumber = 0;
 
 // get html elements
 updateMessageElement = document.getElementById("updateStatus");
 studentLinkElement = document.getElementById("studentLink");
 studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 
+//save button
+var updateSaveoption=document.getElementById('Saveoption')
+updateSaveoption.addEventListener('click', Saveoption)
+
+function Saveoption(){
+    pageNumber++;
+    console.log("Saving page number: ",pageNumber)
+    var imageURL = canvas.toDataURL("image/png", 0.2);
+
+    var message = {
+        type: "Savecanvas",
+        pageNumber: pageNumber,
+        imageURL,
+    }
+    websocket.send(JSON.stringify(message))
+    //clear the current page
+    ctx.canvas.width = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;  
+
+}
 
 // resize canvas
 function resize() {

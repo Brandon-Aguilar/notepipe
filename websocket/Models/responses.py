@@ -46,6 +46,11 @@ class canvasDrawUpdateBroadcast(response):
         self.__type__ = self.__class__.__name__
         self.drawData = drawData
 
+class clearpage(response):
+    def __init__(self) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "New page started"
 
 class error(response):
     def __init__(self) -> None:
