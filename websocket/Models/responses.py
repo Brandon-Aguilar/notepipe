@@ -4,7 +4,7 @@ import json
 
 
 class response:
-    def toJson(self):
+    def toJson(self) -> str:
         return json.dumps(self.__dict__)
 
 
@@ -18,11 +18,12 @@ class initializeHostSuccess(response):
 
 
 class initializeStudentSuccess(response):
-    def __init__(self, studentKey=None) -> None:
+    def __init__(self, studentKey=None, imageURL=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Successfully initialized student"
         self.studentKey = studentKey
+        self.imageURL= imageURL
 
 
 class canvasUpdateSuccess(response):
@@ -33,12 +34,23 @@ class canvasUpdateSuccess(response):
 
 
 class canvasBroadcast(response):
-    def __init__(self, imageURL=None, page=None) -> None:
+    def __init__(self, imageURL=None, pageNumber=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.imageURL = imageURL
-        self.page = page
+        self.pageNumber = pageNumber
 
+class canvasDrawUpdateBroadcast(response):
+    def __init__(self, drawData=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.drawData = drawData
+
+class clearpage(response):
+    def __init__(self) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "New page started"
 
 class error(response):
     def __init__(self) -> None:

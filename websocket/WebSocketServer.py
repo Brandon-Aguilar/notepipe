@@ -3,9 +3,24 @@
 import asyncio
 import json
 import websockets
+import logging
+import sys
+import os
 
 from Controllers.ConnectionController import initializeHost, initializeStudent
 from Models.errorHandler import sendError
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
+class LoggerAdapter(logging.LoggerAdapter):
+    """Add connection ID and client IP address to websockets logs."""
+    def process(self, msg, kwargs):
+        try:
+            websocket = kwargs["extra"]["websocket"]
+        except KeyError:
+            return msg, kwargs
+        xff = websocket.request_headers.get("X-Forwarded-For")
+        return f"{websocket.id} {xff} {msg}", kwargs
 
 
 async def handler(websocket):
@@ -19,7 +34,7 @@ async def handler(websocket):
                 case "initializeHost":
                     await initializeHost(websocket)
                 case "initializeStudent":
-                    await initializeStudent(websocket, messageJSON["studentKey"])
+                    await initializeStudent(websocket, messageJSON["studentKey"], messageJSON["image"])
 
         except websockets.ConnectionClosedOK:
             break
@@ -35,7 +50,8 @@ async def handler(websocket):
 
 
 async def main():
-    async with websockets.serve(handler, "", 8001, subprotocols=["json"]):
+    host = os.environ.get("HOST")
+    async with websockets.serve(handler, "0.0.0.0", 8001, subprotocols=["json"], logger=LoggerAdapter(logging.getLogger("websockets.server")), origins=[host]):
         await asyncio.Future()  # run forever
 
 
