@@ -105,7 +105,7 @@ function processMessage({ data }) {
             
             if(drawAnimations){
                 currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
-                window.requestAnimationFrame(animateDraw);
+                currentFrames.push(window.requestAnimationFrame(animateDraw));
             } else {
                 event.drawData.forEach((element) => {//loop through each value
                     element = JSON.parse(element);
@@ -115,6 +115,15 @@ function processMessage({ data }) {
             
             break;
         case "clearpage":
+            // cancel all the current animations and draw them instantly
+            cancelAllAnimationFrames();
+            currentDrawInstructions.splice(0, currentInstructionIndex);
+            currentDrawInstructions.forEach((element) => {//loop through each value
+                element = JSON.parse(element);
+                draw(element);//just output the stroke 
+            });
+            // TODO this is not the right way to clear a canvas, also why is the save button just a clear button
+            // should have logic to have pages as an array of base64 strings and create a new page, not just clear
             ctx.canvas.width = window.innerWidth
             ctx.canvas.height = window.innerHeight
     }   
@@ -123,6 +132,7 @@ function processMessage({ data }) {
 
 currentDrawInstructions = [];
 currentInstructionIndex = 0;
+currentFrames = [];
 
 function animateDraw() {
     if(currentDrawInstructions.length == 0){
@@ -136,6 +146,13 @@ function animateDraw() {
         draw(element);
         currentInstructionIndex += 1;
     }
-    window.requestAnimationFrame(animateDraw);
+    currentFrames.push(window.requestAnimationFrame(animateDraw));
 }
+
+function cancelAllAnimationFrames() {
+    currentFrames.forEach((frameID) => {
+        window.cancelAnimationFrame(frameID);
+    });
+}
+
 

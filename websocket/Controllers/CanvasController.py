@@ -57,7 +57,7 @@ async def canvasDrawUpdate(websocket, messageJSON, connected, studentKey: str):
 async def retrieveImage(studentKey,response):
     if redisServer.exists(studentKey):
         pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
-        response.imageURL=pages.getPage()
+        response.imageURL=pages.getLatestPage()
     
     
 async def wipestudent(websocket, messageJSON, connected, studentKey: str):

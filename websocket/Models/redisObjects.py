@@ -2,7 +2,6 @@ import json
 import logging
 
 log = logging.getLogger(__name__)
-localPageNumber=0
 
 class redisObject:
     def toJson(self):
@@ -26,14 +25,12 @@ class hostPages(redisObject):
         if pageNumber >= len(self.pages): 
             log.info("Added a new page")
             self.pages.append (imageURL)
-            global localPageNumber
-            localPageNumber+=1
         else:
             log.info("Updating page")
             self.pages[pageNumber] = imageURL
 
-    def getPage(self):
-        return self.pages[localPageNumber]
+    def getLatestPage(self):
+        return self.pages[len(self.pages) - 1]
 
 
 def loadHostPagesFromJSON(data) -> hostPages:
