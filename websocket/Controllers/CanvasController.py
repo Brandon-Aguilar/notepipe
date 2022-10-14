@@ -56,4 +56,4 @@ async def canvasDrawUpdate(websocket, messageJSON, connected, studentKey: str):
 async def retrieveImage(studentKey,response):
     if redisServer.exists(studentKey):
         pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
-        response.imageURL=pages.getPage(0)
+        response.imageURL=pages.getPage()

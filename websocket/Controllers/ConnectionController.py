@@ -62,6 +62,9 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "canvasDrawUpdate":#array
                 await canvasDrawUpdate(websocket, messageJSON, JOINED[studentKey],
                                        HOST_KEYS[hostKey])
+            case "Savecanvas":
+                await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
+
 
 
 async def initializeStudent(websocket, studentKey, image):

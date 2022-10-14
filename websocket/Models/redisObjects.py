@@ -2,12 +2,13 @@ import json
 import logging
 
 log = logging.getLogger(__name__)
+localPageNumber=0
 
 class redisObject:
     def toJson(self):
         return json.dumps(self.__dict__)
 
-localPageNumber=0
+
 class hostPages(redisObject):
     """
     List of all pages for a host to store in redis. 
@@ -18,7 +19,6 @@ class hostPages(redisObject):
         self.pages = pages
         self.studentKey = studentKey
 
-
     def updatePage(self, imageURL: str, pageNumber: int) -> None:  
         if pageNumber < 0:
             raise "Invalid Page Number"
@@ -26,13 +26,13 @@ class hostPages(redisObject):
         if pageNumber >= len(self.pages): 
             log.info("Added a new page")
             self.pages.append (imageURL)
-            localPageNumber+=localPageNumber
+            global localPageNumber
+            localPageNumber+=1
         else:
             log.info("Updating page")
             self.pages[pageNumber] = imageURL
 
-
-    def getPage(self,pageNumber):
+    def getPage(self):
         return self.pages[localPageNumber]
 
 
