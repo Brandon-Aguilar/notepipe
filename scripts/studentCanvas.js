@@ -114,6 +114,9 @@ function processMessage({ data }) {
             }
             
             break;
+        case "clearpage":
+            ctx.canvas.width = window.innerWidth
+            ctx.canvas.height = window.innerHeight
     }   
 }
 

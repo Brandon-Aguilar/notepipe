@@ -1,9 +1,9 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage,wipestudent
 
-from Models.responses import initializeHostSuccess, initializeStudentSuccess
+from Models.responses import initializeHostSuccess, initializeStudentSuccess, clearpage
 from Models.errorHandler import sendError
 
 log = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ async def hostConnection(websocket, hostKey, studentKey):
                                        HOST_KEYS[hostKey])
             case "Savecanvas":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
-
+                await wipestudent(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
 
 
 async def initializeStudent(websocket, studentKey, image):
@@ -101,3 +101,4 @@ async def studentConnection(websocket, studentKey):
             # Button events
             case "placeholder":
                 message = "placeholder"
+            

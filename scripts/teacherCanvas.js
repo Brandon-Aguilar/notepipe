@@ -39,14 +39,14 @@ studentLinkElement = document.getElementById("studentLink");
 studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 
 //save button
-updateSaveoption=document.getElementById('Saveoption')
+var updateSaveoption=document.getElementById('Saveoption')
 updateSaveoption.addEventListener('click', Saveoption)
 
 function Saveoption(){
     pageNumber++;
     console.log("Saving page number: ",pageNumber)
     var imageURL = canvas.toDataURL("image/png", 0.2);
-    //localStorage.setItem("drawing", imageURL);
+
     var message = {
         type: "Savecanvas",
         pageNumber: pageNumber,
@@ -55,7 +55,8 @@ function Saveoption(){
     websocket.send(JSON.stringify(message))
     //clear the current page
     ctx.canvas.width = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
+    ctx.canvas.height = window.innerHeight;  
+
 }
 
 // resize canvas
