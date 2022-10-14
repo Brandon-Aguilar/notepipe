@@ -1,40 +1,39 @@
 import os, io
 from google.cloud import vision_v1
+from binascii import a2b_base64
 
-# authenticate api authorization using service key 
-
-# retrive image file from redis
+# GOOGLE_APPLICATION_CREDENTIALS environment variable 
+# needs to be set for this to work properly
 
 # Instantiate the OCR client
 client = vision_v1.ImageAnnotatorClient()
 
-def readImage(img):
-    """ Triggers the api call through the OCR client
+def readImage(uri):
+    """ Triggers an api call through the OCR client;
+        Recieves, formats, and displays response
     Args:
-        img (file): The image to be read
-    Returns:
-        text_list (list); a list of words/characters recognized & metadata
+        uri (file): The image to be scanned (base64 encoded)
     """
     text_list = []
-    try:
-        # read image file in binary format
-        with io.open(img, 'rb') as image_file:
-            content = image_file.read()
-    except IOError as IOE:
-        print(IOE)
-    else:
-        # make the api call and recieve response
-        image = vision_v1.Image(content=content)
-        response = client.text_detection(image=image)
+    
+    # separate encoded data of the uri from header info
+    header, encoded = uri.split(",", 1)
+    content = a2b_base64(encoded)
 
-    # pair each text with it's location info
+    # make the api call and recieve response
+    image = vision_v1.Image(content=content)
+    response = client.text_detection(image=image)
+
+    # scan response & pair each text with it's location info
     for text in response.text_annotations[1:]:
-        startX = text.bounding_poly.vertices[0].x 
+        startX = text.bounding_poly.vertices[0].x
         startY = text.bounding_poly.vertices[0].y
+
         start_vertex = (startX, startY) # left-bottom vertex of text boundary
         text_list.append([text.description, start_vertex])
 
-    return text_list
+    formatted_text = formatText(text_list)
+    print(outputText(formatted_text))
 
 
 def formatText(unformatted_text):
@@ -73,13 +72,12 @@ def groupLines(unwrapped_text):
         if text[1][1]-prev_text_pos_y <= LINE_TOLERANCE:
             # if diff is below tolerance level, add 'text' to curr_line
             wrapped_text[curr_line].append(text)
-
         else: 
             curr_line += 1
             wrapped_text.append([]) # create a new line
             wrapped_text[curr_line].append(text) # add 'text' to new line
-
         prev_text_pos_y = text[1][1]
+
     return wrapped_text
 
 def isPunctuation(string):
@@ -90,20 +88,12 @@ def isPunctuation(string):
     lst = [',','!','.','(',')','?','"','\'',':',';','-','[',']']
     return True if string in lst else False
 
-def outputText():
+def outputText(formatted_text):
     """ Returns final formatted text
     Returns:
         final_text (string); a formatted string of text 
     """
-    try: # get unformatted text from OCR
-        before_format = readImage(os.path.join(FILE_PATH, FILE_NAME))
-    except OSError as OSE:
-        print(OSE)
-
-    # format the text
-    formatted_text = formatText(before_format)
-    final_text= "\n"
-
+    final_text = "\n"
     for line in formatted_text:
         for text in line:
             # avoid spacing before a punctuation
@@ -112,3 +102,5 @@ def outputText():
             final_text += text[0]
         final_text += "\n"
     return final_text
+
+# readImage(img)
