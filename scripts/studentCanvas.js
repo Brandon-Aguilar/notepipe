@@ -101,15 +101,38 @@ function processMessage({ data }) {
             studentLinkAnchorElement.href=link;
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
-            console.log("Drawing data");
-            event.drawData.forEach((element, i) => {//loop through each value
-                element = JSON.parse(element);
-                if(drawAnimations){
-                    setTimeout(draw, i, element);//animate the stroke 
-                } else {
+            console.log("Updating Draw Instructions");
+            
+            if(drawAnimations){
+                currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
+                window.requestAnimationFrame(animateDraw);
+            } else {
+                event.drawData.forEach((element) => {//loop through each value
+                    element = JSON.parse(element);
                     draw(element);//just output the stroke 
-                }
-            });
+                });
+            }
+            
             break;
     }   
 }
+
+
+currentDrawInstructions = [];
+currentInstructionIndex = 0;
+
+function animateDraw() {
+    if(currentDrawInstructions.length == 0){
+        return;
+    }
+    if(currentInstructionIndex >= currentDrawInstructions.length){
+        currentInstructionIndex = 0;
+        currentDrawInstructions = [];
+    } else {
+        var element = JSON.parse(currentDrawInstructions[currentInstructionIndex]);
+        draw(element);
+        currentInstructionIndex += 1;
+    }
+    window.requestAnimationFrame(animateDraw);
+}
+
