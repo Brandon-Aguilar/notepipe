@@ -4,9 +4,10 @@ import redis
 import json
 import os
 
+#from handwriting.websocket.Models.responses import response
 redisServer = redis.Redis(host=os.environ.get("REDIS_URL"),port=6379, db=0)
 
-from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast
+from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage
 from Models.redisObjects import hostPages, loadHostPagesFromJSON
 
 log = logging.getLogger(__name__)
@@ -57,3 +58,8 @@ async def retrieveImage(studentKey,response):
     if redisServer.exists(studentKey):
         pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
         response.imageURL=pages.getPage()
+    
+    
+async def wipestudent(websocket, messageJSON, connected, studentKey: str):
+    response = clearpage();
+    websockets.broadcast(connected, response.toJson())
