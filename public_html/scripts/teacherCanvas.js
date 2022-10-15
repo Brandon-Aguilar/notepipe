@@ -35,7 +35,7 @@ var pos = { x: 0, y: 0 };
 window.addEventListener('resize', resize);
 var drawCanvas=document.getElementById("drawingCanvas");
 drawCanvas.addEventListener('mousemove', move);
-drawCanvas.addEventListener('click', sendStroke);
+drawCanvas.addEventListener('onmousedown', sendStroke);
 
 // Listen for websocket messages and when initialization finished
 websocket.addEventListener('message', processMessage);
