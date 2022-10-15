@@ -1,8 +1,18 @@
 // Connect to websocket
-serverURL = "ws://localhost:8001/";
+serverURL = getWebSocketServer();
+
+function getWebSocketServer() {
+    if (window.location.host === "notepipe.io") {
+        return "wss://notepipe.herokuapp.com/";
+    } else if (window.location.host === "localhost:8080") {
+        return "ws://localhost:8001/";
+    } else {
+        throw new Error(`Unsupported host: ${window.location.host}`);
+    }
+}
 
 // DO NOT LAUNCH THIS INTO A PROD ENVIRONMENT WITH "rejectUnauthorized: false"
-var websocket = new WebSocket(serverURL, "json", { rejectUnauthorized: false });
+var websocket = new WebSocket(serverURL, "json");
 console.log("Connected to Websocket");
 
 // Copied canvas code
@@ -50,14 +60,14 @@ studentLinkElement = document.getElementById("studentLink");
 studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 
 //save button
-updateSaveoption=document.getElementById('Saveoption')
+var updateSaveoption=document.getElementById('Saveoption')
 updateSaveoption.addEventListener('click', Saveoption)
 
 function Saveoption(){
     pageNumber++;
     console.log("Saving page number: ",pageNumber)
     var imageURL = canvas.toDataURL("image/png", 0.2);
-    //localStorage.setItem("drawing", imageURL);
+
     var message = {
         type: "Savecanvas",
         pageNumber: pageNumber,
@@ -65,8 +75,9 @@ function Saveoption(){
     }
     websocket.send(JSON.stringify(message))
     //clear the current page
-    ctx.canvas.width = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
+    width = window.innerWidth;
+    height = window.innerHeight;  
+    ctx.clearRect(0, 0, width, height)
 }
 
 // resize canvas
@@ -221,7 +232,7 @@ function processMessage({ data }) {
         case "initializeHostSuccess":
             console.log("Successfully initialized host");
 
-            link = "/student.html?key=" + event.studentKey;
+            link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
             break;

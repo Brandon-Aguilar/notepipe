@@ -1,15 +1,24 @@
 // Fetch url params, interested in key
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const download = document.getElementById('download');
 const studentKey = urlParams.get("key");
 // add error handling for params
 
-serverURL = "ws://localhost:8001/";
+serverURL = getWebSocketServer();
+
+function getWebSocketServer() {
+    if (window.location.host === "notepipe.io") {
+        return "wss://notepipe.herokuapp.com/";
+    } else if (window.location.host === "localhost:8080") {
+        return "ws://localhost:8001/";
+    } else {
+        throw new Error(`Unsupported host: ${window.location.host}`);
+    }
+}
 
 // connect to web socket
 // DO NOT LAUNCH THIS INTO A PROD ENVIRONMENT WITH "rejectUnauthorized: false"
-var websocket = new WebSocket(serverURL, "json", { rejectUnauthorized: false });
+var websocket = new WebSocket(serverURL, "json");
 console.log("Connected to Websocket");
 
 
@@ -28,11 +37,17 @@ var ctx = canvas.getContext('2d');
 var image = new Image();
 resize();
 
+//Fetch HTML elements that need event listners
+var TTSElement=document.getElementById("TTS");
+const download = document.getElementById('download');
+
 // Event listeners to trigger functions
 window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
 download.addEventListener('click', downloadbutton);
+TTSElement.addEventListener('click', textToSpeech);
+
 image.onload = function() {
     ctx.drawImage(image, 0, 0);
 }
@@ -91,6 +106,14 @@ function draw(data) {
     link.click();
     link.delete;
   };
+
+
+//request text to speech
+function textToSpeech(){
+    const request = { type: "textToSpeech",  studentKey: studentKey};
+    websocket.send(JSON.stringify(request))
+}
+
 // Handle valid messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
@@ -103,20 +126,64 @@ function processMessage({ data }) {
         case "initializeStudentSuccess":
             console.log("Successfully initialized Student");
             image.src = event.imageURL;
-            link = "/student.html?key=" + event.studentKey;
+            link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
-            console.log("Drawing data");
-            event.drawData.forEach((element, i) => {//loop through each value
-                element = JSON.parse(element);
-                if(drawAnimations){
-                    setTimeout(draw, i, element);//animate the stroke 
-                } else {
+            console.log("Updating Draw Instructions");
+            
+            if(drawAnimations){
+                currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
+                currentFrames.push(window.requestAnimationFrame(animateDraw));
+            } else {
+                event.drawData.forEach((element) => {//loop through each value
+                    element = JSON.parse(element);
                     draw(element);//just output the stroke 
-                }
-            });
+                });
+            }
+            
             break;
+        case "clearpage":
+            // cancel all the current animations and draw them instantly
+            cancelAllAnimationFrames();
+            currentDrawInstructions.splice(0, currentInstructionIndex);
+            currentDrawInstructions.forEach((element) => {//loop through each value
+                element = JSON.parse(element);
+                draw(element);//just output the stroke 
+            });
+            //clear page fixed
+            width = window.innerWidth
+            height = window.innerHeight
+            ctx.clearRect(0, 0, width, height)
+
     }   
 }
+
+
+currentDrawInstructions = [];
+currentInstructionIndex = 0;
+currentFrames = [];
+
+function animateDraw() {
+    if(currentDrawInstructions.length == 0){
+        return;
+    }
+    if(currentInstructionIndex >= currentDrawInstructions.length){
+        currentInstructionIndex = 0;
+        currentDrawInstructions = [];
+    } else {
+        var element = JSON.parse(currentDrawInstructions[currentInstructionIndex]);
+        draw(element);
+        currentInstructionIndex += 1;
+    }
+    currentFrames.push(window.requestAnimationFrame(animateDraw));
+}
+
+function cancelAllAnimationFrames() {
+    currentFrames.forEach((frameID) => {
+        window.cancelAnimationFrame(frameID);
+    });
+}
+
+

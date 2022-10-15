@@ -51,7 +51,8 @@ async def handler(websocket):
 
 async def main():
     host = os.environ.get("HOST")
-    async with websockets.serve(handler, "0.0.0.0", 8001, subprotocols=["json"], logger=LoggerAdapter(logging.getLogger("websockets.server")), origins=[host]):
+    port = os.environ.get("PORT")
+    async with websockets.serve(handler, "0.0.0.0", port, subprotocols=["json"], logger=LoggerAdapter(logging.getLogger("websockets.server")), origins=[host]):
         await asyncio.Future()  # run forever
 
 
