@@ -57,3 +57,11 @@ class error(response):
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Unknown Error"
+
+class textToSpeechRequest(response):
+    def __init__(self, studentKey=None, imageURL=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "Text to speech function requested"
+        self.studentKey = studentKey
+        self.imageURL= imageURL

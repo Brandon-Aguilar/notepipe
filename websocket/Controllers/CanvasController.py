@@ -63,3 +63,11 @@ async def retrieveImage(studentKey,response):
 async def wipestudent(websocket, messageJSON, connected, studentKey: str):
     response = clearpage();
     websockets.broadcast(connected, response.toJson())
+
+
+async def textToSpeech(websocket, studentKey,response):
+    if redisServer.exists(studentKey):
+        pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
+        response.imageURL=pages.getPage()
+    await websocket.send(response.toJson())
+  
