@@ -11,12 +11,23 @@ var canvas = document.createElement('canvas');
 canvas.setAttribute("id", "drawingCanvas");
 document.body.appendChild(canvas);
 
+//grabs the undo button and creates an event if it is clicked
+const testButton = document.getElementById("undo");
+testButton.addEventListener('click', undo);
+
 // some hotfixes... ( ≖_≖)
 document.body.style.margin = 0;
 canvas.style.position = 'absolute';
 
 // get canvas 2D ctx and set him correct size
 var ctx = canvas.getContext('2d');
+
+// Make our in-memory canvas stack for undos
+var canvasStack = [canvas];
+// used to check whether this is the first undo since that would be equal to the current state
+var undoHasBeenDone = false;
+
+
 resize();
 
 // last known position
@@ -60,8 +71,43 @@ function Saveoption(){
 
 // resize canvas
 function resize() {
-  ctx.canvas.width = window.innerWidth;
-  ctx.canvas.height = window.innerHeight;
+
+    var inMemCanvas = document.createElement('canvas');
+    var inMemCtx = inMemCanvas.getContext("2d"); 
+    inMemCanvas.width = canvas.width;
+    inMemCanvas.height = canvas.height;
+  inMemCtx.drawImage(canvas, 0, 0);
+  ctx.canvas.width = Math.max(window.innerWidth, ctx.canvas.width);
+  ctx.canvas.height = Math.max(window.innerHeight, ctx.canvas.height);
+  ctx.drawImage(inMemCanvas, 0, 0);
+}
+
+function undo(){
+    if(canvasStack.length < 1)
+        return; 
+
+    if(!undoHasBeenDone){
+        if(canvasStack.length == 1)
+            return;
+        lastCanvas = canvasStack.pop();
+    }   
+    
+    var lastCanvas = canvasStack.pop();
+
+   
+    undoHasBeenDone = true;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(lastCanvas, 0,0);
+
+    if(canvasStack.length == 0){
+        undoHasBeenDone = false;
+        var inMemCanvas = document.createElement('canvas');
+        var inMemCtx = inMemCanvas.getContext('2d');
+        inMemCanvas.width = canvas.width;
+        inMemCanvas.height = canvas.height;
+        inMemCtx.drawImage(canvas, 0, 0);
+        canvasStack.push(inMemCanvas);    
+    }
 }
 
 //default settings for marker
@@ -83,9 +129,21 @@ function sendDrawUpdate(){
     drawInstructions = [];//reset the array for next use
     console.log("Sent Batch Draw Update");
 }
+function createAndSaveCanvas(){
+    var inMemCanvas = document.createElement('canvas');
+    var inMemCtx = inMemCanvas.getContext('2d');
+    inMemCanvas.width = canvas.width;
+    inMemCanvas.height = canvas.height;
+    inMemCtx.drawImage(canvas, 0, 0);
+    canvasStack.push(inMemCanvas);
+     if(canvasStack.length > 5)
+        canvasStack.shift();
+    undoHasBeenDone = false;
+}
 
 // Send canvas updates, triggered by click end
 function sendUpdate() {
+    createAndSaveCanvas();
     console.log("Sending canvas")
     var imageURL = canvas.toDataURL("image/png", 0.2);
     var message = {

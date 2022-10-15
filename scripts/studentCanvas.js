@@ -54,8 +54,15 @@ drawAnimationsCheckboxElement.addEventListener("change", () => {
 
 // resize canvas
 function resize() {
-  ctx.canvas.width = window.innerWidth;
-  ctx.canvas.height = window.innerHeight;
+
+    var inMemCanvas = document.createElement('canvas');
+    var inMemCtx = inMemCanvas.getContext("2d"); 
+    inMemCanvas.width = canvas.width;
+    inMemCanvas.height = canvas.height;
+  inMemCtx.drawImage(canvas, 0, 0);
+  ctx.canvas.width = Math.max(window.innerWidth, ctx.canvas.width);
+  ctx.canvas.height = Math.max(window.innerHeight, ctx.canvas.height);
+  ctx.drawImage(inMemCanvas, 0, 0);
 }
 
 // Initialize connection
