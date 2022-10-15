@@ -7,5 +7,6 @@ RUN pip install --upgrade pip && \
 EXPOSE 8001
 ENV PYTHONUNBUFFERED definitely
 ENV REDIS_URL redis-container
+ENV PORT 8001
 ENV HOST http://localhost:8080
 CMD python3 WebSocketServer.py

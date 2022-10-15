@@ -1,8 +1,18 @@
 // Connect to websocket
-serverURL = "ws://localhost:8001/";
+serverURL = getWebSocketServer();
+
+function getWebSocketServer() {
+    if (window.location.host === "notepipe.io") {
+        return "wss://notepipe.herokuapp.com/";
+    } else if (window.location.host === "localhost:8080") {
+        return "ws://localhost:8001/";
+    } else {
+        throw new Error(`Unsupported host: ${window.location.host}`);
+    }
+}
 
 // DO NOT LAUNCH THIS INTO A PROD ENVIRONMENT WITH "rejectUnauthorized: false"
-var websocket = new WebSocket(serverURL, "json", { rejectUnauthorized: false });
+var websocket = new WebSocket(serverURL, "json");
 console.log("Connected to Websocket");
 
 // Copied canvas code
@@ -164,7 +174,7 @@ function processMessage({ data }) {
         case "initializeHostSuccess":
             console.log("Successfully initialized host");
 
-            link = "/student.html?key=" + event.studentKey;
+            link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
             break;
