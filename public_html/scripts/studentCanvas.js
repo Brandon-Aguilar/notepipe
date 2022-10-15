@@ -145,10 +145,11 @@ function processMessage({ data }) {
                 element = JSON.parse(element);
                 draw(element);//just output the stroke 
             });
-            // TODO this is not the right way to clear a canvas, also why is the save button just a clear button
-            // should have logic to have pages as an array of base64 strings and create a new page, not just clear
-            ctx.canvas.width = window.innerWidth
-            ctx.canvas.height = window.innerHeight
+            //clear page fixed
+            width = window.innerWidth
+            height = window.innerHeight
+            ctx.clearRect(0, 0, width, height)
+
     }   
 }
 

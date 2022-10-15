@@ -64,9 +64,9 @@ function Saveoption(){
     }
     websocket.send(JSON.stringify(message))
     //clear the current page
-    ctx.canvas.width = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;  
-
+    width = window.innerWidth;
+    height = window.innerHeight;  
+    ctx.clearRect(0, 0, width, height)
 }
 
 // resize canvas
