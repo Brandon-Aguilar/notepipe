@@ -1,7 +1,6 @@
 // Fetch url params, interested in key
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const download = document.getElementById('download');
 const studentKey = urlParams.get("key");
 // add error handling for params
 
@@ -38,11 +37,17 @@ var ctx = canvas.getContext('2d');
 var image = new Image();
 resize();
 
+//Fetch HTML elements that need event listners
+var TTSElement=document.getElementById("TTS");
+const download = document.getElementById('download');
+
 // Event listeners to trigger functions
 window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
 download.addEventListener('click', downloadbutton);
+TTSElement.addEventListener('click', textToSpeech);
+
 image.onload = function() {
     ctx.drawImage(image, 0, 0);
 }
@@ -94,6 +99,14 @@ function draw(data) {
     link.click();
     link.delete;
   };
+
+
+//request text to speech
+function textToSpeech(){
+    const request = { type: "textToSpeech",  studentKey: studentKey};
+    websocket.send(JSON.stringify(request))
+}
+
 // Handle valid messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
