@@ -7,11 +7,9 @@ const studentKey = urlParams.get("key");
 serverURL = getWebSocketServer();
 
 function getWebSocketServer() {
-    if (window.location.host === "notepipe.io") {
-        return "wss://notepipe.herokuapp.com/";
-    } else if (window.location.host === "localhost:8080") {
+if (window.location.host === "localhost:8080") {
         return "ws://localhost:8001/";
-    } if (window.location.host === "coral-app-55tcu.ondigitalocean.app" || window.location.host === "notepipe.net") {
+    } if (window.location.host === "coral-app-55tcu.ondigitalocean.app" || window.location.host === "notepipe.net" || window.location.host === "notepipe.io" || window.location.host === "notepi.pe") {
         return "wss://seahorse-app-hvogi.ondigitalocean.app/notepipe-websocket2";
     }
     else {
