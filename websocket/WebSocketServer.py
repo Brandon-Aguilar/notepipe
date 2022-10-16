@@ -19,7 +19,11 @@ class LoggerAdapter(logging.LoggerAdapter):
             websocket = kwargs["extra"]["websocket"]
         except KeyError:
             return msg, kwargs
-        xff = websocket.request_headers.get("X-Forwarded-For")
+        
+        try:
+            xff = websocket.request_headers.get("X-Forwarded-For")
+        except AttributeError:
+            xff = ""
         return f"{websocket.id} {xff} {msg}", kwargs
 
 
@@ -50,9 +54,11 @@ async def handler(websocket):
 
 
 async def main():
-    host = os.environ.get("HOST")
+    hosts = ["https://notepipe.net", "https://notepipe.io",
+             "https://coral-app-55tcu.ondigitalocean.app", "https://notepi.pe", "http://localhost:8080"]
     port = os.environ.get("PORT")
-    async with websockets.serve(handler, "0.0.0.0", port, subprotocols=["json"], logger=LoggerAdapter(logging.getLogger("websockets.server")), origins=[host]):
+    max_size = 5 * 1048576
+    async with websockets.serve(handler, "0.0.0.0", port, subprotocols=["json"], logger=LoggerAdapter(logging.getLogger("websockets.server")), max_size=max_size, origins=hosts):
         await asyncio.Future()  # run forever
 
 

@@ -7,11 +7,12 @@ const studentKey = urlParams.get("key");
 serverURL = getWebSocketServer();
 
 function getWebSocketServer() {
-    if (window.location.host === "notepipe.io") {
-        return "wss://notepipe.herokuapp.com/";
-    } else if (window.location.host === "localhost:8080") {
+if (window.location.host === "localhost:8080") {
         return "ws://localhost:8001/";
-    } else {
+    } if (window.location.host === "coral-app-55tcu.ondigitalocean.app" || window.location.host === "notepipe.net" || window.location.host === "notepipe.io" || window.location.host === "notepi.pe") {
+        return "wss://seahorse-app-hvogi.ondigitalocean.app/notepipe-websocket2";
+    }
+    else {
         throw new Error(`Unsupported host: ${window.location.host}`);
     }
 }
@@ -42,7 +43,7 @@ var TTSElement=document.getElementById("TTS");
 const download = document.getElementById('download');
 
 // Event listeners to trigger functions
-window.addEventListener('resize', resize);
+//window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
 download.addEventListener('click', downloadbutton);
@@ -92,7 +93,7 @@ function draw(data) {
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);
     ctx.lineTo(data.x, data.y);
     ctx.strokeStyle = data.color;
-    ctx.lineWidth = Math.pow(data.force || 1, 4) * 2;
+    ctx.lineWidth = data.force;
     ctx.lineCap = 'round';
     ctx.stroke();    
 }

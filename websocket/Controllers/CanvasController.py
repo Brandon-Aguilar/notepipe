@@ -5,7 +5,12 @@ import json
 import os
 
 #from handwriting.websocket.Models.responses import response
-redisServer = redis.Redis.from_url(url=os.environ.get("REDIS_URL"), db=0)
+try:
+    redisServer = redis.Redis.from_url(url=os.environ.get("REDIS_URL"), db=0)
+except ValueError:
+    redisServer = redis.Redis(host=os.environ.get("REDIS_URL"), db=0)
+
+
 
 from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage
 from Models.redisObjects import hostPages, loadHostPagesFromJSON
