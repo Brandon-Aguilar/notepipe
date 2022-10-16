@@ -85,7 +85,7 @@ function draw(data) {
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);
     ctx.lineTo(data.x, data.y);
     ctx.strokeStyle = data.color;
-    ctx.lineWidth = Math.pow(data.force || 1, 4) * 2;
+    ctx.lineWidth = data.force;
     ctx.lineCap = 'round';
     ctx.stroke();    
 }

@@ -32,10 +32,40 @@ resize();
 // last known position
 var pos = { x: 0, y: 0 };
 
+var sentImage = false;
+
 window.addEventListener('resize', resize);
 var drawCanvas=document.getElementById("drawingCanvas");
-drawCanvas.addEventListener('mousemove', move);
-drawCanvas.addEventListener('onmousedown', sendStroke);
+drawCanvas.addEventListener('pointermove', move, {capture: true, });
+
+// Release mouse capture when not touching screen
+drawCanvas.addEventListener('pointerup', (e) => {
+    isPointerDown = false;
+    lastPoint = undefined;
+    if(sentImage == false) {
+        sendStroke(e);
+        sentImage = true;
+        
+    }
+}, {capture: true, });
+drawCanvas.addEventListener('pointercancel', (e) => {
+    isPointerDown = false;
+    lastPoint = undefined;
+    if(sentImage == false) {
+        sendStroke(e);
+        sentImage = true;
+    }
+}, {capture: true, });
+drawCanvas.addEventListener('pointerenter', (e) => {
+    isPointerDown = false;
+    lastPoint = undefined;
+    if(sentImage == false) {
+        sendStroke(e);
+        sentImage = true;
+    }
+}, {capture: true, });
+// Disable panning, touch doesn't work if it is on
+canvas.style.touchAction = 'none';
 
 // Listen for websocket messages and when initialization finished
 websocket.addEventListener('message', processMessage);
@@ -80,8 +110,11 @@ var lastPoint = undefined;
 var force = 1;//marker thickness
 var color = "red";//marker color
 var drawInstructions = [];
+var markerWidth = 5;
 
-function sendStroke(){
+var isPointerDown = false;
+
+function sendStroke(e){
     sendDrawUpdate();//will send strokes to clients
     sendUpdate();//store canvas image to redis 
 }
@@ -117,13 +150,17 @@ function draw(data) {
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
     ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
     ctx.strokeStyle = data.color;//original default stroke color 
-    ctx.lineWidth = Math.pow(data.force || 1, 4) * 2;//stroke width
+    ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
     ctx.stroke();//outlines the current or given path with the current stroke style
 }
 
 function move(e) {
-    if (e.buttons) {
+    e.preventDefault();
+    // equation for determinng force, didn't research much, just used feel. Could use improvements.
+    force = Math.log10(Math.pow(e.pressure * (Math.abs(e.tiltX || 90) / 90), 1.5)) + 1.2 || 1;
+    force = Math.pow(force || 1, 4) * markerWidth;
+    if (e.buttons || isPointerDown) {
         if (typeof lastPoint == 'undefined') {
             lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
             return;
@@ -148,6 +185,8 @@ function move(e) {
         drawInstructions.push(drawData);//store drawData in drawInstructions
         if(drawInstructions.length >= 100){//when drawInstruction has 100 entries, send the array
             sendDrawUpdate();
+        } else {
+            sentImage = false;
         }
 
         lastPoint = { x: e.offsetX, y: e.offsetY };//update lastPoint to be the stroke we just processed 
