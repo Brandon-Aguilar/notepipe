@@ -13,7 +13,7 @@ docker network inspect $networkName >/dev/null 2>&1 || docker network create --d
 
 echo "\n\nBuilding Fresh Images"
 docker build --no-cache -t $webImage -f ./docker/web.Dockerfile .    
-docker build --no-cache -t $socketImage -f ./docker/socket.Dockerfile . 
+docker build --no-cache -t $socketImage -f ./websocket/Dockerfile ./websocket 
 
 containers=$(docker ps -q)
 echo "\n\nCleaning containers"

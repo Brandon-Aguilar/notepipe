@@ -6,7 +6,10 @@ function getWebSocketServer() {
         return "wss://notepipe.herokuapp.com/";
     } else if (window.location.host === "localhost:8080") {
         return "ws://localhost:8001/";
-    } else {
+    } if (window.location.host === "coral-app-55tcu.ondigitalocean.app" || window.location.host === "notepipe.net") {
+        return "wss://seahorse-app-hvogi.ondigitalocean.app/notepipe-websocket2";
+    }
+    else {
         throw new Error(`Unsupported host: ${window.location.host}`);
     }
 }
