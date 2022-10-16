@@ -45,7 +45,7 @@ var TTSElement=document.getElementById("TTS");
 const download = document.getElementById('download');
 
 // Event listeners to trigger functions
-window.addEventListener('resize', resize);
+//window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
 download.addEventListener('click', downloadbutton);

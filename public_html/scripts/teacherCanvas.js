@@ -37,7 +37,7 @@ var pos = { x: 0, y: 0 };
 
 var sentImage = false;
 
-window.addEventListener('resize', resize);
+//window.addEventListener('resize', resize);
 var drawCanvas=document.getElementById("drawingCanvas");
 drawCanvas.addEventListener('pointermove', move, {capture: true, });
 

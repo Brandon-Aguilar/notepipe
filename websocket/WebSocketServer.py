@@ -55,7 +55,7 @@ async def handler(websocket):
 
 async def main():
     hosts = ["https://notepipe.net", "https://notepipe.io",
-             "https://coral-app-55tcu.ondigitalocean.app"]
+             "https://coral-app-55tcu.ondigitalocean.app", "https://notepi.pe", "http://localhost:8080"]
     port = os.environ.get("PORT")
     max_size = 5 * 1048576
     async with websockets.serve(handler, "0.0.0.0", port, subprotocols=["json"], logger=LoggerAdapter(logging.getLogger("websockets.server")), max_size=max_size, origins=hosts):
