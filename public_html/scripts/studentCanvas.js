@@ -146,6 +146,8 @@ function processMessage({ data }) {
                 element = JSON.parse(element);
                 draw(element);//just output the stroke 
             });
+            currentDrawInstructions = [];
+            currentInstructionIndex = 0;
             //clear page fixed
             width = window.innerWidth
             height = window.innerHeight
@@ -178,6 +180,7 @@ function cancelAllAnimationFrames() {
     currentFrames.forEach((frameID) => {
         window.cancelAnimationFrame(frameID);
     });
+    currentFrames = [];
 }
 
 
