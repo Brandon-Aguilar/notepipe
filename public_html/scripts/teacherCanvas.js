@@ -84,31 +84,55 @@ websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeHost)
 
 var pageNumber = 0;
+var viewingPageNumber=0; //will keep track of current page being displayed (next/prev function)
+
 
 // get html elements
 updateMessageElement = document.getElementById("updateStatus");
 studentLinkElement = document.getElementById("studentLink");
 studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
+currentPageNumberElement = document.getElementById('currentPageNumber');
+
+//instructor image saved locally
+const localImages=[];
 
 //save button
 var updateSaveoption=document.getElementById('Saveoption')
 updateSaveoption.addEventListener('click', Saveoption)
 
 function Saveoption(){
-    pageNumber++;
-    console.log("Saving page number: ",pageNumber)
-    var imageURL = canvas.toDataURL("image/png", 0.2);
+    //for now teacher cannot go to previous page and use save function
+    if(pageNumber==viewingPageNumber){
+        pageNumber++;
+        viewingPageNumber++;
+        console.log("Saving page number: ",pageNumber)
+        var imageURL = canvas.toDataURL("image/png", 0.2);
+        
+        var message = {
+            type: "Savecanvas",
+            pageNumber: pageNumber,
+            imageURL,
+        }
+        websocket.send(JSON.stringify(message));
+        //clear the current page
+        width = window.innerWidth;
+        height = window.innerHeight;  
+        ctx.clearRect(0, 0, width, height);
+        
 
-    var message = {
-        type: "Savecanvas",
-        pageNumber: pageNumber,
-        imageURL,
+        /*save the newly created page so student's that 
+        join late have current page and not previous page*/
+        sendUpdate();
+        imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
+        localImages[localImages.length]=imageURL//it is a new page so it should be at index length
+
+        currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
     }
-    websocket.send(JSON.stringify(message))
-    //clear the current page
-    width = window.innerWidth;
-    height = window.innerHeight;  
-    ctx.clearRect(0, 0, width, height)
+    else{
+        currentPageNumberElement.textContent="please be on page"+pageNumber+" to add a new page";
+        console.log("please be on last page to add a new page")
+    }
+
 }
 
 // resize canvas
@@ -167,6 +191,16 @@ function sendStroke(e){
 }
 
 function sendDrawUpdate(){
+    //save updated canvas locally 
+    if(pageNumber==viewingPageNumber){//saving the most recent page
+        var imageURL = canvas.toDataURL("image/png", 0.2);
+        localImages[pageNumber]=imageURL
+    }
+    else{//editing a previously stored page
+        var imageURL = canvas.toDataURL("image/png", 0.2);
+        localImages[viewingPageNumber]=imageURL
+    }
+
     websocket.send(JSON.stringify({//send array containing x,y corrdinate of strokes
         type: 'canvasDrawUpdate',
         drawData: drawInstructions
@@ -260,6 +294,50 @@ function initializeHost() {
     websocket.send(JSON.stringify(event))
 }
 
+
+//implement previous and next page requests 
+var image = new Image();
+nextPageElement=document.getElementById('nextPage');
+previousPageElement= document.getElementById('previousPage');
+
+nextPageElement.addEventListener('click', function (){
+    nextOrPrevious(viewingPageNumber+1)});
+previousPageElement.addEventListener('click', function (){
+    nextOrPrevious(viewingPageNumber-1)});
+
+function nextOrPrevious(pageWanted){
+    if(pageWanted>=0 && pageWanted<=pageNumber){
+        console.log("1) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
+        //clear the current page
+        width = window.innerWidth;
+        height = window.innerHeight;  
+        ctx.clearRect(0, 0, width, height);
+        
+        if(pageWanted<viewingPageNumber ){//requested previous page
+            image.src=localImages[pageWanted]
+            image.onload = function() {//wait for image to load before trying to draw to canvas
+                ctx.drawImage(image, 0, 0);
+            }
+            viewingPageNumber-=1
+            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+        }
+        if(pageWanted>viewingPageNumber){//requested next page
+            image.src=localImages[pageWanted]
+            image.onload = function() {//wait for image to load before trying to draw to canvas
+                ctx.drawImage(image, 0, 0);
+            }
+            viewingPageNumber+=1
+            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+        }
+        console.log("2) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
+    }
+
+    else{
+        currentPageNumberElement.textContent="The page requested "+pageWanted+" does not exist "
+        console.log("the page requested ("+pageWanted+") is out of bound")
+    }
+        
+}
 
 // Handle messages sent to client
 function processMessage({ data }) {
