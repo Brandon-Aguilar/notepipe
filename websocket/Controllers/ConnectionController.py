@@ -1,10 +1,11 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage,wipestudent,textToSpeech
 
-from Models.responses import initializeHostSuccess, initializeStudentSuccess
+from Models.responses import initializeHostSuccess, initializeStudentSuccess, clearpage,textToSpeechRequest
 from Models.errorHandler import sendError
+#from OCR.imageToText import readImage
 
 log = logging.getLogger(__name__)
 
@@ -57,14 +58,17 @@ async def hostConnection(websocket, hostKey, studentKey):
         messageJSON = json.loads(message)
         log.info("Received message from host websocket %s with message type %s", websocket.id, messageJSON["type"])
         match messageJSON["type"]:
-            case "canvasUpdate":
+            case "canvasUpdate":#image
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
-            case "canvasDrawUpdate":
+            case "canvasDrawUpdate":#array
                 await canvasDrawUpdate(websocket, messageJSON, JOINED[studentKey],
                                        HOST_KEYS[hostKey])
+            case "Savecanvas":
+                await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
+                await wipestudent(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
 
 
-async def initializeStudent(websocket, studentKey):
+async def initializeStudent(websocket, studentKey, image):
     """Check for valid key and add connection to host's connections"""
     try:
         connected = JOINED[studentKey]
@@ -76,6 +80,7 @@ async def initializeStudent(websocket, studentKey):
 
     response = initializeStudentSuccess()
     response.studentKey = studentKey
+    await retrieveImage(studentKey,response)
 
     try:
         await websocket.send(response.toJson())
@@ -95,5 +100,11 @@ async def studentConnection(websocket, studentKey):
 
         match messageJSON["type"]:
             # Button events
-            case "placeholder":
-                message = "placeholder"
+            case "textToSpeech":
+                response= textToSpeechRequest()
+                response.studentKey = studentKey
+                await textToSpeech(websocket, studentKey,response)
+                image=response.imageURL
+                #readImage(image)
+                log.info("image was retrieved %s", image)
+            

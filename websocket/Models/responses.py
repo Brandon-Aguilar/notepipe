@@ -18,11 +18,12 @@ class initializeHostSuccess(response):
 
 
 class initializeStudentSuccess(response):
-    def __init__(self, studentKey=None) -> None:
+    def __init__(self, studentKey=None, imageURL=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Successfully initialized student"
         self.studentKey = studentKey
+        self.imageURL= imageURL
 
 
 class canvasUpdateSuccess(response):
@@ -45,9 +46,22 @@ class canvasDrawUpdateBroadcast(response):
         self.__type__ = self.__class__.__name__
         self.drawData = drawData
 
+class clearpage(response):
+    def __init__(self) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "New page started"
 
 class error(response):
     def __init__(self) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Unknown Error"
+
+class textToSpeechRequest(response):
+    def __init__(self, studentKey=None, imageURL=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "Text to speech function requested"
+        self.studentKey = studentKey
+        self.imageURL= imageURL

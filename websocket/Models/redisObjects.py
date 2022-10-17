@@ -18,17 +18,19 @@ class hostPages(redisObject):
         self.pages = pages
         self.studentKey = studentKey
 
-
     def updatePage(self, imageURL: str, pageNumber: int) -> None:  
         if pageNumber < 0:
             raise "Invalid Page Number"
 
         if pageNumber >= len(self.pages): 
             log.info("Added a new page")
-            self.pages.append = imageURL
+            self.pages.append (imageURL)
         else:
             log.info("Updating page")
             self.pages[pageNumber] = imageURL
+
+    def getLatestPage(self):
+        return self.pages[len(self.pages) - 1]
 
 
 def loadHostPagesFromJSON(data) -> hostPages:
