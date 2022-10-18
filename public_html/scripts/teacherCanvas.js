@@ -251,7 +251,7 @@ function draw(data) {
 function move(e) {
     e.preventDefault();
     // equation for determinng force, didn't research much, just used feel. Could use improvements.
-    if(e.tiltX != 0 && e.pressure != 0){
+    if(e.tiltX != 0 || e.pressure != 0){
         force = Math.log10(e.pressure * (Math.abs(e.tiltX || 90) / 90) + 3) || 1;
         force = Math.min(Math.pow(force || 1, 4) * markerWidth * 25, markerWidth);
     } else {
