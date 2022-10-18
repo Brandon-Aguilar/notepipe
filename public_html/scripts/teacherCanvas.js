@@ -251,8 +251,13 @@ function draw(data) {
 function move(e) {
     e.preventDefault();
     // equation for determinng force, didn't research much, just used feel. Could use improvements.
-    force = Math.log10(Math.pow(e.pressure * (Math.abs(e.tiltX || 90) / 90), 1.5)) + 1.2 || 1;
-    force = Math.min(Math.pow(force || 1, 4) * markerWidth, markerWidth);
+    if(e.tiltX != 0 && e.pressure != 0){
+        force = (e.pressure * (Math.abs(e.tiltX || 90) / 90)) || 1;
+        force = Math.min(Math.pow(force || 1, 4) * markerWidth, markerWidth);
+    } else {
+        force = markerWidth;
+    }
+    
     if (e.buttons || isPointerDown) {
         if (typeof lastPoint == 'undefined') {
             lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
@@ -355,4 +360,22 @@ function processMessage({ data }) {
             studentLinkAnchorElement.href=link;
             break;
     }
+}
+
+
+document.onkeydown = checkKey;
+
+function checkKey(e) {
+
+    e = e || window.event;
+
+    if (e.keyCode == '38') {
+        // up arrow
+        markerWidth += 1;
+    }
+    else if (e.keyCode == '40') {
+        // down arrow
+        markerWidth -= 1;
+    }
+
 }
