@@ -75,6 +75,12 @@ body{
   right: 10px;
 }
 
+.animation-prompt{
+  position: fixed;
+  bottom: 2px;
+  right: 10px;
+}
+
 .left-sidebar{
   display: flex;
   flex-direction: column;
@@ -116,4 +122,9 @@ body{
 
 .drawing-tools-sidebar button{
   height: 40px;
+}
+
+.text-to-speech-controls{
+  display: flex;
+  justify-content: center;
 }
