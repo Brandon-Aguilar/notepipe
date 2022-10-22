@@ -12,7 +12,7 @@ except ValueError:
 
 
 
-from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage
+from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage,resetbutton
 from Models.redisObjects import hostPages, loadHostPagesFromJSON
 
 log = logging.getLogger(__name__)
@@ -66,6 +66,10 @@ async def retrieveImage(studentKey,response):
     
     
 async def wipestudent(websocket, messageJSON, connected, studentKey: str):
+    response = clearpage();
+    websockets.broadcast(connected, response.toJson())
+
+async def resett(websocket, messageJSON, connected, studentKey: str):
     response = clearpage();
     websockets.broadcast(connected, response.toJson())
 

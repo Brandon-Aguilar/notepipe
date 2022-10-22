@@ -97,19 +97,19 @@ currentPageNumberElement = document.getElementById('currentPageNumber');
 const localImages=[];
 
 //save button
-var updateSaveoption=document.getElementById('Saveoption')
-updateSaveoption.addEventListener('click', Saveoption)
+var updateSaveoption=document.getElementById('newpage')
+updateSaveoption.addEventListener('click', newpage)
 
-function Saveoption(){
+function newpage(){
     //for now teacher cannot go to previous page and use save function
     if(pageNumber==viewingPageNumber){
         pageNumber++;
         viewingPageNumber++;
-        console.log("Saving page number: ",pageNumber)
+        console.log("Adding new page number: ",pageNumber)
         var imageURL = canvas.toDataURL("image/png", 0.2);
         
         var message = {
-            type: "Savecanvas",
+            type: "Addnewpage",
             pageNumber: pageNumber,
             imageURL,
         }
@@ -174,6 +174,29 @@ function undo(){
         inMemCtx.drawImage(canvas, 0, 0);
         canvasStack.push(inMemCanvas);    
     }
+}
+
+var updatereset=document.getElementById('reset')
+updatereset.addEventListener('click', reset)
+
+function reset(){
+        
+    console.log("reset page : ",pageNumber)
+    var imageURL = canvas.toDataURL("image/png", 0.2);
+    
+    var message = {
+        type: "resetcanvas",
+        pageNumber: pageNumber,
+        imageURL,
+    }
+    websocket.send(JSON.stringify(message));
+    //clear the current page
+    width = window.innerWidth;
+    height = window.innerHeight;  
+    ctx.clearRect(0, 0, width, height);
+    imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image  
+
+    sendUpdate();
 }
 
 //default settings for marker

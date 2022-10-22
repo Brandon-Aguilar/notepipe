@@ -52,6 +52,12 @@ class clearpage(response):
         self.__type__ = self.__class__.__name__
         self.message = "New page started"
 
+class resetbutton(response):
+    def __init__(self) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "clear the  page "
+        
 class error(response):
     def __init__(self) -> None:
         super().__init__()
