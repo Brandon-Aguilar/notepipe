@@ -38,6 +38,7 @@ var canvasStack = [canvas];
 // used to check whether this is the first undo since that would be equal to the current state
 var undoHasBeenDone = false;
 
+ctx.globalCompositeOperation = 'destination-out'
 
 resize();
 
