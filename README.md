@@ -10,6 +10,11 @@ Check requirements.txt for more info
 # How to Run
 Run ```build.sh``` to start docker for the application. It will launch the website on the port specified, default port 80.
 
+Before using the OCR functionality, perform the following actions:
+* Create a file named 'credentials.json' in the 'OCR' folder.
+* Copy the contents of 'sample_credentials.json' (located in the same folder) to 'credentials.json'
+* Replace the fields marked "XXXXXX" with the actual values you are provided with. 
+
 # TODO
 
 * Marker properties and erase feature

@@ -2,8 +2,7 @@ import os, io
 from google.cloud import vision_v1
 from binascii import a2b_base64
 
-# GOOGLE_APPLICATION_CREDENTIALS environment variable 
-# needs to be set for this to work properly
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = r"./credentials.json"
 
 # Instantiate the OCR client
 client = vision_v1.ImageAnnotatorClient()
@@ -102,5 +101,3 @@ def outputText(formatted_text):
             final_text += text[0]
         final_text += "\n"
     return final_text
-
-# readImage(img)
