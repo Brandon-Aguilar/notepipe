@@ -263,7 +263,7 @@ function changeColor(newColor) {
 
   // Eraser
 function eraser(){
-context.strokeStyle = "rgba(255,255,255,1)";
+    ctx.strokeStyle = "rgba(255,255,255,1)";
 };
 
 function draw(data) {
