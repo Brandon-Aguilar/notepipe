@@ -263,7 +263,6 @@ function changeColor(newColor) {
 
   // Eraser
 function eraser(){
-context.globalCompositeOperation = "destination-out";
 context.strokeStyle = "rgba(255,255,255,1)";
 };
 
