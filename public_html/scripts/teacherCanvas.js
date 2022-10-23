@@ -38,7 +38,6 @@ var canvasStack = [canvas];
 // used to check whether this is the first undo since that would be equal to the current state
 var undoHasBeenDone = false;
 
-ctx.globalCompositeOperation = 'destination-out'
 
 resize();
 
@@ -294,6 +293,8 @@ function move(e) {
             color: color || 'green'
         });
 
+        ctx.globalCompositeOperation="source-over";
+
         drawData = JSON.stringify({
             lastPoint,
             x: e.offsetX,
@@ -312,6 +313,7 @@ function move(e) {
         lastPoint = { x: e.offsetX, y: e.offsetY };//update lastPoint to be the stroke we just processed 
     } else {
         lastPoint = undefined;//mouse button has been released, this will trigger sendStroke so reset lastpoint
+        ctx.globalCompositeOperation="destination-out";
     }
 }
 
