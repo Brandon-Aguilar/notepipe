@@ -261,6 +261,9 @@ function changeColor(newColor) {
     color = newColor;
   };
 
+  // Eraser
+const erase = () => context.globalCompositeOperation = 'destination-out'
+
 function draw(data) {
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
