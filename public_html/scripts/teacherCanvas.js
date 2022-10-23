@@ -262,7 +262,10 @@ function changeColor(newColor) {
   };
 
   // Eraser
-const erase = () => context.globalCompositeOperation = 'destination-out'
+function eraser(){
+context.globalCompositeOperation = "destination-out";
+context.strokeStyle = "rgba(255,255,255,1)";
+};
 
 function draw(data) {
     ctx.beginPath();
@@ -293,8 +296,6 @@ function move(e) {
             color: color || 'green'
         });
 
-        ctx.globalCompositeOperation="source-over";
-
         drawData = JSON.stringify({
             lastPoint,
             x: e.offsetX,
@@ -313,7 +314,6 @@ function move(e) {
         lastPoint = { x: e.offsetX, y: e.offsetY };//update lastPoint to be the stroke we just processed 
     } else {
         lastPoint = undefined;//mouse button has been released, this will trigger sendStroke so reset lastpoint
-        ctx.globalCompositeOperation="destination-out";
     }
 }
 
