@@ -326,7 +326,20 @@ function initializeHost() {
     const event = { type: "initializeHost" };
     websocket.send(JSON.stringify(event))
 }
+const download = document.getElementById('download');
+download.addEventListener('click', downloadbutton);
 
+//Download the current page
+function downloadbutton(e) {
+    for(let i = 0; i < pageNumber; i++){
+        console.log(localImages[i]);
+        const link = document.createElement('a');
+        link.download = 'download.png';
+        link.href = localImages[i];
+        link.click();
+    }
+    link.delete;
+  };
 
 //implement previous and next page requests 
 var image = new Image();
