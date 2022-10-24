@@ -1,9 +1,13 @@
 <!DOCTYPE html>
     <head>
         <script type="text/javascript" src="../scripts/studentCanvas.js" defer></script>
+        <link rel="stylesheet" href="./teacherCanvas.css">
 
+        <title>NotePipe-Student</title>
     </head>
     <body>
+    
+<!--Old layout     
         <header style="display: flex; justify-content: space-between;">        
             <h1>Student Prototype</h1>
             <div style="margin-right: 10px"> 
@@ -20,8 +24,72 @@
                 <a id="studentLinkAnchor"><p id="studentLink"></p></a>
             </div>
         </header>
-        
-        <br>
+        <br> -->
+
+        <div class="header">
+            <div class="header-left">
+              <h1>NotePipe</h1>
+            </div>
+            <div class="header-right">
+              <div>
+                <p>Current Role: Student</p>
+              </div>
+              <div>
+                <a id="studentLinkAnchor"><p id="studentLink"></p></a>
+              </div>
+            </div>
+          </div>
+  
+          <div class="animation-prompt">
+            <input type="checkbox" id="drawAnimationsCheckbox" checked>
+            <label for="drawAnimationsCheckbox">Enable Animations</label>
+          </div>
+
+          <div class="left-sidebar">
+          
+            <div class="canvas-page-controls">
+              
+              <div class="save-tools">
+                <button id="Saveoption">Save</button>
+              </div>
+              
+              <div class="page-navigation-tools">
+                <div class="page-navigation-button">
+                  <button id="previousPage">&#60;</button>
+                </div>
+                <div class="current-page-counter"> 
+                  <p id="currentPageNumber">Current page is 0</p>
+                </div>
+                <div class="page-navigation-button"> 
+                  <button id="nextPage">&#62;</button> 
+                </div>
+              </div>
+              
+              <div class="text-to-speech-controls">
+                <button id="TTS">TTS</button>
+              </div>
+            </div>
+          </div>  
+  
+              <!-- <div id="container" class="drawing-tools-sidebar">
+                <div class="draw-tool">
+                  <button class="button" onclick="changeColor('black')" id="black">Black</button>
+                </div>
+                <div class="draw-tool">
+                  <button class="button" onclick="changeColor('blue')" id="blue=">Blue</button>
+                </div>
+                <div class="draw-tool">
+                  <button class="button" onclick="changeColor('red')" id="red">Red</button>
+                </div>
+                <div class="draw-tool">
+                  <button class="button" onclick="changeColor('green')" id="green">Green</button>
+                </div>
+                <div class="draw-tool">
+                  <button class="undo"     id="undo">undo</button>
+                </div> -->
+                
+            
+    
     </body>
 
 </html>
