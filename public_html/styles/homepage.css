@@ -20,10 +20,10 @@
     justify-content: start;
     padding-top: 100px;
     margin-bottom: 60px;
-    width: 630px;
+    width: 730px;
  }
  .description {
-    width: 630px;
+    width: 730px;
     font-size: 22px;
     display: flex;
     flex-direction: column;
@@ -35,7 +35,7 @@
     margin-bottom: 30px;
  }
  .button-container {
-    width: 630px; 
+    width: 730px; 
     margin-left: auto;
     margin-right: auto; 
  }
@@ -49,10 +49,10 @@ li {
 }
 .features-list {
  padding-left: 30px;
- width: 600px;
+ width: 700px;
  margin-bottom: 60px;
 }
- .teacher, .student {
+ .teacher, input[type="submit"] {
    font-weight: 700;
    height: 36px;
    width: 120px;
@@ -64,12 +64,12 @@ li {
    border-radius: 16px;
  }
  .teacher {
-  margin-right: 40px;
+  margin-right: 20px;
  }
  .click-description {
    margin-bottom: 12px;
    font-size: 18px;
-   width: 630px;
+   width: 730px;
  } 
  .teacher {
    background-color: hsl(211, 98%, 49%);
@@ -81,13 +81,24 @@ li {
  .teacher:active {
    background-color: hsl(211, 98%, 65%);
  }
- .student {
-   background-color: hsl(130, 97%, 39%);
-   color: white;
- }
- .student:hover {
-   background-color: hsl(130, 97%, 44%);
- }
- .student:active {
-   background-color: hsl(130, 97%, 46%);
- }
+input[type="submit"] {
+  background-color: hsl(130, 97%, 39%);
+  color: white;
+}
+input[type="submit"]:hover {
+  background-color: hsl(130, 97%, 44%);
+}
+input[type="submit"]:active {
+  background-color: hsl(130, 97%, 46%);
+}
+input[type="text"]{
+  font-size: 16px;
+  height: 32px;
+  border-radius: 16px;
+  border-width: 1px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+form {
+  display: inline;
+}
