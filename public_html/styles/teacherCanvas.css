@@ -42,3 +42,89 @@
   
   /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
   .show {display:block;}
+
+  body{
+    padding-left: 100px;
+    padding-top: 100px;
+    margin:0px;
+  }
+    
+  .header{
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    /* Height should match body padding */
+    height: 100px;
+    background-color: lightblue;
+    margin:0;
+    padding: 0;
+    z-index: 100;
+  }
+  
+  .header-right{
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .status-check{
+    position: fixed;
+    bottom: 2px;
+    right: 10px;
+  }
+  
+  .animation-prompt{
+    position: fixed;
+    bottom: 2px;
+    right: 10px;
+  }
+  
+  .left-sidebar{
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 120px;
+    left: 0px;
+    width: 100px;
+  }
+  
+  .canvas-page-controls{
+    background-color:lightgrey;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .page-navigation-tools{
+    background-color: lightgoldenrodyellow;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+  }
+  
+  .save-tools{
+    display: flex;
+    justify-content: center;
+  }
+  
+  .drawing-tools-sidebar{
+    display: flex;
+    flex-direction: column;
+    background-color: lightcoral;
+  
+    align-items: center;
+    top: 100px;
+    left: 0px;
+    /*Width should match body padding*/
+    width: 100px;
+  }
+  
+  .drawing-tools-sidebar button{
+    height: 40px;
+  }
+  
+  .text-to-speech-controls{
+    display: flex;
+    justify-content: center;
+  }

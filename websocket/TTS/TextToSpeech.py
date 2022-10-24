@@ -1,7 +1,9 @@
 from google.cloud import texttospeech
 import os
+import redis
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "<json key filename>"
+# Replace `<json key filename>` and call testAudio() to test tts
+#os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "<json key filename>"
 
 """ Retrieve text generated from ocr script (probably from redis database) """
 
@@ -20,7 +22,22 @@ def createAudio(text):
         out.write(response.audio_content)
 
 # Test the createAudio function
-#text = "<speak> This is a test. Text should be converted to audio. </speak>" # Uses ssml tags
-#createAudio(text)
+def testAudio():
+    text = "<speak> This is a test. Text should be converted to audio. </speak>" # Uses ssml tags
+    createAudio(text)
+
+# redis test
+def storeData():
+    database = redis.StrictRedis(host = "localhost", port = 8002, decode_responses = True)
+    database.set("redis_test", "this should be outputted")
+
+# redis test
+def getData():
+    database = redis.StrictRedis(host = "localhost", port = 8002, decode_responses = True)
+    text = database.get("redis_test")
+    print(text)
 
 """ Store generated audio into redis database """
+# Uncomment two function calls below to test redis
+#storeData()
+#getData()

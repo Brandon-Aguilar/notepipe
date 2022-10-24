@@ -12,7 +12,7 @@ except ValueError:
 
 
 
-from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage
+from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage,resetbutton
 from Models.redisObjects import hostPages, loadHostPagesFromJSON
 
 log = logging.getLogger(__name__)
@@ -69,10 +69,14 @@ async def wipestudent(websocket, messageJSON, connected, studentKey: str):
     response = clearpage();
     websockets.broadcast(connected, response.toJson())
 
+async def resett(websocket, messageJSON, connected, studentKey: str):
+    response = clearpage();
+    websockets.broadcast(connected, response.toJson())
+
 
 async def textToSpeech(websocket, studentKey,response):
     if redisServer.exists(studentKey):
         pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
-        response.imageURL=pages.getPage()
+        response.imageURL=pages.getLatestPage()
     await websocket.send(response.toJson())
   

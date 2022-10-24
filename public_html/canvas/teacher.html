@@ -1,21 +1,42 @@
 <!DOCTYPE html>
     <head>
         <script type="text/javascript" src="../scripts/teacherCanvas.js" defer></script>
-        <link rel="stylesheet" href="./teacherCanvas.css">
+        <link rel="stylesheet" href="../styles/teacherCanvas.css">
+        
+        <title>NotePipe-Teacher</title>
     </head>
     <body>
-        <header style="display: flex; justify-content: space-between;">        
-            <h1>Teacher Prototype</h1>
+        <div class="header">
+          <div class="header-left">
+            <h1>NotePipe</h1>
+          </div>
+          <div class="header-right">
+            <div>
+              <p>Current Role: Teacher</p>
+            </div>
+            <div>
+              <a id="studentLinkAnchor"><p id="studentLink"></p></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-check">
+          <p id="updateStatus">Content Not Sent</p>
+        </div>
+
+            <!-- 
             <p id="currentPageNumber">Current page is 0</p>
             <div style="margin-right: 10px"> 
-                <button id="Saveoption">Save</button>
+                <button id="newpage">NewPage</button>
+                <button id="reset">Reset</button>
                 <p id="updateStatus">Content Not Sent</p>     
                 <a id="studentLinkAnchor"><p id="studentLink"></p></a>
-            </div>
-        </header>
+            </div> -->
 
+        <!-- Removing dropdown menu for now, uncomment to restore
+     
         <div class="dropdown">
-            <button onclick="myFunction()" class="dropbtn">Dropdown</button>
+            <button onclick="dropdown()" class="dropbtn">Dropdown</button>
             <div id="myDropdown" class="dropdown-content">
               <a href="#home">Home</a>
               <a href="#about">About</a>
@@ -26,7 +47,7 @@
           <script>
           /* When the user clicks on the button, 
           toggle between hiding and showing the dropdown content */
-          function myFunction() {
+          function dropdown() {
             document.getElementById("myDropdown").classList.toggle("show");
           }
           
@@ -45,16 +66,55 @@
           }
           </script>
         <br>
+        -->
 
-        <div id="container">
-            <button class="button" onclick="changeColor('black')" id="black">Black</button>
-            <button class="button" onclick="changeColor('blue')" id="blue=">Blue</button>
-            <button class="button" onclick="changeColor('red')" id="red">Red</button>
-            <button class="button" onclick="changeColor('green')" id="green">Green</button>
-            <button class="undo"     id="undo">undo</button>
-            <button id="previousPage">Previous</button>
-            <button id="nextPage">Next</button>
+
+        <div class="left-sidebar">
+          
+          <div class="canvas-page-controls">
+            
+            <div class="save-tools">
+              <button id="Saveoption">Save</button>
+            </div>
+            
+            <div class="page-navigation-tools">
+              <div class="page-navigation-button">
+                <button id="previousPage">&#60;</button>
+              </div>
+              <div class="current-page-counter"> 
+                <p id="currentPageNumber">Current page is 0</p>
+              </div>
+              <div class="page-navigation-button"> 
+                <button id="nextPage">&#62;</button> 
+              </div>
+            </div>
           </div>
+          
+
+            <div id="container" class="drawing-tools-sidebar">
+              <div class="draw-tool">
+                <button class="button" onclick="changeColor('black')" id="black">Black</button>
+              </div>
+              <div class="draw-tool">
+                <button class="button" onclick="changeColor('blue')" id="blue=">Blue</button>
+              </div>
+              <div class="draw-tool">
+                <button class="button" onclick="changeColor('red')" id="red">Red</button>
+              </div>
+              <div class="draw-tool">
+                <button class="button" onclick="changeColor('green')" id="green">Green</button>
+              </div>
+              <div class="draw-tool">
+                <button class="undo"     id="undo">undo</button>
+              </div>
+              <div class="draw-tool">
+                <button class="button" onclick="eraser()" id="eraser">Eraser</button>
+              </div>
+
+
+            </div>
+        </div>
+        
     </body>
 
 </html>

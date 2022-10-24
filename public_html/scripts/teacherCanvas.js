@@ -97,19 +97,19 @@ currentPageNumberElement = document.getElementById('currentPageNumber');
 const localImages=[];
 
 //save button
-var updateSaveoption=document.getElementById('Saveoption')
-updateSaveoption.addEventListener('click', Saveoption)
+var updateSaveoption=document.getElementById('newpage')
+updateSaveoption.addEventListener('click', newpage)
 
-function Saveoption(){
+function newpage(){
     //for now teacher cannot go to previous page and use save function
     if(pageNumber==viewingPageNumber){
         pageNumber++;
         viewingPageNumber++;
-        console.log("Saving page number: ",pageNumber)
+        console.log("Adding new page number: ",pageNumber)
         var imageURL = canvas.toDataURL("image/png", 0.2);
         
         var message = {
-            type: "Savecanvas",
+            type: "Addnewpage",
             pageNumber: pageNumber,
             imageURL,
         }
@@ -176,6 +176,29 @@ function undo(){
     }
 }
 
+var updatereset=document.getElementById('reset')
+updatereset.addEventListener('click', reset)
+
+function reset(){
+        
+    console.log("reset page : ",pageNumber)
+    var imageURL = canvas.toDataURL("image/png", 0.2);
+    
+    var message = {
+        type: "resetcanvas",
+        pageNumber: pageNumber,
+        imageURL,
+    }
+    websocket.send(JSON.stringify(message));
+    //clear the current page
+    width = window.innerWidth;
+    height = window.innerHeight;  
+    ctx.clearRect(0, 0, width, height);
+    imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image  
+
+    sendUpdate();
+}
+
 //default settings for marker
 var lastPoint = undefined;
 var force = 1;//marker thickness
@@ -238,6 +261,11 @@ function changeColor(newColor) {
     color = newColor;
   };
 
+  // Eraser
+function eraser(){
+    ctx.strokeStyle = "rgba(255,255,255,1)";
+};
+
 function draw(data) {
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
@@ -251,8 +279,13 @@ function draw(data) {
 function move(e) {
     e.preventDefault();
     // equation for determinng force, didn't research much, just used feel. Could use improvements.
-    force = Math.log10(Math.pow(e.pressure * (Math.abs(e.tiltX || 90) / 90), 1.5)) + 1.2 || 1;
-    force = Math.pow(force || 1, 4) * markerWidth;
+    if(e.pointerType === "pen"){
+        force = Math.log10(Math.pow(e.pressure * (Math.abs(e.tiltX || 90) / 90) * 0.2 + 0.15, 1.5)) + 1.2 || 1;
+        force = Math.min(15 * Math.pow(force || 1, 4) * (markerWidth + 2), markerWidth);
+    } else {
+        force = markerWidth;
+    }
+    
     if (e.buttons || isPointerDown) {
         if (typeof lastPoint == 'undefined') {
             lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
@@ -356,7 +389,21 @@ function processMessage({ data }) {
             break;
     }
 }
-// grab studentkey
-// get element id
-// event listener
-// redirect function (do stuff with key)
+
+
+document.onkeydown = checkKey;
+
+function checkKey(e) {
+
+    e = e || window.event;
+
+    if (e.keyCode == '38') {
+        // up arrow
+        markerWidth += 1;
+    }
+    else if (e.keyCode == '40') {
+        // down arrow
+        markerWidth -= 1;
+    }
+
+}
