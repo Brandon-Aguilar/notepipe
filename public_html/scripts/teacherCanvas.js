@@ -139,12 +139,12 @@ function newpage(){
 function resize() {
 
     var copyCanvas = document.createElement('canvas');
-    var copyCanvas = copyCanvas.getContext("2d"); 
+    var copyCanvasCtx = copyCanvas.getContext("2d"); 
     // creates another canvas to store values to
     copyCanvas.width = canvas.width;
     copyCanvas.height = canvas.height;
     // set the new canvas equal to the prevoius 
-    copyCanvas.drawImage(canvas, 0, 0);
+    copyCanvasCtx.drawImage(canvas, 0, 0);
     // if the page got smaller then we keep the orignal size and if the page got bigger with increase the canvas size
     ctx.canvas.width = Math.max(window.innerWidth, ctx.canvas.width);
     ctx.canvas.height = Math.max(window.innerHeight, ctx.canvas.height);
@@ -172,10 +172,10 @@ function undo(){
     if(canvasStack.length == 0){
         undoHasBeenDone = false;
         var copyCanvas = document.createElement('canvas');
-        var copyCanvas = copyCanvas.getContext('2d');
+        var copyCanvasCtx = copyCanvas.getContext('2d');
         copyCanvas.width = canvas.width;
         copyCanvas.height = canvas.height;
-        copyCanvas.drawImage(canvas, 0, 0);
+        copyCanvasCtx.drawImage(canvas, 0, 0);
         canvasStack.push(copyCanvas);    
     }
 }
@@ -237,10 +237,10 @@ function sendDrawUpdate(){
 }
 function createAndSaveCanvas(){
     var copyCanvas = document.createElement('canvas');
-    var copyCanvas = copyCanvas.getContext('2d');
+    var copyCanvasCtx = copyCanvas.getContext('2d');
     copyCanvas.width = canvas.width;
     copyCanvas.height = canvas.height;
-    copyCanvas.drawImage(canvas, 0, 0);
+    copyCanvasCtx.drawImage(canvas, 0, 0);
     canvasStack.push(copyCanvas);
      if(canvasStack.length > 5)
         canvasStack.shift();
