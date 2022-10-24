@@ -71,13 +71,17 @@ drawAnimationsCheckboxElement.addEventListener("change", () => {
 // resize canvas
 function resize() {
 
-    var inMemCanvas = document.createElement('canvas');
-    var inMemCtx = inMemCanvas.getContext("2d"); 
-    inMemCanvas.width = canvas.width;
-    inMemCanvas.height = canvas.height;
+  var inMemCanvas = document.createElement('canvas');
+  var inMemCtx = inMemCanvas.getContext("2d"); 
+  // creates another canvas to store values to
+  inMemCanvas.width = canvas.width;
+  inMemCanvas.height = canvas.height;
+  // set the new canvas equal to the prevoius 
   inMemCtx.drawImage(canvas, 0, 0);
+  // if the page got smaller then we keep the orignal size and if the page got bigger with increase the canvas size
   ctx.canvas.width = Math.max(window.innerWidth, ctx.canvas.width);
   ctx.canvas.height = Math.max(window.innerHeight, ctx.canvas.height);
+  // copy the canvas back by redrawing it
   ctx.drawImage(inMemCanvas, 0, 0);
 }
 

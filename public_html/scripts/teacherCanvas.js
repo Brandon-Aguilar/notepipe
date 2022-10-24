@@ -138,14 +138,18 @@ function newpage(){
 // resize canvas
 function resize() {
 
-    var inMemCanvas = document.createElement('canvas');
-    var inMemCtx = inMemCanvas.getContext("2d"); 
-    inMemCanvas.width = canvas.width;
-    inMemCanvas.height = canvas.height;
-  inMemCtx.drawImage(canvas, 0, 0);
-  ctx.canvas.width = Math.max(window.innerWidth, ctx.canvas.width);
-  ctx.canvas.height = Math.max(window.innerHeight, ctx.canvas.height);
-  ctx.drawImage(inMemCanvas, 0, 0);
+    var copyCanvas = document.createElement('canvas');
+    var copyCanvas = copyCanvas.getContext("2d"); 
+    // creates another canvas to store values to
+    copyCanvas.width = canvas.width;
+    copyCanvas.height = canvas.height;
+    // set the new canvas equal to the prevoius 
+    copyCanvas.drawImage(canvas, 0, 0);
+    // if the page got smaller then we keep the orignal size and if the page got bigger with increase the canvas size
+    ctx.canvas.width = Math.max(window.innerWidth, ctx.canvas.width);
+    ctx.canvas.height = Math.max(window.innerHeight, ctx.canvas.height);
+    // copy the canvas back by redrawing it
+    ctx.drawImage(copyCanvas, 0, 0);
 }
 
 function undo(){
@@ -167,12 +171,12 @@ function undo(){
 
     if(canvasStack.length == 0){
         undoHasBeenDone = false;
-        var inMemCanvas = document.createElement('canvas');
-        var inMemCtx = inMemCanvas.getContext('2d');
-        inMemCanvas.width = canvas.width;
-        inMemCanvas.height = canvas.height;
-        inMemCtx.drawImage(canvas, 0, 0);
-        canvasStack.push(inMemCanvas);    
+        var copyCanvas = document.createElement('canvas');
+        var copyCanvas = copyCanvas.getContext('2d');
+        copyCanvas.width = canvas.width;
+        copyCanvas.height = canvas.height;
+        copyCanvas.drawImage(canvas, 0, 0);
+        canvasStack.push(copyCanvas);    
     }
 }
 
@@ -232,12 +236,12 @@ function sendDrawUpdate(){
     console.log("Sent Batch Draw Update");
 }
 function createAndSaveCanvas(){
-    var inMemCanvas = document.createElement('canvas');
-    var inMemCtx = inMemCanvas.getContext('2d');
-    inMemCanvas.width = canvas.width;
-    inMemCanvas.height = canvas.height;
-    inMemCtx.drawImage(canvas, 0, 0);
-    canvasStack.push(inMemCanvas);
+    var copyCanvas = document.createElement('canvas');
+    var copyCanvas = copyCanvas.getContext('2d');
+    copyCanvas.width = canvas.width;
+    copyCanvas.height = canvas.height;
+    copyCanvas.drawImage(canvas, 0, 0);
+    canvasStack.push(copyCanvas);
      if(canvasStack.length > 5)
         canvasStack.shift();
     undoHasBeenDone = false;
