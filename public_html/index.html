@@ -3,29 +3,28 @@
    <title>Handwriting-to-text Homepage</title>
    <head>
        <link href="./styles/homepage.css" type="text/css" rel="stylesheet" />
-       <!-- maybe import a font?-->
        <link rel="preconnect" href="https://fonts.googleapis.com">
        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
    </head>
-   <header>
-       <div class="navigation">
-           <a href="#">How does it work?</a>
-           <a href="#">Contact</a>
-       </div>
-   </header>
    <body>
-       <div class="canvas-for-everyone"> Canvas For Everyone </div>
+       <canvas></canvas>
+       <script src="./scripts/homeCanvas.js"></script>
+       <h1 class="canvas-for-everyone"> Canvas For Everyone </h1>
        <div class="description">
            <p>Introducing the first live whiteboard for educators and the visually-impaired!</p>
            <p>Handwriting is translated to readable text and audio, so that education is accessible to all.</p>
        </div>
-       <div class="features-list">
+        <div class="features-list">
            <ul>
-               <li>Host classes for sighted and visually-impaired students</li>
+               <li>Host classes for the visually-impaired</li>
                <li>Search through handwritten text</li>
                <li>Save lecture notes</li>
                <li>Hear lecture notes out loud</li>
            </ul>
+       </div>
+       <div class="click-description">
+            <p>Click "Teacher" or "Student" below to start:</p>
        </div>
        <div class="button-container">
            <button class="teacher">Teacher</button>

@@ -347,7 +347,7 @@ function processMessage({ data }) {
         case "canvasUpdateSuccess":
             updateMessageElement.textContent="Content Sent";
             break;
-        case "initializeHostSuccess":
+        case "initializeHostSuccess": 
             console.log("Successfully initialized host");
 
             link = "student.html?key=" + event.studentKey;
@@ -356,3 +356,7 @@ function processMessage({ data }) {
             break;
     }
 }
+// grab studentkey
+// get element id
+// event listener
+// redirect function (do stuff with key)
