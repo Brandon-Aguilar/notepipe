@@ -403,6 +403,7 @@ function processMessage({ data }) {
             link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
+            generateQRCode(link);
             break;
     }
 }
@@ -425,5 +426,13 @@ function checkKey(e) {
 
 }
 
-
-
+function generateQRCode(codeContent) {
+    const qrcode = new QRCode(document.getElementById('qrcode'), {
+        text: codeContent,
+        width: 128,
+        height: 128,
+        colorDark : '#000',
+        colorLight : '#fff',
+        correctLevel : QRCode.CorrectLevel.H
+    });
+}
