@@ -8,11 +8,11 @@
     user-select: none;
     position: relative;
  }
- .canvas-for-everyone, .description, .click-description, .features-list {
+ .notepipe-title, .description, .click-description, .features-list {
     margin-left: auto;
     margin-right: auto;
  }
- .canvas-for-everyone {
+ .notepipe-title {
     color: hsl(130, 100%, 31%);
     font-size: 36px;
     font-weight: 700;

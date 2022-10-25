@@ -2,6 +2,8 @@ const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d"); //2d rendering
 canvas.style.position = 'absolute';
 var drawing = false;
+var link;
+var teacherLink = "/canvas/teacher.html";
 
 //Based off of TeacherCanvas.js code
 window.addEventListener("resize", () => {
@@ -48,6 +50,29 @@ window.addEventListener("load", () => {
     canvas.addEventListener("mousemove", draw);
 });
 
+window.addEventListener('input', (e) =>{
+    console.log('variable: ', e.target.value);
+    var key = e.target.value;
+    link = "/canvas/student.html?key=" + key;
+    console.log('link: ', link)
+})
+
+function studentButton(){
+    window.addEventListener("click", (e) => {
+        //console.log('button', link);
+        if (link !== undefined){
+            window.open(link);
+        }
+    })
+}
+
+function teacherButton(){
+    window.addEventListener("click", (e) => {
+        console.log('button', teacherLink);
+    })
+    window.open(teacherLink);
+}
+
 function draw(e){    
     if(!drawing) return; // don't draw if not clicking
 
@@ -62,5 +87,3 @@ function draw(e){
     ctx.beginPath();
     ctx.moveTo(e.layerX, e.layerY);
 }
-
-

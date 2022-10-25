@@ -10,7 +10,7 @@
    <body>
        <canvas></canvas>
        <script src="./scripts/homeCanvas.js"></script>
-       <h1 class="canvas-for-everyone"> Canvas For Everyone </h1>
+       <h1 class="notepipe-title"> NotePipe </h1>
        <div class="description">
            <p>Introducing the first live whiteboard for educators and the visually-impaired!</p>
            <p>Handwriting is translated to readable text and audio, so that education is accessible to all.</p>
@@ -24,15 +24,15 @@
            </ul>
        </div>
        <div class="click-description">
-            <p>Click "Teacher" or "Student" below to start:</p>
+            <p>Click "Teacher" or enter Student Key below to start:</p>
        </div>
        <div class="button-container">
-           <button class="teacher">Teacher</button>
+           <button class="teacher" onclick=teacherButton()>Teacher</button>
                 <form action="#" autocomplete="off">
                     <label>Enter Student Key:
-                        <input type="text" name="student-key">
+                        <input type="text" name="student-key"  onchange={console.log(event.target)}>
                     </label>
-                        <input type="submit" value="Enter Room" />
+                    <button onclick=studentButton()>Enter Room</button>
                 </form>
           </label>
        </div>
