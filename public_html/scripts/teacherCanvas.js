@@ -403,7 +403,7 @@ function processMessage({ data }) {
             link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
-            generateQRCode(link);
+            generateQRCode(window.location.host + "/canvas/" + link);
             break;
     }
 }
