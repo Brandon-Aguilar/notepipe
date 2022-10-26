@@ -1,55 +1,104 @@
 *{
     margin: 0;
     padding: 0;
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 3px;
+    font-weight: 500;
+    cursor: url(../resources/pencil-cursor-icon.png), auto;
+    user-select: none;
+    position: relative;
  }
- .canvas-for-everyone, .description, .button-container, .features-list {
-    margin-left: 50px;
+ .notepipe-title, .description, .click-description, .features-list {
+    margin-left: auto;
+    margin-right: auto;
  }
- .navigation {
-    display: flex;
-    justify-content: end;
- }
- .navigation a{
-    margin-right: 10px;
- }
- .canvas-for-everyone {
-    font-size: 32px;
-    font-weight: 600;
+ .notepipe-title {
+    color: hsl(130, 100%, 31%);
+    font-size: 36px;
+    font-weight: 700;
     display: flex;
     justify-content: start;
-    padding: 130px 0px 30px 0px;
+    padding-top: 100px;
+    margin-bottom: 60px;
+    width: 730px;
  }
  .description {
-    width: 450px;
-    font-size: 20px;
+    width: 730px;
+    font-size: 22px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 30px 0px 10px 0px;
+    margin-bottom: 30px;
+    border-width: 1px;
  }
  .description p {
     margin-bottom: 30px;
  }
  .button-container {
-    width: 300px;
-    display: flex;
-    justify-content: space-between;
+    width: 730px; 
+    margin-left: auto;
+    margin-right: auto; 
  }
- .features-list ul {
-    list-style-position: inside;
-    font-size: 16px;
+ul {
+  list-style-position: inside;
+  font-size: 18px;
+}
+li {
+  list-style-position: inside;
+  margin-bottom: 20px;
+}
+.features-list {
+ padding-left: 30px;
+ width: 700px;
+ margin-bottom: 60px;
+}
+ .teacher, input[type="submit"] {
+   font-weight: 700;
+   height: 36px;
+   width: 120px;
+   font-size: 16px;
+   cursor: pointer;
+   transition: background-color 0.15s;
+   letter-spacing: 2px;
+   border-style: none; 
+   border-radius: 16px;
  }
- .features-list li {
-    list-style-position: inside;
-    margin-bottom: 12px;
+ .teacher {
+  margin-right: 20px;
  }
- .features-list {
-    width: 450px;
-    margin-bottom: 30px;
- }
- .teacher, .student {
-    font-weight: 600;
-    height: 36px;
-    width: 100px;
-    font-size: 16px;
+ .click-description {
+   margin-bottom: 12px;
+   font-size: 18px;
+   width: 730px;
  } 
+ .teacher {
+   background-color: hsl(211, 98%, 49%);
+   color: hsl(0, 0%, 100%); 
+ }
+ .teacher:hover {
+   background-color: hsl(211, 98%, 55%);
+ }
+ .teacher:active {
+   background-color: hsl(211, 98%, 65%);
+ }
+input[type="submit"] {
+  background-color: hsl(130, 97%, 39%);
+  color: white;
+}
+input[type="submit"]:hover {
+  background-color: hsl(130, 97%, 44%);
+}
+input[type="submit"]:active {
+  background-color: hsl(130, 97%, 46%);
+}
+input[type="text"]{
+  font-size: 16px;
+  height: 32px;
+  border-radius: 16px;
+  border-width: 1px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+form {
+  display: inline;
+}
