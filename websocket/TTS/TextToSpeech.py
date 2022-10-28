@@ -1,15 +1,20 @@
 from google.cloud import texttospeech
 import os
 import redis
+import inspect # Used for inspect.stack()[0][3] within functions, which returns the function name it's called in
 
 # Replace `<json key filename>` and call testAudio() to test tts
-#os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "<json key filename>"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "<json key filename>"
 
 """ Retrieve text generated from ocr script (probably from redis database) """
 
 # Take in some text and turn it into audio using customizable speech synthesis
 def createAudio(text):
-    client = texttospeech.TextToSpeechClient()
+    try:
+        client = texttospeech.TextToSpeechClient()
+    except Exception:
+        print("Invalid Google Cloud API credentials. Exiting createAudio()")
+        return
     syn_input = texttospeech.SynthesisInput(ssml=text)
 
     # Customization for how the voice sounds and how it gets encoded
@@ -28,16 +33,33 @@ def testAudio():
 
 # redis test
 def storeData():
-    database = redis.StrictRedis(host = "localhost", port = 8002, decode_responses = True)
-    database.set("redis_test", "this should be outputted")
+    function_name = inspect.stack()[0][3]
+    if (testConnection(function_name)):
+        database = redis.StrictRedis(host = "localhost", port = 8002, decode_responses = True)
+        database.set("redis_test", "this should be outputted")
 
 # redis test
 def getData():
-    database = redis.StrictRedis(host = "localhost", port = 8002, decode_responses = True)
-    text = database.get("redis_test")
-    print(text)
+    function_name = inspect.stack()[0][3]
+    if (testConnection(function_name)):
+        database = redis.StrictRedis(host = "localhost", port = 8002, decode_responses = True)
+        text = database.get("redis_test")
+        print(text)
+
+# Tests connection to Redis database
+# Returns: False if connection failed, True if connection was successful
+def testConnection(function_name):
+    try:
+        connection_test = redis.Redis("localhost", port = 8002, socket_connect_timeout = 1)
+        connection_test.ping()
+    except (TimeoutError, redis.exceptions.TimeoutError):
+        print("Could not establish connection to Redis database for function " + function_name + "().")
+        return False
+    return True
 
 """ Store generated audio into redis database """
-# Uncomment two function calls below to test redis
+# Uncomment function calls below to test redis and Google Cloud TTS
 #storeData()
 #getData()
+
+#testAudio()
