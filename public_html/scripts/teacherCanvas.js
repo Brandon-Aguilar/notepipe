@@ -389,6 +389,8 @@ function nextOrPrevious(pageWanted){
         
 }
 
+var absoluteJoinLink = "";
+
 // Handle messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
@@ -403,7 +405,9 @@ function processMessage({ data }) {
             link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
-            generateQRCode(window.location.host + "/canvas/" + link);
+
+            absoluteJoinLink = window.location.host + "/canvas/" + link;
+            generateQRCode(absoluteJoinLink);
             break;
     }
 }
@@ -435,4 +439,17 @@ function generateQRCode(codeContent) {
         colorLight : '#fff',
         correctLevel : QRCode.CorrectLevel.H
     });
+}
+
+function copyJoinKey() {
+    // TO DO get join key text
+    navigator.clipboard.writeText(absoluteJoinLink);
+
+    var tooltip = document.getElementById("myTooltip");
+    tooltip.innerHTML = "Copied";
+}
+
+function copyKeyOutFunc() {
+    var tooltip = document.getElementById("myTooltip");
+    tooltip.innerHTML = "Copy key to clipboard";
 }
