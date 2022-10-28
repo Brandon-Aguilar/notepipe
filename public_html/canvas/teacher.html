@@ -17,7 +17,16 @@
               <p>Current Role: Teacher</p>
             </div>
             <div>
-              <a id="studentLinkAnchor"><p id="studentLink"></p></a>
+              <div class="tooltip">
+                <button onclick="copyJoinKey()" onmouseout="copyKeyOutFunc()">
+                  <span class="tooltiptext" id="myTooltip">Copy to clipboard</span>
+                  Copy text
+                </button>
+              </div>
+              <a id="studentLinkAnchor">
+                <p id="studentLink"></p>
+              </a>
+              <div id="qrcode"></div>
             </div>
           </div>
         </div>
@@ -25,7 +34,7 @@
         <div class="status-check">
           <p id="updateStatus">Content Not Sent</p>
         </div>
-        <div id="qrcode"></div>
+        
 
             <!-- 
             <p id="currentPageNumber">Current page is 0</p>
@@ -71,28 +80,8 @@
         <br>
         -->
 
-        <div class="tooltip">
-          <button onclick="copyJoinKey()" onmouseout="outFunc()">
-            <span class="tooltiptext" id="myTooltip">Copy to clipboard</span>
-            Copy text
-            </button>
-          </div>
-          
-          <script>
-          function copyJoinKey() {
-            // TO DO get join key text
-            var joinKey = "joinKey";
-            navigator.clipboard.writeText(joinKey);
-            
-            var tooltip = document.getElementById("myTooltip");
-            tooltip.innerHTML = "Copied: " + joinKey;
-          }
-          
-          function outFunc() {
-            var tooltip = document.getElementById("myTooltip");
-            tooltip.innerHTML = "Copy to clipboard";
-          }
-          </script>
+        
+        
 
         <div class="left-sidebar">
           
