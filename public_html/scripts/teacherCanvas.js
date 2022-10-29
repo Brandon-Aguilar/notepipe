@@ -98,7 +98,18 @@ const localImages=[];
 
 //save button
 var updateSaveoption=document.getElementById('newpage')
-updateSaveoption.addEventListener('click', newpage)
+updateSaveoption.addEventListener('click', storePage)
+
+function storePage(){
+    var imageURL = canvas.toDataURL("image/png", 0.2);
+    var message = {
+        type: "storePage",
+        pageNumber: pageNumber,
+        imageURL,
+    }
+    websocket.send(JSON.stringify(message));
+    newpage();
+}
 
 function newpage(){
     //for now teacher cannot go to previous page and use save function
@@ -125,6 +136,12 @@ function newpage(){
         sendUpdate();
         imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
         localImages[localImages.length]=imageURL//it is a new page so it should be at index length
+        var message = {
+            type: "storePage",
+            pageNumber: pageNumber,
+            imageURL,
+        }
+        websocket.send(JSON.stringify(message));
 
         currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
     }
@@ -137,7 +154,6 @@ function newpage(){
 
 // resize canvas
 function resize() {
-
     var copyCanvas = document.createElement('canvas');
     var copyCanvasCtx = copyCanvas.getContext("2d"); 
     // creates another canvas to store values to
@@ -184,7 +200,6 @@ var updatereset=document.getElementById('reset')
 updatereset.addEventListener('click', reset)
 
 function reset(){
-        
     console.log("reset page : ",pageNumber)
     var imageURL = canvas.toDataURL("image/png", 0.2);
     

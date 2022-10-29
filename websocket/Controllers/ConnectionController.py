@@ -1,7 +1,7 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage,wipestudent,textToSpeech,resett
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage,wipestudent,textToSpeech,resett,studentStorepage
 
 from Models.responses import initializeHostSuccess, initializeStudentSuccess,textToSpeechRequest
 from Models.errorHandler import sendError
@@ -69,6 +69,8 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "resetcanvas":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
+            case "storePage":
+                await studentStorepage(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
 
 async def initializeStudent(websocket, studentKey, image):
     """Check for valid key and add connection to host's connections"""
