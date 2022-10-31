@@ -1,4 +1,5 @@
 // Connect to websocket
+
 serverURL = getWebSocketServer();
 
 function getWebSocketServer() {
@@ -98,7 +99,18 @@ const localImages=[];
 
 //save button
 var updateSaveoption=document.getElementById('newpage')
-updateSaveoption.addEventListener('click', newpage)
+updateSaveoption.addEventListener('click', storePage)
+
+function storePage(){
+    var imageURL = canvas.toDataURL("image/png", 0.2);
+    var message = {
+        type: "storePage",
+        pageNumber: pageNumber,
+        imageURL,
+    }
+    websocket.send(JSON.stringify(message));
+    newpage();
+}
 
 function newpage(){
     //for now teacher cannot go to previous page and use save function
@@ -125,6 +137,12 @@ function newpage(){
         sendUpdate();
         imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
         localImages[localImages.length]=imageURL//it is a new page so it should be at index length
+        var message = {
+            type: "storePage",
+            pageNumber: pageNumber,
+            imageURL,
+        }
+        websocket.send(JSON.stringify(message));
 
         currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
     }
@@ -137,7 +155,6 @@ function newpage(){
 
 // resize canvas
 function resize() {
-
     var copyCanvas = document.createElement('canvas');
     var copyCanvasCtx = copyCanvas.getContext("2d"); 
     // creates another canvas to store values to
@@ -184,7 +201,6 @@ var updatereset=document.getElementById('reset')
 updatereset.addEventListener('click', reset)
 
 function reset(){
-        
     console.log("reset page : ",pageNumber)
     var imageURL = canvas.toDataURL("image/png", 0.2);
     
@@ -330,20 +346,55 @@ function initializeHost() {
     const event = { type: "initializeHost" };
     websocket.send(JSON.stringify(event))
 }
+
+const zipfolder = document.getElementById('zipFolder');
+zipfolder.addEventListener('click', zipFolderbutton);
+
+//Download a zip folder
+function zipFolderbutton(e) {
+    var zip = new JSZip();
+    index = 0;   
+    function Buffer(url, callback) {
+        var ctx = new XMLHttpRequest();
+        ctx.open("GET", url);
+        ctx.responseType = "arraybuffer";
+        ctx.onload = function() {
+            if (ctx.status == 200) {
+                callback(ctx.response, url)
+            }
+
+        };
+        ctx.send();
+    }
+
+    (function load() {
+        if (index < localImages.length) {
+            Buffer(localImages[index++], function(buffer, url) {
+                zip.file(index+"page.png", buffer); 
+                load(); 
+            })
+        }
+        else {                         
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, "LectureNote.zip");// save as LectureNote
+            });  
+        }
+    })();
+}   
+
 const download = document.getElementById('download');
 download.addEventListener('click', downloadbutton);
 
-//Download the current page
+
 function downloadbutton(e) {
-    for(let i = 0; i < pageNumber; i++){
-        console.log(localImages[i]);
-        const link = document.createElement('a');
-        link.download = 'download.png';
-        link.href = localImages[i];
-        link.click();
-    }
+    console.log(canvas.toDataURL());
+    const link = document.createElement('a');
+    link.download = 'download.png';
+    link.href = canvas.toDataURL();
+    link.click();
+
     link.delete;
-  };
+};     
 
 //implement previous and next page requests 
 var image = new Image();

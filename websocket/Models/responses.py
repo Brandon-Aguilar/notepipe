@@ -71,3 +71,10 @@ class textToSpeechRequest(response):
         self.message = "Text to speech function requested"
         self.studentKey = studentKey
         self.imageURL= imageURL
+
+class studentStorepageRequest(response):
+    def __init__(self, imageURL=None, pageNumber=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.imageURL = imageURL
+        self.pageNumber = pageNumber

@@ -12,7 +12,7 @@ except ValueError:
 
 
 
-from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage,resetbutton
+from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage,resetbutton,studentStorepageRequest
 from Models.redisObjects import hostPages, loadHostPagesFromJSON
 
 log = logging.getLogger(__name__)
@@ -58,6 +58,11 @@ async def canvasDrawUpdate(websocket, messageJSON, connected, studentKey: str):
     response = canvasUpdateSuccess()
     await websocket.send(response.toJson())#send canvas updated "Successfully processed canvas update"
 
+async def studentStorepage(websocket, messageJSON, connected, studentKey: str):
+    response = studentStorepageRequest()
+    response.imageURL=messageJSON["imageURL"]
+    response.pageNumber=messageJSON["pageNumber"]
+    websockets.broadcast(connected, response.toJson())
 
 async def retrieveImage(studentKey,response):
     if redisServer.exists(studentKey):

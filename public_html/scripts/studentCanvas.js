@@ -53,7 +53,10 @@ image.onload = function() {
     ctx.drawImage(image, 0, 0);
 }
 
+//pages saved locally
+const localImages=[];
 pageNumber = 0;
+viewingPageNumber=0;
 
 // Fetch HTML elements to be updated
 var updateMessageElement = document.getElementById("updateStatus");
@@ -70,7 +73,6 @@ drawAnimationsCheckboxElement.addEventListener("change", () => {
 
 // resize canvas
 function resize() {
-
   var inMemCanvas = document.createElement('canvas');
   var inMemCtx = inMemCanvas.getContext("2d"); 
   // creates another canvas to store values to
@@ -100,17 +102,11 @@ function draw(data) {
     ctx.lineWidth = data.force;
     ctx.lineCap = 'round';
     ctx.stroke();    
+    //update the current image (for page navigation)
+    imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
+    localImages[pageNumber]=imageURL;
 }
 
-//Download the current page
- function downloadbutton(e) {
-    console.log(canvas.toDataURL());
-    const link = document.createElement('a');
-    link.download = 'download.png';
-    link.href = canvas.toDataURL();
-    link.click();
-    link.delete;
-  };
 
 
 //request text to speech
@@ -119,18 +115,106 @@ function textToSpeech(){
     websocket.send(JSON.stringify(request))
 }
 
+//implement previous and next page requests 
+var image = new Image();
+nextPageElement=document.getElementById('nextPage');
+previousPageElement= document.getElementById('previousPage');
+currentPageNumberElement = document.getElementById('currentPageNumber');
+
+nextPageElement.addEventListener('click', function (){
+    nextOrPrevious(viewingPageNumber+1)});
+previousPageElement.addEventListener('click', function (){
+    nextOrPrevious(viewingPageNumber-1)});
+
+function nextOrPrevious(pageWanted){
+    if(pageWanted>=0 && pageWanted<=pageNumber){
+        console.log("1) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
+        //clear the current page
+        width = window.innerWidth;
+        height = window.innerHeight;  
+        ctx.clearRect(0, 0, width, height);
+        
+        if(pageWanted<viewingPageNumber ){//requested previous page
+            image.src=localImages[pageWanted]
+            image.onload = function() {//wait for image to load before trying to draw to canvas
+                ctx.drawImage(image, 0, 0);
+            }
+            viewingPageNumber-=1
+            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+        }
+        if(pageWanted>viewingPageNumber){//requested next page
+            image.src=localImages[pageWanted]
+            image.onload = function() {//wait for image to load before trying to draw to canvas
+                ctx.drawImage(image, 0, 0);
+            }
+            viewingPageNumber+=1
+            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+        }
+        console.log("2) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
+    }
+
+    else{
+        currentPageNumberElement.textContent="The page requested "+pageWanted+" does not exist "
+        console.log("the page requested ("+pageWanted+") is out of bound")
+    }
+        
+}
+
+//Download the current page
+function downloadbutton(e) {
+    console.log(canvas.toDataURL());
+    const link = document.createElement('a');
+    link.download = 'download.png';
+    link.href = canvas.toDataURL();
+    link.click();
+    link.delete;
+};
+
+const zipfolder = document.getElementById('zipFolder');
+zipfolder.addEventListener('click', zipFolderbutton);
+
+//Download a zip folder
+function zipFolderbutton(e) {
+    var zip = new JSZip();
+    index = 0;   
+    function Buffer(url, callback) {
+        var ctx = new XMLHttpRequest();
+        ctx.open("GET", url);
+        ctx.responseType = "arraybuffer";
+        ctx.onload = function() {
+            if (ctx.status == 200) {
+                callback(ctx.response, url)
+            }
+
+        };
+        ctx.send();
+    }
+
+    (function load() {
+        if (index < localImages.length) {
+            Buffer(localImages[index++], function(buffer, url) {
+                zip.file(index+"page.png", buffer); 
+                load(); 
+            })
+        }
+        else {                         
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, "LectureNote.zip");// save as LectureNote
+            });  
+        }
+    })();
+}   
 // Handle valid messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
     console.log(event)
     switch(event.__type__){
-        //case "canvasBroadcast":
-        //    updateMessageElement.textContent="Content Received";
-        //    image.src = event.imageURL;
-         //   break;
         case "initializeStudentSuccess":
             console.log("Successfully initialized Student");
             image.src = event.imageURL;
+            image.onload = function() {//wait for image to load before trying to draw to canvas
+                ctx.drawImage(image, 0, 0);
+            }
             link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
@@ -163,7 +247,13 @@ function processMessage({ data }) {
             width = window.innerWidth
             height = window.innerHeight
             ctx.clearRect(0, 0, width, height)
-
+            break;
+        case "studentStorepageRequest":
+            pageNumber=event.pageNumber;
+            localImages[pageNumber]=event.imageURL;
+            viewingPageNumber=pageNumber;
+            currentPageNumberElement.textContent="Current page is "+pageNumber;
+            break;
     }   
 }
 
