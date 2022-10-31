@@ -107,15 +107,6 @@ function draw(data) {
     localImages[pageNumber]=imageURL;
 }
 
-//Download the current page
- function downloadbutton(e) {
-    console.log(canvas.toDataURL());
-    const link = document.createElement('a');
-    link.download = 'download.png';
-    link.href = canvas.toDataURL();
-    link.click();
-    link.delete;
-};
 
 
 //request text to speech
@@ -168,6 +159,51 @@ function nextOrPrevious(pageWanted){
     }
         
 }
+
+//Download the current page
+function downloadbutton(e) {
+    console.log(canvas.toDataURL());
+    const link = document.createElement('a');
+    link.download = 'download.png';
+    link.href = canvas.toDataURL();
+    link.click();
+    link.delete;
+};
+
+const zipfolder = document.getElementById('zipFolder');
+zipfolder.addEventListener('click', zipFolderbutton);
+
+//Download a zip folder
+function zipFolderbutton(e) {
+    var zip = new JSZip();
+    index = 0;   
+    function Buffer(url, callback) {
+        var ctx = new XMLHttpRequest();
+        ctx.open("GET", url);
+        ctx.responseType = "arraybuffer";
+        ctx.onload = function() {
+            if (ctx.status == 200) {
+                callback(ctx.response, url)
+            }
+
+        };
+        ctx.send();
+    }
+
+    (function load() {
+        if (index < localImages.length) {
+            Buffer(localImages[index++], function(buffer, url) {
+                zip.file(index+"page.png", buffer); 
+                load(); 
+            })
+        }
+        else {                         
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, "LectureNote.zip");// save as LectureNote
+            });  
+        }
+    })();
+}   
 // Handle valid messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);

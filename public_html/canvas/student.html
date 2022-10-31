@@ -2,7 +2,8 @@
     <head>
         <script type="text/javascript" src="../scripts/studentCanvas.js" defer></script>
         <link rel="stylesheet" href="../styles/teacherCanvas.css">
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="http://cdn.jsdelivr.net/g/filesaver.js"></script>
         <title>NotePipe-Student</title>
     </head>
     <body>
@@ -71,6 +72,7 @@
                 <input type="checkbox" id="drawAnimationsCheckbox" checked>
                 <label for="drawAnimationsCheckbox">Enable Animations</label>
                 <button id="download">Download</button>
+                <button id="zipFolder">ZipFolder</button>
               </div>
               <div class="text-to-speech-controls">
                 <button id="TTS">TTS</button>
