@@ -78,3 +78,10 @@ class studentStorepageRequest(response):
         self.__type__ = self.__class__.__name__
         self.imageURL = imageURL
         self.pageNumber = pageNumber
+
+class userJoinUpdate(response):
+    def __init__(self, userList):
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "Userlist change"
+        self.userList = userList

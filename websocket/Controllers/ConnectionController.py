@@ -5,12 +5,18 @@ from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieve
 
 from Models.responses import initializeHostSuccess, initializeStudentSuccess,textToSpeechRequest
 from Models.errorHandler import sendError
+from Models.userList import userList
+from Models.userList import userObject
 #from OCR.imageToText import readImage
 
 log = logging.getLogger(__name__)
 
+# hostKey: studentKey
 HOST_KEYS = {str: str}
+# studentKey: list of connected websockets
 JOINED = {str: list}
+# studentKey: userList
+USERS = {str: userList}
 
 
 async def createStudentKey():
@@ -37,6 +43,7 @@ async def initializeHost(websocket):
     # Store list of connections to be broadcasted to
     HOST_KEYS[hostKey] = studentKey
     JOINED[studentKey] = {websocket}
+    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(websocket.id, "DefaultTeacher", True, True)})
 
     response = initializeHostSuccess()
     response.hostKey = hostKey
@@ -50,6 +57,9 @@ async def initializeHost(websocket):
         # this will need to be changed to allow a reconnect.
         # this drops connections as soon as host loses connection
         del HOST_KEYS[hostKey]
+
+        # Some kind of way to deal with teacher dropping
+        USERS[studentKey].removeUser(websocket.id)
 
 
 async def hostConnection(websocket, hostKey, studentKey):
@@ -76,11 +86,15 @@ async def initializeStudent(websocket, studentKey, image):
     """Check for valid key and add connection to host's connections"""
     try:
         connected = JOINED[studentKey]
+        users = USERS[studentKey]
     except KeyError:
         await sendError(websocket, "Invalid Key")
         return
 
     connected.add(websocket)
+    # Maybe add some kind of name randomizer
+    users.addUser(websocket.id, userObject(websocket.id, "DefaultStudent", False, False))
+    
 
     response = initializeStudentSuccess()
     response.studentKey = studentKey
@@ -92,6 +106,7 @@ async def initializeStudent(websocket, studentKey, image):
         await studentConnection(websocket, studentKey)
     finally:
         connected.remove(websocket)
+        users.removeUser(websocket.id)
 
 
 async def studentConnection(websocket, studentKey):
