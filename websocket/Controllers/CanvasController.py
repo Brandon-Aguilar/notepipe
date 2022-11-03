@@ -12,7 +12,7 @@ except ValueError:
 
 
 
-from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage,resetbutton,studentStorepageRequest
+from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage,resetbutton
 from Models.redisObjects import hostPages, loadHostPagesFromJSON
 
 log = logging.getLogger(__name__)
@@ -41,7 +41,9 @@ async def canvasUpdate(websocket, messageJSON, connected, studentKey: str):
     log.info("Set image in redis for studentKey %s", studentKey)
 
     response = canvasUpdateSuccess()
-    await websocket.send(response.toJson())#send canvas updated "Successfully processed canvas update"
+    response.pageNumber = pageNumber 
+    websockets.broadcast(connected, response.toJson())
+    #await websocket.send(response.toJson())#send canvas updated "Successfully processed canvas update"
 
 
 async def canvasDrawUpdate(websocket, messageJSON, connected, studentKey: str):
@@ -53,22 +55,22 @@ async def canvasDrawUpdate(websocket, messageJSON, connected, studentKey: str):
 
     broadcast = canvasDrawUpdateBroadcast() #broadcast.type="canvasDrawUpdateBroadcast"
     broadcast.drawData = messageJSON["drawData"]#broadcast.drawData=drawInstruction array from teacher
+    broadcast.page= messageJSON["page"]
     websockets.broadcast(connected, broadcast.toJson())
 
     response = canvasUpdateSuccess()
     await websocket.send(response.toJson())#send canvas updated "Successfully processed canvas update"
 
-async def studentStorepage(websocket, messageJSON, connected, studentKey: str):
-    response = studentStorepageRequest()
-    response.imageURL=messageJSON["imageURL"]
-    response.pageNumber=messageJSON["pageNumber"]
-    websockets.broadcast(connected, response.toJson())
-
 async def retrieveImage(studentKey,response):
     if redisServer.exists(studentKey):
         pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
         response.imageURL=pages.getLatestPage()
-    
+        response.pageNumber= pages.getLatestPageNumber()
+
+async def fetchPage(studentKey, response, pageNumber):
+    if redisServer.exists(studentKey):
+        pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
+        response.imageURL=pages.getPage(pageNumber)
     
 async def wipestudent(websocket, messageJSON, connected, studentKey: str):
     response = clearpage();
@@ -77,7 +79,6 @@ async def wipestudent(websocket, messageJSON, connected, studentKey: str):
 async def resett(websocket, messageJSON, connected, studentKey: str):
     response = clearpage();
     websockets.broadcast(connected, response.toJson())
-
 
 async def textToSpeech(websocket, studentKey,response):
     if redisServer.exists(studentKey):

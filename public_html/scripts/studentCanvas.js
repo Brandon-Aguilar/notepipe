@@ -63,6 +63,7 @@ var updateMessageElement = document.getElementById("updateStatus");
 var studentLinkElement = document.getElementById("studentLink");
 var studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 var drawAnimationsCheckboxElement = document.getElementById("drawAnimationsCheckbox");
+var currentPageNumberElement = document.getElementById('currentPageNumber');
 
 var drawAnimations = drawAnimationsCheckboxElement.checked;
 drawAnimationsCheckboxElement.addEventListener("change", () => {
@@ -102,62 +103,12 @@ function draw(data) {
     ctx.lineWidth = data.force;
     ctx.lineCap = 'round';
     ctx.stroke();    
-    //update the current image (for page navigation)
-    imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
-    localImages[pageNumber]=imageURL;
 }
-
-
 
 //request text to speech
 function textToSpeech(){
     const request = { type: "textToSpeech",  studentKey: studentKey};
     websocket.send(JSON.stringify(request))
-}
-
-//implement previous and next page requests 
-var image = new Image();
-nextPageElement=document.getElementById('nextPage');
-previousPageElement= document.getElementById('previousPage');
-currentPageNumberElement = document.getElementById('currentPageNumber');
-
-nextPageElement.addEventListener('click', function (){
-    nextOrPrevious(viewingPageNumber+1)});
-previousPageElement.addEventListener('click', function (){
-    nextOrPrevious(viewingPageNumber-1)});
-
-function nextOrPrevious(pageWanted){
-    if(pageWanted>=0 && pageWanted<=pageNumber){
-        console.log("1) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
-        //clear the current page
-        width = window.innerWidth;
-        height = window.innerHeight;  
-        ctx.clearRect(0, 0, width, height);
-        
-        if(pageWanted<viewingPageNumber ){//requested previous page
-            image.src=localImages[pageWanted]
-            image.onload = function() {//wait for image to load before trying to draw to canvas
-                ctx.drawImage(image, 0, 0);
-            }
-            viewingPageNumber-=1
-            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
-        }
-        if(pageWanted>viewingPageNumber){//requested next page
-            image.src=localImages[pageWanted]
-            image.onload = function() {//wait for image to load before trying to draw to canvas
-                ctx.drawImage(image, 0, 0);
-            }
-            viewingPageNumber+=1
-            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
-        }
-        console.log("2) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
-    }
-
-    else{
-        currentPageNumberElement.textContent="The page requested "+pageWanted+" does not exist "
-        console.log("the page requested ("+pageWanted+") is out of bound")
-    }
-        
 }
 
 //Download the current page
@@ -214,6 +165,10 @@ function processMessage({ data }) {
             image.src = event.imageURL;
             image.onload = function() {//wait for image to load before trying to draw to canvas
                 ctx.drawImage(image, 0, 0);
+                localImages[event.pageNumber]=image;
+                viewingPageNumber=event.pageNumber;
+                currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+                console.log("initialized on page "+viewingPageNumber);
             }
             link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
@@ -241,6 +196,12 @@ function processMessage({ data }) {
                 element = JSON.parse(element);
                 draw(element);//just output the stroke 
             });
+            //event is triggered by creation of new page so save current page  
+            var imageURL = canvas.toDataURL("image/png", 0.2);
+            localImages[viewingPageNumber]= imageURL
+            viewingPageNumber+=1;
+            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+
             currentDrawInstructions = [];
             currentInstructionIndex = 0;
             //clear page fixed
@@ -248,15 +209,72 @@ function processMessage({ data }) {
             height = window.innerHeight
             ctx.clearRect(0, 0, width, height)
             break;
-        case "studentStorepageRequest":
-            pageNumber=event.pageNumber;
-            localImages[pageNumber]=event.imageURL;
-            viewingPageNumber=pageNumber;
-            currentPageNumberElement.textContent="Current page is "+pageNumber;
+        case "canvasUpdateSuccess":
+            console.log("Mouse click has been released or new page has been created")
+            var imageURL = canvas.toDataURL("image/png", 0.2);
+            localImages[event.pageNumber]= imageURL
+            break;
+        case "pageFetched":
+            //clear the current page
+            width = window.innerWidth;
+            height = window.innerHeight;  
+            ctx.clearRect(0, 0, width, height);
+
+            //load requested page
+            image.src=event.imageURL
+            image.onload = function() {//wait for image to load before trying to draw to canvas
+                ctx.drawImage(image, 0, 0);
+            }
+
+            //update the page number currently being viewed 
+            viewingPageNumber=event.pageNumber;
+            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
             break;
     }   
 }
 
+
+//implement previous and next page requests 
+var image = new Image();
+nextPageElement=document.getElementById('nextPage');
+previousPageElement= document.getElementById('previousPage');
+
+nextPageElement.addEventListener('click', function (){
+    nextOrPrevious(viewingPageNumber+1)});
+previousPageElement.addEventListener('click', function (){
+    nextOrPrevious(viewingPageNumber-1)});
+
+function nextOrPrevious(pageWanted){
+    //acceptable range for pages to load
+    if(pageWanted>=0 && pageWanted<localImages.length){
+        //before loading previous/next page, store the current page in local array
+        localImages[viewingPageNumber]= canvas.toDataURL("image/png", 0.2);
+        //check if page wanted has been stord locally (in case where student joins late it might not be)
+        if(localImages[pageWanted]!=undefined){
+            //clear the current page
+            width = window.innerWidth;
+            height = window.innerHeight;  
+            ctx.clearRect(0, 0, width, height);
+
+            //load requested page
+            image.src=localImages[pageWanted]
+            image.onload = function() {//wait for image to load before trying to draw to canvas
+                ctx.drawImage(image, 0, 0);
+            }
+
+            //update the page number currently being viewed 
+            viewingPageNumber=pageWanted
+            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+        }
+        //page is not stored locally so retrieve from redis 
+        else {
+            console.log("Page not stored locally, fetch from redis")
+            const request = { type: "fetchPage", pageNumber:pageWanted, studentKey: studentKey};
+            websocket.send(JSON.stringify(request))
+        }
+        console.log("1) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+localImages.length);
+    }
+}
 
 currentDrawInstructions = [];
 currentInstructionIndex = 0;
