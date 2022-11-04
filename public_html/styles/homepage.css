@@ -81,16 +81,26 @@ li {
  .teacher:active {
    background-color: hsl(211, 98%, 65%);
  }
-input[type="submit"] {
+ .studentSB {
+  font-weight: 700;
+  height: 36px;
+  width: 120px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  letter-spacing: 2px;
+  border-style: none; 
+  border-radius: 16px;
   background-color: hsl(130, 97%, 39%);
   color: white;
 }
-input[type="submit"]:hover {
+.studentSB:hover {
   background-color: hsl(130, 97%, 44%);
 }
-input[type="submit"]:active {
+.studentSB:active {
   background-color: hsl(130, 97%, 46%);
 }
+
 input[type="text"]{
   font-size: 16px;
   height: 32px;
