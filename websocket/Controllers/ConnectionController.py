@@ -1,16 +1,22 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage,wipestudent,textToSpeech,resett,studentStorepage
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage,wipestudent,textToSpeech,resett,fetchPage
 
-from Models.responses import initializeHostSuccess, initializeStudentSuccess,textToSpeechRequest
+from Models.responses import initializeHostSuccess, initializeStudentSuccess,textToSpeechRequest,pageFetched
 from Models.errorHandler import sendError
+from Models.userList import userList
+from Models.userList import userObject
 #from OCR.imageToText import readImage
 
 log = logging.getLogger(__name__)
 
+# hostKey: studentKey
 HOST_KEYS = {str: str}
+# studentKey: list of connected websockets
 JOINED = {str: list}
+# studentKey: userList
+USERS = {str: userList}
 
 
 async def createStudentKey():
@@ -37,6 +43,7 @@ async def initializeHost(websocket):
     # Store list of connections to be broadcasted to
     HOST_KEYS[hostKey] = studentKey
     JOINED[studentKey] = {websocket}
+    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(websocket.id, "DefaultTeacher", True, True)})
 
     response = initializeHostSuccess()
     response.hostKey = hostKey
@@ -51,6 +58,9 @@ async def initializeHost(websocket):
         # this drops connections as soon as host loses connection
         del HOST_KEYS[hostKey]
 
+        # Some kind of way to deal with teacher dropping
+        USERS[studentKey].removeUser(websocket.id)
+
 
 async def hostConnection(websocket, hostKey, studentKey):
     """Process messages for a host connection, loops until disconnected"""
@@ -61,26 +71,27 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "canvasUpdate":#image
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
             case "canvasDrawUpdate":#array
-                await canvasDrawUpdate(websocket, messageJSON, JOINED[studentKey],
-                                       HOST_KEYS[hostKey])
+                await canvasDrawUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
             case "Addnewpage":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await wipestudent(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
             case "resetcanvas":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
-            case "storePage":
-                await studentStorepage(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
 
 async def initializeStudent(websocket, studentKey, image):
     """Check for valid key and add connection to host's connections"""
     try:
         connected = JOINED[studentKey]
+        users = USERS[studentKey]
     except KeyError:
         await sendError(websocket, "Invalid Key")
         return
 
     connected.add(websocket)
+    # Maybe add some kind of name randomizer
+    users.addUser(websocket.id, userObject(websocket.id, "DefaultStudent", False, False))
+    
 
     response = initializeStudentSuccess()
     response.studentKey = studentKey
@@ -92,6 +103,7 @@ async def initializeStudent(websocket, studentKey, image):
         await studentConnection(websocket, studentKey)
     finally:
         connected.remove(websocket)
+        users.removeUser(websocket.id)
 
 
 async def studentConnection(websocket, studentKey):
@@ -111,4 +123,12 @@ async def studentConnection(websocket, studentKey):
                 image=response.imageURL
                 #readImage(image)
                 log.info("image was retrieved %s", image)
+
+            case "fetchPage":
+                response = pageFetched()
+                response.studentKey = studentKey
+                response.pageNumber= messageJSON["pageNumber"]
+                await fetchPage(studentKey, response,messageJSON["pageNumber"])
+                await websocket.send(response.toJson())
+                log.info("fetched page and image is "+response.imageURL)
             

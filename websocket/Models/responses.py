@@ -18,18 +18,20 @@ class initializeHostSuccess(response):
 
 
 class initializeStudentSuccess(response):
-    def __init__(self, studentKey=None, imageURL=None) -> None:
+    def __init__(self, studentKey=None,  pageNumber=None, imageURL=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Successfully initialized student"
         self.studentKey = studentKey
+        self.pageNumber = pageNumber
         self.imageURL= imageURL
 
 
 class canvasUpdateSuccess(response):
-    def __init__(self) -> None:
+    def __init__(self, pageNumber=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
+        self.pageNumber = pageNumber
         self.message = "Successfully processed canvas update"
 
 
@@ -41,10 +43,11 @@ class canvasBroadcast(response):
         self.pageNumber = pageNumber
 
 class canvasDrawUpdateBroadcast(response):
-    def __init__(self, drawData=None) -> None:
+    def __init__(self, drawData=None, page=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.drawData = drawData
+        self.page = page
 
 class clearpage(response):
     def __init__(self) -> None:
@@ -72,9 +75,18 @@ class textToSpeechRequest(response):
         self.studentKey = studentKey
         self.imageURL= imageURL
 
-class studentStorepageRequest(response):
-    def __init__(self, imageURL=None, pageNumber=None) -> None:
+class pageFetched(response):
+    def __init__(self, studentKey=None, pageNumber= None, imageURL=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
-        self.imageURL = imageURL
+        self.message = "Page has been fetched"
+        self.studentKey = studentKey
         self.pageNumber = pageNumber
+        self.imageURL= imageURL
+
+class userJoinUpdate(response):
+    def __init__(self, userList):
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "Userlist change"
+        self.userList = userList
