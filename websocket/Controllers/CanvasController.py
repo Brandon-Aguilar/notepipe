@@ -86,4 +86,9 @@ async def textToSpeech(websocket, studentKey, response):
         pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
         response.imageURL = pages.getLatestPage()
     await websocket.send(response.toJson())
-  
+
+async def fetchImage(studentKey, response, pageNumber):
+    if redisServer.exists(studentKey):
+        pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
+        response.imageURL=pages.getPage(pageNumber) 
+    

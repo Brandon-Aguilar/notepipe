@@ -175,6 +175,20 @@ zipfolder.addEventListener('click', zipFolderbutton);
 
 //Download a zip folder
 function zipFolderbutton(e) {
+            
+    for(let i = 0; i < localImages.length; i++){
+        if(localImages[i]==undefined || localImages.length-1){
+            console.log("Image not stored locally, fetch from redis", i)
+            const request = { type: "fetchImage", pageNumber:i, studentKey: studentKey};
+            websocket.send(JSON.stringify(request))
+        }
+       else{
+            arrayBuffr();
+       }
+    }
+}
+    
+function arrayBuffr(){ 
     var zip = new JSZip();
     index = 0;   
     function Buffer(url, callback) {
@@ -279,6 +293,12 @@ function processMessage({ data }) {
             viewingPageNumber=event.pageNumber;
             currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
             break;
+            case "imageFetched":
+                localImages[event.pageNumber] = event.imageURL
+                if(localImages.length-1 == event.pageNumber){
+                    arrayBuffr();
+                }
+            break; 
     }   
 }
 

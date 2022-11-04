@@ -90,3 +90,12 @@ class userJoinUpdate(response):
         self.__type__ = self.__class__.__name__
         self.message = "Userlist change"
         self.userList = userList
+
+class imageFetched(response):
+    def __init__(self, studentKey=None, pageNumber= None, imageURL=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "Image has been fetched"
+        self.studentKey = studentKey
+        self.pageNumber = pageNumber
+        self.imageURL= imageURL

@@ -1,9 +1,9 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage,wipestudent,textToSpeech,resett,fetchPage
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage,wipestudent,textToSpeech,resett,fetchPage,fetchImage
 
-from Models.responses import initializeHostSuccess, initializeStudentSuccess,textToSpeechRequest,pageFetched
+from Models.responses import initializeHostSuccess, initializeStudentSuccess,textToSpeechRequest,pageFetched,imageFetched
 from Models.errorHandler import sendError
 from Models.userList import userList
 from Models.userList import userObject
@@ -132,3 +132,11 @@ async def studentConnection(websocket, studentKey):
                 await websocket.send(response.toJson())
                 log.info("fetched page and image is "+response.imageURL)
             
+            case "fetchImage":
+                response = imageFetched()
+                log.info("connetionContro", response.pageNumber)
+                response.studentKey = studentKey
+                response.pageNumber= messageJSON["pageNumber"]
+                await fetchImage(studentKey, response,messageJSON["pageNumber"])
+                await websocket.send(response.toJson())
+                log.info("fetche image is "+response.imageURL)
