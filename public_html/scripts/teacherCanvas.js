@@ -99,18 +99,7 @@ const localImages=[];
 
 //save button
 var updateSaveoption=document.getElementById('newpage')
-updateSaveoption.addEventListener('click', storePage)
-
-function storePage(){
-    var imageURL = canvas.toDataURL("image/png", 0.2);
-    var message = {
-        type: "storePage",
-        pageNumber: pageNumber,
-        imageURL,
-    }
-    websocket.send(JSON.stringify(message));
-    newpage();
-}
+updateSaveoption.addEventListener('click', newpage)
 
 function newpage(){
     //for now teacher cannot go to previous page and use save function
@@ -137,13 +126,6 @@ function newpage(){
         sendUpdate();
         imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
         localImages[localImages.length]=imageURL//it is a new page so it should be at index length
-        var message = {
-            type: "storePage",
-            pageNumber: pageNumber,
-            imageURL,
-        }
-        websocket.send(JSON.stringify(message));
-
         currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
     }
     else{
@@ -246,11 +228,13 @@ function sendDrawUpdate(){
 
     websocket.send(JSON.stringify({//send array containing x,y corrdinate of strokes
         type: 'canvasDrawUpdate',
-        drawData: drawInstructions
+        drawData: drawInstructions,
+        page: viewingPageNumber
     }));
     drawInstructions = [];//reset the array for next use
     console.log("Sent Batch Draw Update");
 }
+
 function createAndSaveCanvas(){
     var copyCanvas = document.createElement('canvas');
     var copyCanvasCtx = copyCanvas.getContext('2d');
