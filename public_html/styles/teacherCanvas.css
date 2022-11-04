@@ -42,12 +42,6 @@
   
   /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
   .show {display:block;}
-
-  body{
-    padding-left: 100px;
-    padding-top: 100px;
-    margin:0px;
-  }
     
   .header{
     display: flex;
@@ -56,25 +50,94 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    /* Height should match body padding */
-    height: 100px;
-    background-color: lightblue;
+    background: none;
     margin:0;
     padding: 0;
     z-index: 100;
   }
+
+  .header button:active{
+    opacity: .75;
+  }
+  
+  button:hover{
+    cursor: pointer;
+  }
+  
+  .header-left{
+    background-color: #323336;
+    border-radius:  20px;
+    border: none;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .header-left img{
+    padding-top: 5px;
+    height: 25px;
+  }
+
+  .header-middle{
+    display: flex;
+    background-color: #323336;
+    align-content: space-between;
+    justify-content: space-between;
+    width: 200px;
+    height: 40px;
+    border-radius: 20px;
+  }
+
+  .header-middle button{
+    height: 32px;
+    width: 32px;
+    border-radius: 16px;
+    border: none;
+    background-color: #323336;
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+  .current-page-counter{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: white;
+  }
+
+  .navigation-icon{
+    padding: 5px;
+  }
   
   .header-right{
     display: flex;
-    flex-direction: column;
   }
-  
-  .status-check{
-    position: fixed;
-    bottom: 2px;
-    right: 10px;
+
+  .header-right button{
+    height: 40px;
+    width: 40px;
+    border-radius: 20px;
+    border: none;
+    background-color: #323336;
+    display: flex;
+    justify-content: center;
   }
-  
+
+  .save-button{
+    margin-right: 5px;
+  }
+
+  .menu-icon{
+    padding: 6px;
+  }
+
+  .save-icon{
+    padding: 2px;
+  }
+
   .animation-prompt{
     position: fixed;
     bottom: 2px;
@@ -85,22 +148,10 @@
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 120px;
+    top: 35%;
     left: 0px;
-    width: 100px;
-  }
-  
-  .canvas-page-controls{
-    background-color:lightgrey;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .page-navigation-tools{
-    background-color: lightgoldenrodyellow;
-    display: flex;
-    justify-content: center;
-    align-content: center;
+    width: 75px;
+    z-index: 100;
   }
   
   .save-tools{
@@ -111,18 +162,49 @@
   .drawing-tools-sidebar{
     display: flex;
     flex-direction: column;
-    background-color: lightcoral;
-  
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: #323336;
     align-items: center;
-    top: 100px;
-    left: 0px;
-    /*Width should match body padding*/
-    width: 100px;
   }
   
   .drawing-tools-sidebar button{
+    background-color: #555;
+    border: none;
+    border-radius: 20px;
+
+
     height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
   }
+
+  .drawing-tools-sidebar button:active{
+    opacity: .75;
+  }
+
+  .color-button{
+    margin-top: 5px;
+  }
+
+  .undo-button{
+    margin-top: 15px;
+  }
+
+  .eraser-button{
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .color-button img{
+    padding: 1px;
+  }
+
+  .undo-button, .eraser-button img {
+    padding: 8px;
+  }
+
   
   .text-to-speech-controls{
     display: flex;
@@ -165,4 +247,31 @@
   .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+  }
+
+  .top-border{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 20px;
+    background-color: black;
+  }
+
+  .left-border{
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 20px;
+    background-color: black;
+  }
+
+  .feature-testing{
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 2px;
+    right: 10px;
   }
