@@ -28,47 +28,97 @@
             </div>
         </header>
         <br> -->
-
-        <div id="header" class="header">
-            <div class="header-left">
-              <h1>NotePipe</h1>
-            </div>
-            <div class="header-right">
-              <div>
-                <p>Current Role: Student</p>
-              </div>
-              <div>
-                <p id="updateStatus">Content Not Sent</p>
-                <a id="studentLinkAnchor"><p id="studentLink"></p></a>
-              </div>
-            </div>
-          </div>
-  
-          <div class="animation-prompt">
-            <input type="checkbox" id="drawAnimationsCheckbox">
-            <label for="drawAnimationsCheckbox">Enable Animations</label>
-          </div>
-
-          <div class="left-sidebar">
+      
+        <div id="header "class="header">
           
-            <div class="canvas-page-controls">
-              
-              <div class="save-tools">
-                <button id="Saveoption">Save</button>
+          <div class="header-left">
+            <a class="home-link" href="../index.html">
+              <img src="../icons/home-icon.svg" alt="Home">
+            </a>
+          </div>
+          
+          <div class="header-middle">
+            <div class="page-navigation-button">
+              <button id="previousPage">
+                  <img class="navigation-icon" src="../icons/left-arrow.svg" alt="Previous Page">
+              </button>
+            </div>
+            <div class="current-page-counter"> 
+              <p id="currentPageNumber">1/1</p>
+            </div>
+            <div class="page-navigation-button"> 
+              <button id="nextPage">
+                <img class="navigation-icon" src="../icons/right-arrow.svg" alt="Next Page">
+              </button>
+            </div> 
+          </div>
+          
+          <div class="header-right">
+            <button class="save-button">
+              <img class="save-icon" src="../icons/save-icon.svg" alt="Save">
+            </button>
+            <button class="menu-button">
+              <img class="menu-icon" src="../icons/menu-icon.svg" alt="Menu">
+            </button>
+          </div>
+
+          <!-- Hiding for now, will add as functionality inside menu icon
+            <div>
+              <div class="tooltip">
+                <button onclick="copyJoinKey()" onmouseout="copyKeyOutFunc()">
+                  <span class="tooltiptext" id="myTooltip">Copy to clipboard</span>
+                  Copy text
+                </button>
               </div>
-              
-              <div class="page-navigation-tools">
-                <div class="page-navigation-button">
-                  <button id="previousPage">&#60;</button>
-                </div>
-                <div class="current-page-counter"> 
-                  <p id="currentPageNumber">Current page is 0</p>
-                </div>
-                <div class="page-navigation-button"> 
-                  <button id="nextPage">&#62;</button> 
-                </div>
-              </div>
-              
+              <a id="studentLinkAnchor">
+                <p id="studentLink"></p>
+              </a>
+              <div id="qrcode"></div>
+            </div>
+          </div> -->
+        </div> 
+        
+        <div class="left-sidebar">
+          <!-- Need to add effects when selected/active -->
+          <div id="container" class="drawing-tools-sidebar">
+            <div class="draw-tool">
+              <button class="color-button" onclick="changeColor('black')" id="black">
+                <img src="../icons/black-icon.svg" alt="Black">
+              </button>
+            </div>
+            <div class="draw-tool">
+              <button class="color-button" onclick="changeColor('blue')" id="blue=">
+                <img src="../icons/blue-icon.svg" alt="Blue">
+              </button>
+            </div>
+            <div class="draw-tool">
+              <button class="color-button" onclick="changeColor('red')" id="red">
+                <img src="../icons/red-icon.svg" alt="Red">
+              </button>
+            </div>
+            <div class="draw-tool">
+              <button class="color-button" onclick="changeColor('green')" id="green">
+                <img src="../icons/green-icon.svg" alt="Green">
+              </button>
+            </div>
+            <div class="draw-tool">
+              <button class="undo-button" id="undo">
+                <img src="../icons/undo-icon.svg" alt="Undo">
+              </button>
+            </div>
+            <div class="draw-tool">
+              <button class="eraser-button" onclick="eraser()" id="eraser">
+                <img src="../icons/eraser-icon.svg" alt="Eraser">
+              </button>
+            </div>
+          </div>
+      </div>
+    
+    <div class="top-border"></div>
+    <div class="left-border"></div>
+
+      <!-- Place experimental features/buttons here -->
+      <div class="feature-testing">
               <!-- TODO: FIX THIS!!!! NEEDED FOR JAVASCRIPT TEMPORARILY PUTTING HERE-->
               <div class="temporaryfixsomeonefixthislater">
                 <input type="checkbox" id="drawAnimationsCheckbox" checked>
@@ -79,27 +129,14 @@
               <div class="text-to-speech-controls">
                 <button id="TTS">TTS</button>
               </div>
-            </div>
-          </div> 
-
-              <!-- <div id="container" class="drawing-tools-sidebar">
-                <div class="draw-tool">
-                  <button class="button" onclick="changeColor('black')" id="black">Black</button>
-                </div>
-                <div class="draw-tool">
-                  <button class="button" onclick="changeColor('blue')" id="blue=">Blue</button>
-                </div>
-                <div class="draw-tool">
-                  <button class="button" onclick="changeColor('red')" id="red">Red</button>
-                </div>
-                <div class="draw-tool">
-                  <button class="button" onclick="changeColor('green')" id="green">Green</button>
-                </div>
-                <div class="draw-tool">
-                  <button class="undo"     id="undo">Undo</button>
-                </div> -->
-                
-            
+              <div class="save-tools">
+                <button id="Saveoption">Save</button>
+              </div>
+              <a id="studentLinkAnchor">
+                <p id="studentLink"></p>
+              </a>
+              <p id="updateStatus">Content Not Sent</p>
+        </div>       
     
     </body>
 
