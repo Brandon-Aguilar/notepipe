@@ -43,11 +43,12 @@ class canvasBroadcast(response):
         self.pageNumber = pageNumber
 
 class canvasDrawUpdateBroadcast(response):
-    def __init__(self, drawData=None, page=None) -> None:
+    def __init__(self, drawData=None, eraser=None, page=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.drawData = drawData
         self.page = page
+        self.eraser = eraser
 
 class clearpage(response):
     def __init__(self) -> None:

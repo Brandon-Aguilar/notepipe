@@ -144,7 +144,12 @@ function initializeStudent() {
 }
 
 //same as teacher draw function
-function draw(data) {
+function draw(data, eraser) {
+    if(eraser == true){
+        ctx.globalCompositeOperation = "destination-out";
+    }else{
+        ctx.globalCompositeOperation = 'source-over';
+    }
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);
     ctx.lineTo(data.x, data.y);
@@ -240,13 +245,13 @@ function processMessage({ data }) {
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
             
-            if(drawAnimations){
+            if(drawAnimations && event.eraser == false){
                 currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
                 currentFrames.push(window.requestAnimationFrame(animateDraw));
             } else {
                 event.drawData.forEach((element) => {//loop through each value
                     element = JSON.parse(element);
-                    draw(element);//just output the stroke 
+                    draw(element, event.eraser);//just output the stroke 
                 });
             }
             

@@ -214,6 +214,7 @@ function sendStroke(e){
     sendDrawUpdate();//will send strokes to clients
     sendUpdate();//store canvas image to redis 
 }
+var requestER = false;
 
 function sendDrawUpdate(){
     //save updated canvas locally 
@@ -229,7 +230,8 @@ function sendDrawUpdate(){
     websocket.send(JSON.stringify({//send array containing x,y corrdinate of strokes
         type: 'canvasDrawUpdate',
         drawData: drawInstructions,
-        page: viewingPageNumber
+        page: viewingPageNumber,
+        requestER: requestER
     }));
     drawInstructions = [];//reset the array for next use
     console.log("Sent Batch Draw Update");
@@ -263,11 +265,16 @@ function sendUpdate() {
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
     color = newColor;
+    requestER= false;
+    ctx.globalCompositeOperation = 'source-over';
   };
 
   // Eraser
 function eraser(){
-    ctx.strokeStyle = "rgba(255,255,255,1)";
+    requestER = true;
+    // Erasing by using destination image to be on top of the drawn image in source image
+    ctx.globalCompositeOperation = "destination-out";
+    console.log("Image erased: ", pageNumber)
 };
 
 function draw(data) {
@@ -376,7 +383,6 @@ function downloadbutton(e) {
     link.download = 'download.png';
     link.href = canvas.toDataURL();
     link.click();
-
     link.delete;
 };     
 
