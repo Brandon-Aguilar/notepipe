@@ -68,6 +68,15 @@ class error(response):
         self.__type__ = self.__class__.__name__
         self.message = "Unknown Error"
 
+class imageToTextRequest(response):
+    def __init__(self, studentKey=None, imageURL=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "Image to text function requested"
+        self.studentKey = studentKey
+        self.imageURL= imageURL
+        self.convertedText = ""
+        
 class textToSpeechRequest(response):
     def __init__(self, studentKey=None, imageURL=None) -> None:
         super().__init__()

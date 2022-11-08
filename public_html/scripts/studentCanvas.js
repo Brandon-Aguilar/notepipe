@@ -39,7 +39,7 @@ var image = new Image();
 resize();
 
 //Fetch HTML elements that need event listners
-var imageToText = document.getElementById("TTS");
+var ocr = document.getElementById("TTS");
 const download = document.getElementById('download');
 
 // Event listeners to trigger functions
@@ -47,29 +47,30 @@ const download = document.getElementById('download');
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
 download.addEventListener('click', downloadbutton);
-imageToText.addEventListener('click', showTextEditor);
+ocr.addEventListener('click', showTextEditor);
 
 function showTextEditor(){
-    imageToText.disabled = true;
+    ocr.disabled = true;
+
+    // Create editor container
     var html = [
         "<button type='button' id='closeBtn' class='btn'>X</button>",
         "<div style='background-color: #ffffff;'>" ,
-            "<div id='toolbar'></div>" ,
             "<div id='editor'></div>" ,
         "</div>" ,
         "<button type='button' id='saveAs' class='btn'>save as</button>" ,
         "<button type='button' id='speechify' class='btn'>convert to speech</button>"
     ].join("");
 
+    // Wrap and insert editor container to document 
     var editorWindow = document.createElement('div');
     editorWindow.setAttribute('id', 'textEditor');
     editorWindow.setAttribute('class', 'box');
     editorWindow.innerHTML = html;
     document.body.appendChild(editorWindow);
 
-    // insert image to text output into div(id=editor)
-
-    var toolbarOptions = [
+    // Set editor toolbar options
+    toolbarOptions = [
         [{'header': [1, 2, 3, 4, 5, 6, false]}],
         [{ 'font': [] }],
         ['bold', 'italic', 'underline', 'strike'],
@@ -80,22 +81,35 @@ function showTextEditor(){
         ['link', 'image', 'formula'],
         [{ 'color': [] }, {'background': [] }],
         [{ 'align': [] }]
-      ];
+        ];
 
-    var quill = new Quill('#editor', {
+    // Instantiate editor
+    quill = new Quill('#editor', {
         modules: {
             toolbar: toolbarOptions
         },
         theme: 'snow'
     });
 
+    // Invoke websocket request for OCR service
+    imageToText();
+
+    // Event listener for 'X' button
     const closeEditorBtn = document.getElementById('closeBtn');
     closeEditorBtn.addEventListener('click', closeEditor);
+
+    // Event listener for 'Save As' button
+    const SaveAsBtn = document.getElementById('closeBtn');
+    SaveAsBtn.addEventListener('click', function(){});
+
+    // Event listener for 'Convert To Speech' button
+    const convertToSpeechBtn = document.getElementById('closeBtn');
+    convertToSpeechBtn.addEventListener('click', function(){});
 }
 
 function closeEditor(){
     document.getElementById('textEditor').remove();
-    imageToText.disabled = false;
+    ocr.disabled = false;
 }
 
 image.onload = function() {
@@ -159,9 +173,9 @@ function draw(data, eraser) {
     ctx.stroke();    
 }
 
-//request text to speech
-function textToSpeech(){
-    const request = { type: "textToSpeech",  studentKey: studentKey};
+// request OCR service
+function imageToText(){
+    const request = { type: "imageToText",  studentKey: studentKey};
     websocket.send(JSON.stringify(request))
 }
 
@@ -303,7 +317,10 @@ function processMessage({ data }) {
                 if(localImages.length-1 == event.pageNumber){
                     arrayBuffr();
                 }
-            break; 
+            break;
+            case "imageToTextRequest":
+                quill.setText(event.convertedText);
+                break;
     }   
 }
 

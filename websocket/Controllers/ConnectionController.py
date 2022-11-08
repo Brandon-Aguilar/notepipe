@@ -1,13 +1,13 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate,retrieveImage,wipestudent,textToSpeech,resett,fetchPage,fetchImage
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, wipestudent, imageToText, resett, fetchPage, fetchImage
 
-from Models.responses import initializeHostSuccess, initializeStudentSuccess,textToSpeechRequest,pageFetched,imageFetched
+from Models.responses import initializeHostSuccess, initializeStudentSuccess, imageToTextRequest, pageFetched, imageFetched
 from Models.errorHandler import sendError
 from Models.userList import userList
 from Models.userList import userObject
-#from OCR.imageToText import readImage
+from OCR.imageToText import readImage, rearrangeLines, reorderWords
 
 log = logging.getLogger(__name__)
 
@@ -116,13 +116,13 @@ async def studentConnection(websocket, studentKey):
 
         match messageJSON["type"]:
             # Button events
-            case "textToSpeech":
-                response= textToSpeechRequest()
+            case "imageToText":
+                response = imageToTextRequest()
                 response.studentKey = studentKey
-                await textToSpeech(websocket, studentKey,response)
-                image=response.imageURL
-                #readImage(image)
-                log.info("image was retrieved %s", image)
+                await imageToText(websocket, studentKey, response)
+                response.convertedText = rearrangeLines(reorderWords(readImage(response.imageURL)))
+                await websocket.send(response.toJson())
+                log.info("image was retrieved %s", response.imageURL)
 
             case "fetchPage":
                 response = pageFetched()
