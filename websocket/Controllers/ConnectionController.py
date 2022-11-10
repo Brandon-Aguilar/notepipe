@@ -119,7 +119,7 @@ async def studentConnection(websocket, studentKey):
             case "imageToText":
                 response = imageToTextRequest()
                 response.studentKey = studentKey
-                await imageToText(websocket, studentKey, response)
+                await imageToText(websocket, studentKey, response,messageJSON["pageNumber"])
                 response.convertedText = rearrangeLines(reorderWords(readImage(response.imageURL)))
                 await websocket.send(response.toJson())
                 log.info("image was retrieved %s", response.imageURL)
