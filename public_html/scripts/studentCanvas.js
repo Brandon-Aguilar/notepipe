@@ -305,6 +305,7 @@ function processMessage({ data }) {
             //localImages[event.pageNumber]= imageURL;
             pageNumber += 1;
             drawInstructions.push([]);
+            setCurrentPageText();
             break;
         case "pageFetched":
             //clear the current page

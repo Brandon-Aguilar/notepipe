@@ -126,6 +126,8 @@ async def studentConnection(websocket, studentKey):
                 log.info("image was retrieved %s", response.imageURL)
 
             case "fetchPage":
+                log.info("Fetching image for page %s", messageJSON["pageNumber"])
+
                 try:
                     response = pageFetched()
                     response.studentKey = studentKey
@@ -138,8 +140,8 @@ async def studentConnection(websocket, studentKey):
                 log.info("fetched page and image is "+response.imageURL)
             
             case "fetchImage":
-                log.info("connetionContro", response.pageNumber)
-                
+                log.info("Fetching image for page %s", messageJSON["pageNumber"])
+
                 try:
                     response = imageFetched()
                     response.studentKey = studentKey
