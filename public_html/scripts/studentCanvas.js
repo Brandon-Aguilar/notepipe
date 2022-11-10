@@ -158,19 +158,15 @@ function initializeStudent() {
 }
 
 //same as teacher draw function
-function draw(data, eraser) {
-    if(eraser == true){
-        ctx.globalCompositeOperation = "destination-out";
-    }else{
-        ctx.globalCompositeOperation = 'source-over';
-    }
+function draw(data) {
+    ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
     ctx.beginPath();
-    ctx.moveTo(data.lastPoint.x, data.lastPoint.y);
-    ctx.lineTo(data.x, data.y);
-    ctx.strokeStyle = data.color;
-    ctx.lineWidth = data.force;
+    ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
+    ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
+    ctx.strokeStyle = data.color;//original default stroke color 
+    ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
-    ctx.stroke();    
+    ctx.stroke();//outlines the current or given path with the current stroke style
 }
 
 // request OCR service
@@ -249,25 +245,40 @@ function processMessage({ data }) {
                 ctx.drawImage(image, 0, 0);
                 localImages[event.pageNumber]=image;
                 viewingPageNumber=event.pageNumber;
-                currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+                setCurrentPageText();
                 console.log("initialized on page "+viewingPageNumber);
             }
             link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
+            pageNumber = event.pageNumber;
+            
+            // initialize page drawInstructions
+            drawInstructions = Array(pageNumber+1).fill([]);
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
-            
-            if(drawAnimations && event.eraser == false){
-                currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
-                currentFrames.push(window.requestAnimationFrame(animateDraw));
+
+            if(event.page == viewingPageNumber){
+                if(drawAnimations){
+                    currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
+                    currentFrames.push(window.requestAnimationFrame(animateDraw));
+                } else {
+                    event.drawData.forEach((element) => {//loop through each value
+                        element = JSON.parse(element);
+                        draw(element);//just output the stroke 
+                    });
+                }
             } else {
+                parsedInstructions = []
                 event.drawData.forEach((element) => {//loop through each value
                     element = JSON.parse(element);
-                    draw(element, event.eraser);//just output the stroke 
+                    parsedInstructions.push(element);
                 });
+                
+                drawInstructions[event.page].push(parsedInstructions);
             }
+            
             
             break;
         case "clearpage":
@@ -278,23 +289,22 @@ function processMessage({ data }) {
                 element = JSON.parse(element);
                 draw(element);//just output the stroke 
             });
-            //event is triggered by creation of new page so save current page  
-            var imageURL = canvas.toDataURL("image/png", 0.2);
-            localImages[viewingPageNumber]= imageURL
-            viewingPageNumber+=1;
-            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
-
             currentDrawInstructions = [];
             currentInstructionIndex = 0;
+
             //clear page fixed
             width = window.innerWidth
             height = window.innerHeight
             ctx.clearRect(0, 0, width, height)
             break;
-        case "canvasUpdateSuccess":
-            console.log("Mouse click has been released or new page has been created")
-            var imageURL = canvas.toDataURL("image/png", 0.2);
-            localImages[event.pageNumber]= imageURL
+        case "newPageCreated":
+            console.log("New page has been created")
+            // When we add page following, this should be an if
+            // if following...viewingPageNumber = event.pageNumber
+            //var imageURL = canvas.toDataURL("image/png", 0.2);
+            //localImages[event.pageNumber]= imageURL;
+            pageNumber += 1;
+            drawInstructions.push([]);
             break;
         case "pageFetched":
             //clear the current page
@@ -310,17 +320,18 @@ function processMessage({ data }) {
 
             //update the page number currently being viewed 
             viewingPageNumber=event.pageNumber;
-            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+            setCurrentPageText();
             break;
-            case "imageFetched":
-                localImages[event.pageNumber] = event.imageURL
-                if(localImages.length-1 == event.pageNumber){
-                    arrayBuffr();
-                }
+        case "imageFetched":
+            localImages[event.pageNumber] = event.imageURL
+            if(localImages.length-1 == event.pageNumber){
+                arrayBuffr();
+            }
             break;
-            case "imageToTextRequest":
-                quill.setText(event.convertedText);
-                break;
+        case "imageToTextRequest":
+            quill.setText(event.convertedText);
+            break;
+
     }   
 }
 
@@ -331,13 +342,17 @@ nextPageElement=document.getElementById('nextPage');
 previousPageElement= document.getElementById('previousPage');
 
 nextPageElement.addEventListener('click', function (){
-    nextOrPrevious(viewingPageNumber+1)});
+    navigateToPage(viewingPageNumber+1)});
 previousPageElement.addEventListener('click', function (){
-    nextOrPrevious(viewingPageNumber-1)});
+    navigateToPage(viewingPageNumber-1)});
 
-function nextOrPrevious(pageWanted){
+
+var drawInstructions=[[]]
+
+// This was nextOrPrevious, changing name to navigateToPage since we need this for future direct page navs and it more clearly represents what it is doing
+function navigateToPage(pageWanted){
     //acceptable range for pages to load
-    if(pageWanted>=0 && pageWanted<localImages.length){
+    if(pageWanted>=0 && pageWanted<=pageNumber){
         //before loading previous/next page, store the current page in local array
         localImages[viewingPageNumber]= canvas.toDataURL("image/png", 0.2);
         //check if page wanted has been stord locally (in case where student joins late it might not be)
@@ -353,9 +368,20 @@ function nextOrPrevious(pageWanted){
                 ctx.drawImage(image, 0, 0);
             }
 
+            if(drawInstructions[pageWanted].length !=0 ){
+                console.log("draw instructions need to execute");
+                drawInstructions[pageWanted].forEach((currInstructions) => {
+                    currInstructions.forEach((stroke) => {
+                        draw(stroke);
+                    });
+                });
+
+                drawInstructions[pageWanted]=[];
+            }
+
             //update the page number currently being viewed 
-            viewingPageNumber=pageWanted
-            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+            viewingPageNumber=pageWanted;
+            setCurrentPageText();
         }
         //page is not stored locally so retrieve from redis 
         else {
@@ -364,6 +390,10 @@ function nextOrPrevious(pageWanted){
             websocket.send(JSON.stringify(request))
         }
         console.log("1) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+localImages.length);
+    } else {
+        //currentPageNumberElement.textContent="The page requested "+pageWanted+" does not exist "
+        // Probably dont need to show this in prod
+        console.log("the page requested ("+pageWanted+") is out of bound")
     }
 }
 
@@ -393,4 +423,6 @@ function cancelAllAnimationFrames() {
     currentFrames = [];
 }
 
-
+function setCurrentPageText() {
+    currentPageNumberElement.textContent = (viewingPageNumber + 1).toString() + "/" + (pageNumber + 1).toString();
+}

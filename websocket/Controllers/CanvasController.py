@@ -4,6 +4,8 @@ import redis
 import json
 import os
 
+from Models.responses import newPageCreated
+
 #from handwriting.websocket.Models.responses import response
 try:
     redisServer = redis.Redis.from_url(url=os.environ.get("REDIS_URL"), db=0)
@@ -97,4 +99,9 @@ async def fetchImage(studentKey, response, pageNumber):
     if redisServer.exists(studentKey):
         pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
         response.imageURL=pages.getPage(pageNumber) 
+
+async def canvasNewPage(websocket, messageJSON, connected, studentKey: str):
+    log.info("Adding new page on websocket %s", websocket.id)
+    response = newPageCreated()
+    websockets.broadcast(connected, response.toJson())
     

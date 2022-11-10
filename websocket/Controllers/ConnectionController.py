@@ -1,7 +1,7 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, wipestudent, imageToText, resett, fetchPage, fetchImage
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, wipestudent, imageToText, resett, fetchPage, fetchImage, canvasNewPage
 
 from Models.responses import initializeHostSuccess, initializeStudentSuccess, imageToTextRequest, pageFetched, imageFetched
 from Models.errorHandler import sendError
@@ -73,8 +73,9 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "canvasDrawUpdate":#array
                 await canvasDrawUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
             case "Addnewpage":
-                await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
-                await wipestudent(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
+                await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) 
+                await canvasNewPage(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])        
+                #await wipestudent(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) leave the client to decide to wipe
             case "resetcanvas":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
@@ -125,18 +126,27 @@ async def studentConnection(websocket, studentKey):
                 log.info("image was retrieved %s", response.imageURL)
 
             case "fetchPage":
-                response = pageFetched()
-                response.studentKey = studentKey
-                response.pageNumber= messageJSON["pageNumber"]
-                await fetchPage(studentKey, response,messageJSON["pageNumber"])
-                await websocket.send(response.toJson())
+                try:
+                    response = pageFetched()
+                    response.studentKey = studentKey
+                    response.pageNumber= messageJSON["pageNumber"]
+                    await fetchPage(studentKey, response, messageJSON["pageNumber"])
+                    await websocket.send(response.toJson())
+                except Exception as e:
+                    log.info("Failed to fetch image: %s", e)
+                    sendError(websocket, "Failed to fetch image")
                 log.info("fetched page and image is "+response.imageURL)
             
             case "fetchImage":
-                response = imageFetched()
                 log.info("connetionContro", response.pageNumber)
-                response.studentKey = studentKey
-                response.pageNumber= messageJSON["pageNumber"]
-                await fetchImage(studentKey, response,messageJSON["pageNumber"])
-                await websocket.send(response.toJson())
+                
+                try:
+                    response = imageFetched()
+                    response.studentKey = studentKey
+                    response.pageNumber= messageJSON["pageNumber"]
+                    await fetchImage(studentKey, response,messageJSON["pageNumber"])
+                    await websocket.send(response.toJson())
+                except Exception as e:
+                    log.info("Failed to fetch image: %s", e)
+                    sendError(websocket, "Failed to fetch image")
                 log.info("fetche image is "+response.imageURL)

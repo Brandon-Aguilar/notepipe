@@ -31,8 +31,10 @@ class hostPages(redisObject):
 #use these two functions only for inital conne
     def getLatestPage(self):
         return self.pages[len(self.pages) - 1]
+        
     def getLatestPageNumber(self):
         return len(self.pages) - 1
+
 #get any requested page
     def getPage(self, pageNumber: int)->None:
         return self.pages[pageNumber]

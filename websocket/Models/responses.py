@@ -109,3 +109,10 @@ class imageFetched(response):
         self.studentKey = studentKey
         self.pageNumber = pageNumber
         self.imageURL= imageURL
+
+class newPageCreated(response):
+    def __init__(self):
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "New Page Added"
+

@@ -126,7 +126,7 @@ function newpage(){
         sendUpdate();
         imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
         localImages[localImages.length]=imageURL//it is a new page so it should be at index length
-        currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
+        setCurrentPageText();
     }
     else{
         currentPageNumberElement.textContent="please be on page"+pageNumber+" to add a new page";
@@ -214,7 +214,7 @@ function sendStroke(e){
     sendDrawUpdate();//will send strokes to clients
     sendUpdate();//store canvas image to redis 
 }
-var requestER = false;
+var eraserState = false;
 
 function sendDrawUpdate(){
     //save updated canvas locally 
@@ -231,7 +231,7 @@ function sendDrawUpdate(){
         type: 'canvasDrawUpdate',
         drawData: drawInstructions,
         page: viewingPageNumber,
-        requestER: requestER
+        requestER: eraserState
     }));
     drawInstructions = [];//reset the array for next use
     console.log("Sent Batch Draw Update");
@@ -265,19 +265,20 @@ function sendUpdate() {
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
     color = newColor;
-    requestER= false;
+    eraserState= false;
     ctx.globalCompositeOperation = 'source-over';
   };
 
   // Eraser
 function eraser(){
-    requestER = true;
+    eraserState = true;
     // Erasing by using destination image to be on top of the drawn image in source image
     ctx.globalCompositeOperation = "destination-out";
     console.log("Image erased: ", pageNumber)
 };
 
 function draw(data) {
+    ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
     ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
@@ -308,7 +309,8 @@ function move(e) {
             x: e.offsetX,//x-coordinate of the mouse pointer relative to the document
             y: e.offsetY,//y-coordinate of the mouse pointer relative to the document
             force: force,
-            color: color || 'green'
+            color: color || 'green',
+            eraserState
         });
 
         drawData = JSON.stringify({
@@ -316,7 +318,8 @@ function move(e) {
             x: e.offsetX,
             y: e.offsetY,
             color: color || 'green',
-            force: force
+            force: force,
+            eraserState
         });
 
         drawInstructions.push(drawData);//store drawData in drawInstructions
@@ -392,40 +395,27 @@ nextPageElement=document.getElementById('nextPage');
 previousPageElement= document.getElementById('previousPage');
 
 nextPageElement.addEventListener('click', function (){
-    nextOrPrevious(viewingPageNumber+1)});
+    navigateToPage(viewingPageNumber+1)});
 previousPageElement.addEventListener('click', function (){
-    nextOrPrevious(viewingPageNumber-1)});
+    navigateToPage(viewingPageNumber-1)});
 
-function nextOrPrevious(pageWanted){
+function navigateToPage(pageWanted){
     if(pageWanted>=0 && pageWanted<=pageNumber){
         console.log("1) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
         //clear the current page
         width = window.innerWidth;
         height = window.innerHeight;  
         ctx.clearRect(0, 0, width, height);
-        
-        if(pageWanted<viewingPageNumber ){//requested previous page
-            image.src=localImages[pageWanted]
-            image.onload = function() {//wait for image to load before trying to draw to canvas
-                ctx.drawImage(image, 0, 0);
-            }
-            viewingPageNumber-=1
-            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
-        }
-        if(pageWanted>viewingPageNumber){//requested next page
-            image.src=localImages[pageWanted]
-            image.onload = function() {//wait for image to load before trying to draw to canvas
-                ctx.drawImage(image, 0, 0);
-            }
-            viewingPageNumber+=1
-            currentPageNumberElement.textContent="Current page is "+viewingPageNumber;
-        }
-        console.log("2) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
-    }
 
-    else{
-        currentPageNumberElement.textContent="The page requested "+pageWanted+" does not exist "
-        console.log("the page requested ("+pageWanted+") is out of bound")
+
+        image.src=localImages[pageWanted]
+        image.onload = function() {//wait for image to load before trying to draw to canvas
+            ctx.drawImage(image, 0, 0);
+        }
+        viewingPageNumber = pageWanted;
+        setCurrentPageText();
+
+        console.log("2) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
     }
         
 }
@@ -493,4 +483,8 @@ function copyJoinKey() {
 function copyKeyOutFunc() {
     var tooltip = document.getElementById("myTooltip");
     tooltip.innerHTML = "Copy key to clipboard";
+}
+
+function setCurrentPageText() {
+    currentPageNumberElement.textContent = (viewingPageNumber + 1).toString() + "/" + (pageNumber + 1).toString();
 }
