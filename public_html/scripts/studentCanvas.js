@@ -171,7 +171,7 @@ function draw(data) {
 
 // request OCR service
 function imageToText(){
-    const request = { type: "imageToText",  studentKey: studentKey};
+    const request = { type: "imageToText",  studentKey: studentKey, pageNumber: viewingPageNumber};
     websocket.send(JSON.stringify(request))
 }
 
