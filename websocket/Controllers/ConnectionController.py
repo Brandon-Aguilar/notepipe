@@ -109,7 +109,7 @@ async def initializeStudent(websocket, studentKey, image):
 
 async def studentConnection(websocket, studentKey):
     """Process messages for a student connection, loops until disconnected"""
-
+    users = USERS[studentKey]
     async for message in websocket:
         messageJSON = json.loads(message)
         log.info("Received message from student websocket %s with message type %s",
@@ -152,3 +152,5 @@ async def studentConnection(websocket, studentKey):
                     log.info("Failed to fetch image: %s", e)
                     sendError(websocket, "Failed to fetch image")
                 log.info("fetche image is "+response.imageURL)
+            case "updateName":
+               users.updateUserName(websocket.id, messageJSON["newName"])

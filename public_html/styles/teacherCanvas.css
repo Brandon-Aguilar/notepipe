@@ -336,3 +336,10 @@
     bottom: 2px;
     right: 10px;
   }
+  /*For showing and hiding edit name textbox in javascript*/
+  .show{
+    display:block;
+  }
+  .hide{
+    display: none;
+  }
