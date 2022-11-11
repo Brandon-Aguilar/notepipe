@@ -442,7 +442,7 @@ function setCurrentPageText() {
 //edit name
 function editName(){
     console.log('editName button was clicked and function called');
-    const request = { type: "updateName", name: newName};
+    const request = {type: "updateName", newName: newName}; 
     websocket.send(JSON.stringify(request))
  } 
 
