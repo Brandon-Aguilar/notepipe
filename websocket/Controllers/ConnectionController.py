@@ -64,6 +64,7 @@ async def initializeHost(websocket):
 
 async def hostConnection(websocket, hostKey, studentKey):
     """Process messages for a host connection, loops until disconnected"""
+    users = USERS[studentKey]
     async for message in websocket:
         messageJSON = json.loads(message)
         log.info("Received message from host websocket %s with message type %s", websocket.id, messageJSON["type"])
@@ -79,6 +80,8 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "resetcanvas":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
+            case "updateName":
+               users.updateUserName(websocket.id, messageJSON["newName"])
 
 async def initializeStudent(websocket, studentKey, image):
     """Check for valid key and add connection to host's connections"""

@@ -87,6 +87,17 @@ websocket.addEventListener('open', initializeHost)
 var pageNumber = 0;
 var viewingPageNumber=0; //will keep track of current page being displayed (next/prev function)
 
+//for name change
+var newName = '' // what client chooses new username to be
+const updateName = document.getElementById('updateName');
+updateName.addEventListener('click', editName);
+//listen for input for edit name using input box in teacher.html
+
+window.addEventListener('input', (e) =>{
+    console.log('new name: ', e.target.value);
+    newName = e.target.value;
+}) 
+
 
 // get html elements
 updateMessageElement = document.getElementById("updateStatus");
@@ -487,4 +498,20 @@ function copyKeyOutFunc() {
 
 function setCurrentPageText() {
     currentPageNumberElement.textContent = (viewingPageNumber + 1).toString() + "/" + (pageNumber + 1).toString();
+}
+//edit name
+function editName(){
+    console.log('editName button was clicked and function called');
+    const request = {type: "updateName", newName: newName}; 
+    websocket.send(JSON.stringify(request))
+ } 
+
+ //show/hide textbox to input name
+ function showEditName(){
+    document.getElementById('nameTextBox').className="show";
+    document.getElementById('updateName').className="show";
+ }
+function hideEditName(){
+    document.getElementById('nameTextBox').className="hide";
+    document.getElementById('updateName').className="hide";
 }

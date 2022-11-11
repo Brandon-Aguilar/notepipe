@@ -22,7 +22,7 @@ if (window.location.host === "localhost:8080") {
 var websocket = new WebSocket(serverURL, "json");
 console.log("Connected to Websocket");
 
-//for userList
+//for name change
 var newName = '' // what client chooses new username to be
 
 // Copied canvas code
@@ -445,7 +445,6 @@ function editName(){
     const request = {type: "updateName", newName: newName}; 
     websocket.send(JSON.stringify(request))
  } 
-
  //show/hide textbox to input name
  function showEditName(){
     document.getElementById('nameTextBox').className="show";
