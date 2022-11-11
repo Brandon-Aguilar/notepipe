@@ -254,7 +254,7 @@ function processMessage({ data }) {
             pageNumber = event.pageNumber;
             
             // initialize page drawInstructions
-            drawInstructions = Array(pageNumber+1).fill([]);
+            drawInstructions = Array.from({length: pageNumber+1}, () => new Array());
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");

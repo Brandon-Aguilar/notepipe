@@ -256,7 +256,7 @@ function sendUpdate() {
     var imageURL = canvas.toDataURL("image/png", 0.2);
     var message = {
         type: "canvasUpdate",
-        pageNumber: pageNumber,
+        pageNumber: viewingPageNumber,
         imageURL,
     }
     websocket.send(JSON.stringify(message))
