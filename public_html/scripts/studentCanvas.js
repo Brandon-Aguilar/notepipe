@@ -22,6 +22,8 @@ if (window.location.host === "localhost:8080") {
 var websocket = new WebSocket(serverURL, "json");
 console.log("Connected to Websocket");
 
+//for userList
+var newName = '' // what client chooses new username to be
 
 // Copied canvas code
 // create canvas element and append it to document body
@@ -41,6 +43,8 @@ resize();
 //Fetch HTML elements that need event listners
 var ocr = document.getElementById("TTS");
 const download = document.getElementById('download');
+const updateName = document.getElementById('updateName');
+
 
 // Event listeners to trigger functions
 //window.addEventListener('resize', resize);
@@ -48,6 +52,13 @@ websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
 download.addEventListener('click', downloadbutton);
 ocr.addEventListener('click', showTextEditor);
+updateName.addEventListener('click', editName);
+
+//listen for input for edit name using input box in student.html
+window.addEventListener('input', (e) =>{
+    console.log('new name: ', e.target.value);
+    newName = e.target.value;
+}) 
 
 function showTextEditor(){
     ocr.disabled = true;
@@ -426,4 +437,21 @@ function cancelAllAnimationFrames() {
 
 function setCurrentPageText() {
     currentPageNumberElement.textContent = (viewingPageNumber + 1).toString() + "/" + (pageNumber + 1).toString();
+}
+
+//edit name
+function editName(){
+    console.log('editName button was clicked and function called');
+    const request = { type: "updateName", name: newName};
+    websocket.send(JSON.stringify(request))
+ } 
+
+ //show/hide textbox to input name
+ function showEditName(){
+    document.getElementById('nameTextBox').className="show";
+    document.getElementById('updateName').className="show";
+ }
+function hideEditName(){
+    document.getElementById('nameTextBox').className="hide";
+    document.getElementById('updateName').className="hide";
 }
