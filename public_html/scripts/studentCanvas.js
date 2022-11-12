@@ -69,8 +69,8 @@ function showTextEditor(){
         "<div style='background-color: #ffffff;'>" ,
             "<div id='editor'></div>" ,
         "</div>" ,
-        "<button type='button' id='saveAs' class='btn'>save as</button>" ,
-        "<button type='button' id='speechify' class='btn'>convert to speech</button>"
+        "<button type='button' id='saveAsPDF' class='btn'>download</button>" ,
+        "<button type='button' id='speechify' class='btn'>play</button>"
     ].join("");
 
     // Wrap and insert editor container to document 
@@ -106,21 +106,23 @@ function showTextEditor(){
     imageToText();
 
     // Event listener for 'X' button
-    const closeEditorBtn = document.getElementById('closeBtn');
-    closeEditorBtn.addEventListener('click', closeEditor);
+    const xBtn = document.getElementById('closeBtn');
+    xBtn.addEventListener('click', function(){
+        document.getElementById('textEditor').remove();
+        ocr.disabled = false;
+    });
 
-    // Event listener for 'Save As' button
-    const SaveAsBtn = document.getElementById('closeBtn');
-    SaveAsBtn.addEventListener('click', function(){});
+    // Event listener for 'Download' button
+    const downloadBtn = document.getElementById('saveAsPDF');
+    downloadBtn.addEventListener('click', function(){ 
+        var contentWrapper = document.createElement('div');
+        contentWrapper.innerHTML = quill.root.innerHTML;
+        $(contentWrapper).printThis();
+    });
 
-    // Event listener for 'Convert To Speech' button
-    const convertToSpeechBtn = document.getElementById('closeBtn');
-    convertToSpeechBtn.addEventListener('click', function(){});
-}
-
-function closeEditor(){
-    document.getElementById('textEditor').remove();
-    ocr.disabled = false;
+    // Event listener for 'Play' button
+    const playBtn = document.getElementById('speechify');
+    playBtn.addEventListener('click', function(){});
 }
 
 image.onload = function() {
