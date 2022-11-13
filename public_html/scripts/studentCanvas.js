@@ -56,7 +56,7 @@ updateName.addEventListener('click', editName);
 
 //listen for input for edit name using input box in student.html
 window.addEventListener('input', (e) =>{
-    console.log('new name: ', e.target.value);
+    //console.log('new name: ', e.target.value);
     newName = e.target.value;
 }) 
 
@@ -202,8 +202,7 @@ const zipfolder = document.getElementById('zipFolder');
 zipfolder.addEventListener('click', zipFolderbutton);
 
 //Download a zip folder
-function zipFolderbutton(e) {
-            
+function zipFolderbutton(e) {  
     for(let i = 0; i < localImages.length; i++){
         if(localImages[i]==undefined || localImages.length-1){
             console.log("Image not stored locally, fetch from redis", i)
@@ -246,6 +245,20 @@ function arrayBuffr(){
         }
     })();
 }   
+
+localUserList={}
+function retrieveUserList(){
+        //request and update name
+        let name="";
+        name= prompt ("Enter your name: ");
+        while(name == null || name == "" ){
+            name= prompt ("Please enter your name: ");
+        }
+    
+        const newStudentName= {type: "retrieveUserList", newName: name}
+        websocket.send(JSON.stringify(newStudentName))
+}
+
 // Handle valid messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
@@ -268,10 +281,10 @@ function processMessage({ data }) {
             
             // initialize page drawInstructions
             drawInstructions = Array.from({length: pageNumber+1}, () => new Array());
+            retrieveUserList();
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
-
             if(event.page == viewingPageNumber){
                 if(drawAnimations){
                     currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
@@ -290,9 +303,7 @@ function processMessage({ data }) {
                 });
                 
                 drawInstructions[event.page].push(parsedInstructions);
-            }
-            
-            
+            }        
             break;
         case "clearpage":
             // cancel all the current animations and draw them instantly
@@ -344,6 +355,27 @@ function processMessage({ data }) {
             break;
         case "imageToTextRequest":
             quill.setText(event.convertedText);
+            break;
+        case "fullUserList":
+            console.log("new list has been made")
+            for (const [key, value] of Object.entries(event.names)) {
+                localUserList[key]=value;
+            }
+          break;
+        case "updateUserList":
+            console.log("update has been called and the list is")
+            localUserList[event.id]=event.name
+            for (const [key, value] of Object.entries(localUserList)) {
+                console.log(key, value);
+              } 
+            break;
+        case "removeUserFromList":
+            
+            console.log("student left: "+localUserList[event.id])
+            delete localUserList[event.id];
+            for (const [key, value] of Object.entries(localUserList)) {
+                console.log(key, value);
+            } 
             break;
 
     }   

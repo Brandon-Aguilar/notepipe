@@ -43,7 +43,7 @@ async def initializeHost(websocket):
     # Store list of connections to be broadcasted to
     HOST_KEYS[hostKey] = studentKey
     JOINED[studentKey] = {websocket}
-    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(websocket.id, "DefaultTeacher", True, True)})
+    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(websocket.id, "DefaultTeacher", True, True)}, {})
 
     response = initializeHostSuccess()
     response.hostKey = hostKey
@@ -59,7 +59,7 @@ async def initializeHost(websocket):
         del HOST_KEYS[hostKey]
 
         # Some kind of way to deal with teacher dropping
-        USERS[studentKey].removeUser(websocket.id)
+        USERS[studentKey].removeUser(websocket.id, JOINED[studentKey])
 
 
 async def hostConnection(websocket, hostKey, studentKey):
@@ -82,6 +82,8 @@ async def hostConnection(websocket, hostKey, studentKey):
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
             case "updateName":
                users.updateUserName(websocket.id, messageJSON["newName"])
+
+
 
 async def initializeStudent(websocket, studentKey, image):
     """Check for valid key and add connection to host's connections"""
@@ -107,7 +109,7 @@ async def initializeStudent(websocket, studentKey, image):
         await studentConnection(websocket, studentKey)
     finally:
         connected.remove(websocket)
-        users.removeUser(websocket.id)
+        users.removeUser(websocket.id, JOINED[studentKey])
 
 
 async def studentConnection(websocket, studentKey):
@@ -156,4 +158,9 @@ async def studentConnection(websocket, studentKey):
                     sendError(websocket, "Failed to fetch image")
                 log.info("fetche image is "+response.imageURL)
             case "updateName":
-               users.updateUserName(websocket.id, messageJSON["newName"])
+                users.updateUserName(websocket.id, messageJSON["newName"],JOINED[studentKey])
+            case "retrieveUserList":
+                #add the new user's name to list
+                users.updateUserName(websocket.id, messageJSON["newName"], JOINED[studentKey])
+                #get the whole user's list
+                await users.fullUserList(websocket)
