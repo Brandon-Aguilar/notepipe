@@ -515,3 +515,25 @@ function hideEditName(){
     document.getElementById('nameTextBox').className="hide";
     document.getElementById('updateName').className="hide";
 }
+
+/*
+uploadFile TODO:
+    - Add support for ppt/pptx, probably jpg/jpeg and pdf too
+        - Currently only works for png files
+    - Make the button look better maybe (in public_html/canvas/teacher.html)
+        - It's a default html `Choose File` button right now
+    - Maybe mess with formatting
+        - Currently draws the image on the top left corner
+*/
+function uploadFile() {
+    var file = document.getElementById("upload").files[0];
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function (e) {
+        var img = new Image();
+        img.src = e.target.result;
+        img.onload = function () {
+           ctx.drawImage(img, 10, 10);
+        };
+     }
+} 
