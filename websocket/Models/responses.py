@@ -138,3 +138,9 @@ class removeUserFromList(response):
         self.id = id
         self.name = name
         self.message = "Those already connected need to update their user list"
+
+class newPage(response):
+    def __init__(self):
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.message = "New Page Added"

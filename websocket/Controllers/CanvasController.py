@@ -4,7 +4,7 @@ import redis
 import json
 import os
 
-from Models.responses import newPageCreated
+from Models.responses import newPageCreated,newPage
 
 #from handwriting.websocket.Models.responses import response
 try:
@@ -14,7 +14,7 @@ except ValueError:
 
 
 
-from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage,resetbutton
+from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage
 from Models.redisObjects import hostPages, loadHostPagesFromJSON
 
 log = logging.getLogger(__name__)
@@ -104,4 +104,7 @@ async def canvasNewPage(websocket, messageJSON, connected, studentKey: str):
     log.info("Adding new page on websocket %s", websocket.id)
     response = newPageCreated()
     websockets.broadcast(connected, response.toJson())
-    
+async def canvasNew(websocket, messageJSON, connected, studentKey: str):
+    log.info("Adding new page on websocket %s", websocket.id)
+    response = newPage()
+    websockets.broadcast(connected, response.toJson())     

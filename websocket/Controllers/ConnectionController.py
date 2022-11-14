@@ -1,7 +1,7 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, wipestudent, imageToText, resett, fetchPage, fetchImage, canvasNewPage
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, wipestudent, imageToText, resett, fetchPage, fetchImage, canvasNewPage,canvasNew
 
 from Models.responses import initializeHostSuccess, initializeStudentSuccess, imageToTextRequest, pageFetched, imageFetched
 from Models.errorHandler import sendError
@@ -77,6 +77,9 @@ async def hostConnection(websocket, hostKey, studentKey):
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) 
                 await canvasNewPage(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])        
                 #await wipestudent(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) leave the client to decide to wipe
+            case "Addnew":
+               # await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) 
+                await canvasNew(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])     
             case "resetcanvas":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
@@ -97,7 +100,7 @@ async def initializeStudent(websocket, studentKey, image):
     connected.add(websocket)
     # Maybe add some kind of name randomizer
     users.addUser(websocket.id, userObject(websocket.id, "DefaultStudent", False, False))
-    
+
 
     response = initializeStudentSuccess()
     response.studentKey = studentKey

@@ -322,12 +322,13 @@ function processMessage({ data }) {
             ctx.clearRect(0, 0, width, height)
             break;
         case "newPageCreated":
-            console.log("New page has been created")
+
             // When we add page following, this should be an if
             // if following...viewingPageNumber = event.pageNumber
             //var imageURL = canvas.toDataURL("image/png", 0.2);
             //localImages[event.pageNumber]= imageURL;
             pageNumber += 1;
+            navigateToPage(viewingPageNumber+1)
             drawInstructions.push([]);
             setCurrentPageText();
             break;

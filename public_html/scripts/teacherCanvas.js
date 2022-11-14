@@ -107,6 +107,7 @@ currentPageNumberElement = document.getElementById('currentPageNumber');
 
 //instructor image saved locally
 const localImages=[];
+const TemplocalImages= [];
 
 //save button
 var updateSaveoption=document.getElementById('newpage')
@@ -140,8 +141,43 @@ function newpage(){
         setCurrentPageText();
     }
     else{
-        currentPageNumberElement.textContent="please be on page"+pageNumber+" to add a new page";
-        console.log("please be on last page to add a new page")
+        for(let i = 0; i <localImages.length; i++){
+            TemplocalImages[i] = localImages[i];
+        }
+        pageNumber++;
+        viewingPageNumber++;
+        console.log("Adding new page number: ",pageNumber)
+        var imageURL = canvas.toDataURL("image/png", 0.2);
+       
+        var message = {
+            type: "Addnew",
+            pageNumber: pageNumber,
+            imageURL,
+        }
+        websocket.send(JSON.stringify(message));  
+
+        width = window.innerWidth;
+        height = window.innerHeight;  
+        ctx.clearRect(0, 0, width, height);   
+
+        sendUpdate();
+        setCurrentPageText();
+        imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
+
+        const tmp = []
+        
+        for(let i = 0; i <=viewingPageNumber; i++){
+            tmp[i] = TemplocalImages[i];
+        }
+        tmp[viewingPageNumber] = imageURL;
+        for(let i = viewingPageNumber; i < TemplocalImages.length; i++){
+            tmp[i+1] = TemplocalImages[i];
+        }    
+        for(let i = 0; i < tmp.length; i++){
+            localImages[i] = tmp[i];
+        } 
+         sendUpdate();
+         setCurrentPageText();
     }
 
 }
