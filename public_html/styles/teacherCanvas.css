@@ -326,3 +326,14 @@
   .hide{
     display: none;
   }
+  .list{
+    position: absolute;
+    top: 10;
+    right: 0;
+    width: 100px;
+    height: 400px;
+    background: rgb(221, 225, 226);
+    box-shadow: 0px 1px 12px rgb(0, 0, 0, 0.5);
+    border-radius:10px; 
+    overflow-y: auto;
+  }

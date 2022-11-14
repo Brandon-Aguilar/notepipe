@@ -432,7 +432,7 @@ function navigateToPage(pageWanted){
 }
 
 var absoluteJoinLink = "";
-
+localUserList={}
 // Handle messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
@@ -451,9 +451,47 @@ function processMessage({ data }) {
             absoluteJoinLink = window.location.host + "/canvas/" + link;
             generateQRCode(absoluteJoinLink);
             break;
+            case "updateUserList":
+                //empty list
+                if(Object.keys(localUserList).length===0){
+                    addName("Users", event.id, event.name)
+                    lastId=event.id
+                }
+                //check we are updating student name
+                else if(event.id in localUserList){
+                    changeName(event.id, event.name)
+                }
+                //must be a new student 
+                else{
+                    addName(lastId, event.id, event.name)
+                    lastId=event.id
+                }
+                localUserList[event.id]=event.name
+                break;
+            case "removeUserFromList":
+                console.log("student left: "+localUserList[event.id])
+                //if lastId is removed and a new student joins, their name won't populate
+                delete localUserList[event.id];
+                if(lastId==event.id){
+                    var total= Object.keys(localUserList).length;
+                    lastId= Object.keys(localUserList)[total-1]
+                }
+                removeName(event.id) 
+                break;
     }
 }
-
+function addName(previousId, id, name) {
+    var full= "<h4 id='"+id+"'> "+name
+    document.getElementById(previousId).insertAdjacentHTML("afterend",full);
+}
+function changeName(id, name){
+    const full= document.getElementById(id)
+    full.innerHTML = name;
+}
+function removeName(name){
+    const element = document.getElementById(name);
+    element.remove()
+}
 
 document.onkeydown = checkKey;
 
