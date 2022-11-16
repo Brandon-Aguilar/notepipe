@@ -309,6 +309,12 @@ function sendUpdate() {
     websocket.send(JSON.stringify(message))
 }
 
+function changeWidth(newWidth) {
+    markerWidth = newWidth;
+    eraserState= false;
+    ctx.globalCompositeOperation = 'source-over';
+};
+
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
     color = newColor;
