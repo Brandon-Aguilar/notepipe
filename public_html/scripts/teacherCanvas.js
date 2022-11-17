@@ -313,11 +313,22 @@ function sendUpdate() {
     websocket.send(JSON.stringify(message))
 }
 
+// Change width of the marker based on input from a HTML slider
 function changeWidth(newWidth) {
     markerWidth = newWidth;
     eraserState= false;
     ctx.globalCompositeOperation = 'source-over';
 };
+
+// shows the HTML slider located in slider-div
+function showSlider() {
+    var x = document.getElementById("slider-div");
+    if (x.style.display === "block") {
+      x.style.display = "none";
+    } else {
+      x.style.display = "block";
+    }
+  };
 
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {

@@ -144,6 +144,27 @@
     right: 10px;
   }
   
+  .slider-menu{
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    top: 62%;
+    left: 80px;
+    width: 150px;
+    z-index: 101;
+  }
+
+  .slider-container{
+    display: flex;
+    flex-direction: column;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background-color: #323336;
+    align-items: center;
+  }
+
   .left-sidebar{
     display: flex;
     flex-direction: column;
