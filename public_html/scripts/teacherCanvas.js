@@ -39,6 +39,10 @@ var canvasStack = [canvas];
 // used to check whether this is the first undo since that would be equal to the current state
 var undoHasBeenDone = false;
 
+var highlightDraw = false;
+
+
+
 
 resize();
 
@@ -317,6 +321,7 @@ function changeWidth(newWidth) {
 
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
+    highlightDraw = false;
     color = newColor;
     eraserState= false;
     ctx.globalCompositeOperation = 'source-over';
@@ -330,15 +335,24 @@ function eraser(){
     console.log("Image erased: ", pageNumber)
 };
 
+
 function draw(data) {
-    ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
+    ctx.strokeStyle = data.color;//original default stroke color 
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = data.force;//stroke width
+    ctx.lineCap = 'round';
+
+    if (highlightDraw) {ctx.globalCompositeOperation = "overlay"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 0.8; ctx.lineWidth = 40;}
+    else if (data.eraserState) ctx.globalCompositeOperation = "destination-out";
+    else ctx.globalCompositeOperation = "source-over";
+
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
     ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
-    ctx.strokeStyle = data.color;//original default stroke color 
-    ctx.lineWidth = data.force;//stroke width
-    ctx.lineCap = 'round';
     ctx.stroke();//outlines the current or given path with the current stroke style
+}
+function startHighlight(){
+    highlightDraw = true;
 }
 
 function move(e) {
@@ -356,7 +370,7 @@ function move(e) {
             lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
             return;
         }
-
+        
         draw({
             lastPoint,//the x,y coordinate of the last stroke
             x: e.offsetX,//x-coordinate of the mouse pointer relative to the document

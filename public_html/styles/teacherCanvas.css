@@ -200,6 +200,9 @@
   .color-button img{
     padding: 1px;
   }
+  .highlight-button img{
+    padding: 1px;
+  }
 
   .undo-button, .eraser-button img {
     padding: 8px;
