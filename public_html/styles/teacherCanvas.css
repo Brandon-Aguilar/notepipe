@@ -72,10 +72,10 @@
     width: 40px;
     display: flex;
     justify-content: center;
+    align-items: center;
   }
 
   .header-left img{
-    padding-top: 5px;
     height: 25px;
   }
 
@@ -122,7 +122,9 @@
     border-radius: 20px;
     border: none;
     background-color: #323336;
+    
     display: flex;
+    align-items: center;
     justify-content: center;
   }
 
@@ -131,11 +133,11 @@
   }
 
   .menu-icon{
-    padding: 6px;
+    height: 15px;
   }
 
   .save-icon{
-    padding: 2px;
+    height: 30px;
   }
 
   .animation-prompt{
@@ -199,6 +201,7 @@
     width: 40px;
     display: flex;
     justify-content: center;
+    align-items: center;
   }
 
   .drawing-tools-sidebar button:active{
@@ -219,14 +222,14 @@
   }
 
   .color-button img{
-    padding: 1px;
+    height: 30px;
   }
   .highlight-button img{
-    padding: 1px;
+    height: 24px;
   }
 
-  .undo-button, .eraser-button img {
-    padding: 8px;
+  .undo-button img {
+    height: 24px;
   }
 
   
