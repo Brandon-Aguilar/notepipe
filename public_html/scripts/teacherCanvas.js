@@ -580,8 +580,8 @@ function checkKey(e) {
 function generateQRCode(codeContent) {
     const qrcode = new QRCode(document.getElementById('qrcode'), {
         text: codeContent,
-        width: 128,
-        height: 128,
+        width: 350,
+        height: 350,
         colorDark : '#000',
         colorLight : '#fff',
         correctLevel : QRCode.CorrectLevel.H
@@ -620,6 +620,54 @@ function hideEditName(){
     document.getElementById('nameTextBox').className="hide";
     document.getElementById('updateName').className="hide";
 }
+
+// QR Overlay
+function openQR(){
+    document.getElementById("qr-code-overlay").style.display = "block";
+}
+function closeQR(){
+    document.getElementById("qr-code-overlay").style.display = "none";
+}
+
+// Dropdown menu functions
+// function showSaveButtonDropdown() {
+//     document.getElementById("save-button-dropdown").classList.toggle("show-save-dropdown");
+// }
+
+//     // Close dropdown menu if clicked outside
+//     window.onclick = function(event) {
+//         if (!event.target.matches('.save-button' || '.save-icon')) {
+//           var dropdowns = document.getElementsByClassName("header-right-dropdown-content");
+//           var i;
+//           for (i = 0; i < dropdowns.length; i++) {
+//             var openDropdown = dropdowns[i];
+//             if (openDropdown.classList.contains('show-save-dropdown')) {
+//               openDropdown.classList.remove('show-save-dropdown');
+//             }
+//           }
+//         }
+//       } 
+    
+
+// function showMenuButtonDropdown() {
+//     document.getElementById("menu-button-dropdown").classList.toggle("show-dropdown");
+// }
+
+//     window.onclick = function(event) {
+//         if (!event.target.matches('.menu-button' || '.menu-icon')) {
+//         var dropdowns = document.getElementsByClassName("header-right-dropdown-content");
+//         var i;
+//         for (i = 0; i < dropdowns.length; i++) {
+//             var openDropdown = dropdowns[i];
+//             if (openDropdown.classList.contains('show-menu-dropdown')) {
+//             openDropdown.classList.remove('show-menu-dropdown');
+//             }
+//         }
+//         }
+//     } 
+
+
+
 
 /*
 uploadFile TODO:

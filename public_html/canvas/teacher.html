@@ -34,12 +34,26 @@
           </div>
           
           <div class="header-right">
-            <button class="save-button">
-              <img class="save-icon" src="../icons/save-icon.svg" alt="Save">
-            </button>
-            <button class="menu-button">
-              <img class="menu-icon" src="../icons/menu-icon.svg" alt="Menu">
-            </button>
+
+            <div class="header-right-dropdown">
+              <button class="save-button">
+                <img class="save-icon" src="../icons/save-icon.svg" alt="Save">
+              </button>
+              <div class="header-right-dropdown-content">
+                <p id="zipFolder">Download All</p>
+                <p id="download">Download Current Page</p>
+              </div>
+            </div>
+
+            <div class="header-right-dropdown">
+              <button class="menu-button">
+                <img class="menu-icon" src="../icons/menu-icon.svg" alt="Menu">
+              </button>
+              <div class="header-right-dropdown-content">
+                <p onclick="copyJoinKey()">Copy Room Link</p>
+                <p onclick="openQR()">Show QR Code</p>
+              </div>
+            </div>
           </div>
 
           <!-- Hiding for now, will add as functionality inside menu icon
@@ -134,7 +148,7 @@
               </div>
               <div class="draw-tool">
                 <button class="highlight-button" id="highligher">
-                  <img src="../icons/undo-icon.svg" onclick="startHighlight()" alt="highligher">
+                  <img src="../icons/highlighter-icon.svg" onclick="startHighlight()" alt="highligher">
                 </button>
               </div>
               <div class="draw-tool">
@@ -154,10 +168,15 @@
             </div>
         </div>
       
+      <div id="qr-code-overlay" class="overlay">
+        <a href="javascript:void(0)" class="close-button" onclick="closeQR()">&times;</a>
+        <div class="qrcode-container" id="qrcode"></div>
+      </div>
+      
       <div class="top-border"></div>
       <div class="left-border"></div>
 
-
+      
 
       <!-- Place experimental features/buttons here -->
       <div class="feature-testing">
