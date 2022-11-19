@@ -337,8 +337,22 @@ function processMessage({ data }) {
         case "NewpagesInserted":
           
             pageNumber += 1;  
-          
-            drawInstructions.push([]);
+            width = window.innerWidth
+            height = window.innerHeight
+            
+            
+            if(event.insertIndex <= viewingPageNumber){
+                localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
+                ctx.clearRect(0, 0, width, height);
+
+                drawInstructions.splice(event.insertIndex, 0, []);
+                localImages.splice(event.insertIndex, 0, "");
+                // When we add follow teacher, then don't navigate if following
+                navigateToPage(viewingPageNumber + 1);
+            } else {
+                drawInstructions.splice(event.insertIndex, 0, []);
+                localImages.splice(event.insertIndex, 0, "");
+            }
             setCurrentPageText();
             break;
         case "pageFetched":

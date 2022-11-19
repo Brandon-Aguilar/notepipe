@@ -115,5 +115,5 @@ async def newPageInsert(websocket, messageJSON, connected, studentKey: str):
     pages.insertnewPage(imageURL, pageNumber)
     redisServer.set(studentKey, pages.toJson())
     
-    response = NewpagesInserted()
+    response = NewpagesInserted(pageNumber)
     websockets.broadcast(connected, response.toJson())     
