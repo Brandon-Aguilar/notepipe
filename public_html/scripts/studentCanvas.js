@@ -170,6 +170,8 @@ function initializeStudent() {
     websocket.send(JSON.stringify(event))
 }
 
+
+
 //same as teacher draw function
 function draw(data) {
     ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
@@ -180,7 +182,6 @@ function draw(data) {
     ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
     ctx.stroke();//outlines the current or given path with the current stroke style
-    ctx.globalCompositeOperation = "source-over";
 }
 
 // request OCR service
@@ -250,19 +251,19 @@ function arrayBuffr(){
 localUserList={}
 function retrieveUserList(){
         //request and update name
-        // let name="";
-        // name= prompt ("Enter your name: ");
-        // while(name == null || name == "" ){
-        //     name= prompt ("Please enter your name: ");
-        // }
+        let name="";
+        name= prompt ("Enter your name: ");
+        while(name == null || name == "" ){
+            name= prompt ("Please enter your name: ");
+        }
     
-        const newStudentName= {type: "retrieveUserList", newName: "hey"}
+        const newStudentName= {type: "retrieveUserList", newName: name}
         websocket.send(JSON.stringify(newStudentName))
 }
 
 // Handle valid messages sent to client
 function processMessage({ data }) {
-    const event = JSON.parse(data);
+    const event = JSON.parse(data); 
     console.log(event)
     switch(event.__type__){
         case "initializeStudentSuccess":
@@ -282,7 +283,7 @@ function processMessage({ data }) {
             
             // initialize page drawInstructions
             drawInstructions = Array.from({length: pageNumber+1}, () => new Array());
-            retrieveUserList();
+            createStudentName();
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
@@ -437,20 +438,19 @@ function navigateToPage(pageWanted){
             image.src=localImages[pageWanted]
             image.onload = function() {//wait for image to load before trying to draw to canvas
                 ctx.drawImage(image, 0, 0);
-            }
 
-            if(drawInstructions[pageWanted].length !=0 ){
-                console.log("draw instructions need to execute");
-                drawInstructions[pageWanted].forEach((currInstructions) => {
-                    currInstructions.forEach((stroke) => {
-                        draw(stroke);
+                if (drawInstructions[pageWanted].length != 0) {
+                    console.log("draw instructions need to execute");
+                    drawInstructions[pageWanted].forEach((currInstructions) => {
+                        currInstructions.forEach((stroke) => {
+                            draw(stroke);
+                        });
                     });
-                });
 
-                drawInstructions[pageWanted]=[];
+                    drawInstructions[pageWanted] = [];
+                }
             }
-           
-           
+
             //update the page number currently being viewed 
             viewingPageNumber=pageWanted;
             setCurrentPageText();

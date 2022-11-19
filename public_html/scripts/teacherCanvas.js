@@ -328,7 +328,8 @@ function changeColor(newColor) {
   // Eraser
 function eraser(){
     eraserState = true;
-    // Erasing by using destination image to be on top of the drawn image in source imag
+    // Erasing by using destination image to be on top of the drawn image in source image
+   // ctx.globalCompositeOperation = "destination-out";
     console.log("Image erased: ", pageNumber)
 };
 
@@ -347,6 +348,7 @@ function draw(data) {
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
     ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
     ctx.stroke();//outlines the current or given path with the current stroke style
+    ctx.globalCompositeOperation = "source-over";
 }
 function startHighlight(){
     highlightDraw = true;
