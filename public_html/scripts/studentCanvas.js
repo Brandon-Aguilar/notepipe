@@ -414,18 +414,20 @@ function navigateToPage(pageWanted){
             image.src=localImages[pageWanted]
             image.onload = function() {//wait for image to load before trying to draw to canvas
                 ctx.drawImage(image, 0, 0);
-            }
 
-            if(drawInstructions[pageWanted].length !=0 ){
-                console.log("draw instructions need to execute");
-                drawInstructions[pageWanted].forEach((currInstructions) => {
-                    currInstructions.forEach((stroke) => {
-                        draw(stroke);
+                if (drawInstructions[pageWanted].length != 0) {
+                    console.log("draw instructions need to execute");
+                    drawInstructions[pageWanted].forEach((currInstructions) => {
+                        currInstructions.forEach((stroke) => {
+                            draw(stroke);
+                        });
                     });
-                });
 
-                drawInstructions[pageWanted]=[];
+                    drawInstructions[pageWanted] = [];
+                }
             }
+
+            
 
             //update the page number currently being viewed 
             viewingPageNumber=pageWanted;
