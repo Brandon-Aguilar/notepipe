@@ -145,42 +145,29 @@ function newpage(){
         setCurrentPageText();
     }
     else{
-        for(let i = 0; i <localImages.length; i++){
-            TemplocalImages[i] = localImages[i];
-        }
+      
         pageNumber++;
         viewingPageNumber++;
         console.log("Adding new page number: ",pageNumber)
         var imageURL = canvas.toDataURL("image/png", 0.2);
-       
-        var message = {
-            type: "Addnew",
-            pageNumber: pageNumber,
-            imageURL,
-        }
-        websocket.send(JSON.stringify(message));  
+             
+          
 
         width = window.innerWidth;
         height = window.innerHeight;  
-        ctx.clearRect(0, 0, width, height);   
+        ctx.clearRect(0, 0, width, height);
 
+        var message = {
+            type: "newPageInsert",
+            pageNumber: viewingPageNumber,
+            imageURL,
+        }  
+        websocket.send(JSON.stringify(message));
         sendUpdate();
         setCurrentPageText();
         imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
-
-        const tmp = []
-        
-        for(let i = 0; i <=viewingPageNumber; i++){
-            tmp[i] = TemplocalImages[i];
-        }
-        tmp[viewingPageNumber] = imageURL;
-        for(let i = viewingPageNumber; i < TemplocalImages.length; i++){
-            tmp[i+1] = TemplocalImages[i];
-        }    
-        for(let i = 0; i < tmp.length; i++){
-            localImages[i] = tmp[i];
-        } 
-         sendUpdate();
+       
+        localImages.splice(viewingPageNumber,0,imageURL)
          setCurrentPageText();
     }
 
@@ -341,8 +328,7 @@ function changeColor(newColor) {
   // Eraser
 function eraser(){
     eraserState = true;
-    // Erasing by using destination image to be on top of the drawn image in source image
-    ctx.globalCompositeOperation = "destination-out";
+    // Erasing by using destination image to be on top of the drawn image in source imag
     console.log("Image erased: ", pageNumber)
 };
 

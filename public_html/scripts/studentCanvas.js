@@ -180,6 +180,7 @@ function draw(data) {
     ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
     ctx.stroke();//outlines the current or given path with the current stroke style
+    ctx.globalCompositeOperation = "source-over";
 }
 
 // request OCR service
@@ -249,13 +250,13 @@ function arrayBuffr(){
 localUserList={}
 function retrieveUserList(){
         //request and update name
-        let name="";
-        name= prompt ("Enter your name: ");
-        while(name == null || name == "" ){
-            name= prompt ("Please enter your name: ");
-        }
+        // let name="";
+        // name= prompt ("Enter your name: ");
+        // while(name == null || name == "" ){
+        //     name= prompt ("Please enter your name: ");
+        // }
     
-        const newStudentName= {type: "retrieveUserList", newName: name}
+        const newStudentName= {type: "retrieveUserList", newName: "hey"}
         websocket.send(JSON.stringify(newStudentName))
 }
 
@@ -327,8 +328,16 @@ function processMessage({ data }) {
             // if following...viewingPageNumber = event.pageNumber
             //var imageURL = canvas.toDataURL("image/png", 0.2);
             //localImages[event.pageNumber]= imageURL;
+        
             pageNumber += 1;
-            navigateToPage(viewingPageNumber+1)
+            drawInstructions.push([]);
+            setCurrentPageText();
+            break;
+
+        case "NewpagesInserted":
+          
+            pageNumber += 1;  
+          
             drawInstructions.push([]);
             setCurrentPageText();
             break;
@@ -401,6 +410,7 @@ function navigateToPage(pageWanted){
     //acceptable range for pages to load
     if(pageWanted>=0 && pageWanted<=pageNumber){
         //before loading previous/next page, store the current page in local array
+        
         localImages[viewingPageNumber]= canvas.toDataURL("image/png", 0.2);
         //check if page wanted has been stord locally (in case where student joins late it might not be)
         if(localImages[pageWanted]!=undefined){
@@ -408,7 +418,7 @@ function navigateToPage(pageWanted){
             width = window.innerWidth;
             height = window.innerHeight;  
             ctx.clearRect(0, 0, width, height);
-
+            
             //load requested page
             image.src=localImages[pageWanted]
             image.onload = function() {//wait for image to load before trying to draw to canvas
@@ -425,7 +435,8 @@ function navigateToPage(pageWanted){
 
                 drawInstructions[pageWanted]=[];
             }
-
+           
+           
             //update the page number currently being viewed 
             viewingPageNumber=pageWanted;
             setCurrentPageText();
@@ -442,6 +453,7 @@ function navigateToPage(pageWanted){
         // Probably dont need to show this in prod
         console.log("the page requested ("+pageWanted+") is out of bound")
     }
+   
 }
 
 currentDrawInstructions = [];

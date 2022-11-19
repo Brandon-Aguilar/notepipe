@@ -1,7 +1,7 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, wipestudent, imageToText, resett, fetchPage, fetchImage, canvasNewPage,canvasNew
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, newPageInsert, imageToText, resett, fetchPage, fetchImage, canvasNewPage
 
 from Models.responses import initializeHostSuccess, initializeStudentSuccess, imageToTextRequest, pageFetched, imageFetched
 from Models.errorHandler import sendError
@@ -76,10 +76,8 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "Addnewpage":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) 
                 await canvasNewPage(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])        
-                #await wipestudent(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) leave the client to decide to wipe
-            case "Addnew":
-               # await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) 
-                await canvasNew(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])     
+            case "newPageInsert":
+                await newPageInsert(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])     
             case "resetcanvas":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
