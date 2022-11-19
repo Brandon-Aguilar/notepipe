@@ -170,6 +170,8 @@ function initializeStudent() {
     websocket.send(JSON.stringify(event))
 }
 
+
+
 //same as teacher draw function
 function draw(data) {
     ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
@@ -247,21 +249,16 @@ function arrayBuffr(){
 }   
 
 localUserList={}
-function retrieveUserList(){
-        //request and update name
-        let name="";
-        name= prompt ("Enter your name: ");
-        while(name == null || name == "" ){
-            name= prompt ("Please enter your name: ");
-        }
-    
-        const newStudentName= {type: "retrieveUserList", newName: name}
-        websocket.send(JSON.stringify(newStudentName))
+function createStudentName(){
+    let name =  Math.random().toString(16).slice(2); 
+    console.log('default name is:', name)
+    const newStudentName = {type: "retrieveUserList", newName: name}
+    websocket.send(JSON.stringify(newStudentName))
 }
 
 // Handle valid messages sent to client
 function processMessage({ data }) {
-    const event = JSON.parse(data);
+    const event = JSON.parse(data); 
     console.log(event)
     switch(event.__type__){
         case "initializeStudentSuccess":
@@ -281,7 +278,7 @@ function processMessage({ data }) {
             
             // initialize page drawInstructions
             drawInstructions = Array.from({length: pageNumber+1}, () => new Array());
-            retrieveUserList();
+            createStudentName();
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
