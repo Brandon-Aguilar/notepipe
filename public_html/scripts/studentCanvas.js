@@ -249,13 +249,13 @@ function arrayBuffr(){
 localUserList={}
 function retrieveUserList(){
         //request and update name
-        let name="";
-        name= prompt ("Enter your name: ");
-        while(name == null || name == "" ){
-            name= prompt ("Please enter your name: ");
-        }
+        // let name="";
+        // name= prompt ("Enter your name: ");
+        // while(name == null || name == "" ){
+        //     name= prompt ("Please enter your name: ");
+        // }
     
-        const newStudentName= {type: "retrieveUserList", newName: name}
+        const newStudentName= {type: "retrieveUserList", newName: "StudentName"}
         websocket.send(JSON.stringify(newStudentName))
 }
 
