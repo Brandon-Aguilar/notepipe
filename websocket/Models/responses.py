@@ -140,8 +140,10 @@ class removeUserFromList(response):
         self.name = name
         self.message = "Those already connected need to update their user list"
 
-class newPage(response):
-    def __init__(self):
+class NewpagesInserted(response):
+    def __init__(self, insertIndexr=None,imageURL=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
-        self.message = "New Page Added"
+        self.insertIndex = insertIndexr
+        # self.imageURL= imageURL
+        self.message = "New page Inserted"

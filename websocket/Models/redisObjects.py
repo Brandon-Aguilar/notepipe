@@ -29,6 +29,11 @@ class hostPages(redisObject):
             log.info("Updating page")
             self.pages[pageNumber] = imageURL
 #use these two functions only for inital conne
+    def insertnewPage(self, imageURL: str, pageNumber: int) -> None: 
+        log.info("in radis",pageNumber)
+        log.info("image in radis", imageURL)
+        self.pages.insert(pageNumber, imageURL)
+        
     def getLatestPage(self):
         return self.pages[len(self.pages) - 1]
         

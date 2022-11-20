@@ -4,8 +4,8 @@ import redis
 import json
 import os
 
-from Models.responses import newPageCreated,newPage
 from TTS.TextToSpeech import createAudio
+from Models.responses import newPageCreated,NewpagesInserted
 
 #from handwriting.websocket.Models.responses import response
 try:
@@ -103,7 +103,16 @@ async def canvasNewPage(websocket, messageJSON, connected, studentKey: str):
     log.info("Adding new page on websocket %s", websocket.id)
     response = newPageCreated()
     websockets.broadcast(connected, response.toJson())
-async def canvasNew(websocket, messageJSON, connected, studentKey: str):
-    log.info("Adding new page on websocket %s", websocket.id)
-    response = newPage()
+
+
+async def newPageInsert(websocket, messageJSON, connected, studentKey: str):
+    imageURL = messageJSON["imageURL"]
+    pageNumber = messageJSON["pageNumber"]
+    log.info("Inserted new page on websocket %s", websocket.id)
+    
+    pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
+    pages.insertnewPage(imageURL, pageNumber)
+    redisServer.set(studentKey, pages.toJson())
+    
+    response = NewpagesInserted(pageNumber)
     websockets.broadcast(connected, response.toJson())     
