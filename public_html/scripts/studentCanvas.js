@@ -41,7 +41,7 @@ var image = new Image();
 resize();
 
 //Fetch HTML elements that need event listners
-var ocr = document.getElementById("TTS");
+var ocr = document.getElementById("editNote");
 const download = document.getElementById('download');
 const updateName = document.getElementById('updateName');
 
@@ -65,12 +65,16 @@ function showTextEditor(){
 
     // Create editor container
     var html = [
-        "<button type='button' id='closeBtn' class='btn'>X</button>",
+        "<button type='button' id='closeBtn' class='btn'>x</button>",
         "<div style='background-color: #ffffff;'>" ,
             "<div id='editor'></div>" ,
         "</div>" ,
         "<button type='button' id='saveAsPDF' class='btn'>download</button>" ,
-        "<button type='button' id='speechify' class='btn'>play</button>"
+        "<button type='button' id='speechify' class='btn'>play</button>" ,
+        "<audio id='speech' controlsList='nodownload noplaybackrate'></audio>",
+        "<button type='button' id='minimize' style='display: none;'>",
+            "<span class='material-icons-outlined'>arrow_back_ios</span>",
+        "</button>"
     ].join("");
 
     // Wrap and insert editor container to document 
@@ -105,15 +109,18 @@ function showTextEditor(){
     // Invoke websocket request for OCR service
     imageToText();
 
+    var downloadBtn = document.getElementById('saveAsPDF');
+    var xBtn = document.getElementById('closeBtn');
+    playBtn = document.getElementById('speechify');
+    minimizeBtn = document.getElementById('minimize');
+
     // Event listener for 'X' button
-    const xBtn = document.getElementById('closeBtn');
     xBtn.addEventListener('click', function(){
         document.getElementById('textEditor').remove();
         ocr.disabled = false;
     });
 
     // Event listener for 'Download' button
-    const downloadBtn = document.getElementById('saveAsPDF');
     downloadBtn.addEventListener('click', function(){ 
         var contentWrapper = document.createElement('div');
         contentWrapper.innerHTML = quill.root.innerHTML;
@@ -121,8 +128,17 @@ function showTextEditor(){
     });
 
     // Event listener for 'Play' button
-    const playBtn = document.getElementById('speechify');
-    playBtn.addEventListener('click', function(){});
+    playBtn.addEventListener('click', function(){
+        textToSpeech(quill.getText()); // Invoke websocket request for TTS service
+    });
+
+    // Event listener for '<' button
+    minimizeBtn.addEventListener('click', function(){
+        if(!audio.paused && !audio.ended) { audio.pause(); }
+        minimizeBtn.style.display="none";
+        playBtn.style.display="";
+        audio.controls = false;
+    })
 }
 
 image.onload = function() {
@@ -188,6 +204,12 @@ function draw(data) {
 // request OCR service
 function imageToText(){
     const request = { type: "imageToText",  studentKey: studentKey, pageNumber: viewingPageNumber};
+    websocket.send(JSON.stringify(request))
+}
+
+// request TTS service
+function textToSpeech(targetText){
+    const request = { type: "textToSpeech",  studentKey: studentKey, inputText: targetText};
     websocket.send(JSON.stringify(request))
 }
 
@@ -354,6 +376,16 @@ function processMessage({ data }) {
             break;
         case "imageToTextRequest":
             quill.setText(event.convertedText);
+            break;
+        case "textToSpeechRequest":
+            console.log("audio file recieved")
+            audio = document.getElementById('speech');
+            audio.src = "data:audio/mpeg;base64," + event.convertedAudio;
+            audio.load();
+            playBtn.style.display="none";
+            minimizeBtn.style.display="";
+            audio.controls = true;
+            audio.play();
             break;
         case "fullUserList":
             console.log("new list has been made")

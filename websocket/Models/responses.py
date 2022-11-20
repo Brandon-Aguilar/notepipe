@@ -78,12 +78,13 @@ class imageToTextRequest(response):
         self.convertedText = ""
         
 class textToSpeechRequest(response):
-    def __init__(self, studentKey=None, imageURL=None) -> None:
+    def __init__(self, studentKey=None, inputText=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Text to speech function requested"
         self.studentKey = studentKey
-        self.imageURL= imageURL
+        self.inputText = inputText
+        self.convertedAudio = ""
 
 class pageFetched(response):
     def __init__(self, studentKey=None, pageNumber= None, imageURL=None) -> None:

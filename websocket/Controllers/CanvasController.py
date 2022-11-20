@@ -5,6 +5,7 @@ import json
 import os
 
 from Models.responses import newPageCreated,newPage
+from TTS.TextToSpeech import createAudio
 
 #from handwriting.websocket.Models.responses import response
 try:
@@ -90,9 +91,7 @@ async def imageToText(websocket, studentKey, response, pageNumber):
     await websocket.send(response.toJson())
 
 async def textToSpeech(websocket, studentKey, response):
-    if redisServer.exists(studentKey):
-        pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
-        response.imageURL = pages.getLatestPage()
+    response.convertedAudio = createAudio(response.inputText)
     await websocket.send(response.toJson())
 
 async def fetchImage(studentKey, response, pageNumber):
