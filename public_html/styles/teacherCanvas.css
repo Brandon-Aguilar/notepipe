@@ -350,6 +350,8 @@
     opacity: 1;
   }
 
+  /*-- Styling For Note Editor Starts Here --*/
+  
   .box{
     position: absolute;
     left:50%;
@@ -362,10 +364,10 @@
   
   .btn{
     color:#fff;
-    background-color:#333333;
+    vertical-align: top;
+    background-color:#2c2b2b;
     outline: none;
     border: 0;
-    color: #fff;
     padding:10px 15px;
     text-transform:uppercase;
     margin-top:10px;
@@ -376,13 +378,49 @@
     cursor:pointer;
     position:relative;
   }
+
+  audio::-webkit-media-controls-enclosure {
+      background-color: rgba(185, 185, 185);
+      border-radius: 20px;
+      max-width: 800px;
+      padding:0px 8px;
+      margin-top:10px;
+      margin-bottom:10px;
+      margin-right:5px;
+      margin-left:5px;
+      position:relative;
+  }
+
+  audio::-webkit-media-controls-panel {
+    background-color: rgba(185, 185, 185);
+    border-radius: 40px;
+  }
+
+  audio::-webkit-media-controls-play-button {
+      transform: scale(2.5, 2.7);
+  }
+
+  audio::-webkit-media-controls-mute-button {
+    transform: scale(2, 2);
+  }
+
+  #minimize{
+    background-color: rgba(185, 185, 185);
+    border: 0;
+    border-radius: 20px;
+    transform: scale(1.6, 1.5);
+    vertical-align: top;
+    margin-top:16px;
+    margin-bottom:10px;
+    padding: 0px 0px;
+  }
   
   .btn:hover{
-    background-color:#262626;
+    background-color:#222121;
   }
   
   .btn:active{
-    background-color:#1a1a1a;
+    background-color:#030303;
   }
 
   .ql-container.ql-snow {
@@ -393,6 +431,10 @@
       height: 200px;
       overflow-y: scroll;
   }
+  
+  /*-- Styling For Note Editor Ends Here --*/
+
+
 
   .top-border{
     position: fixed;
@@ -422,6 +464,7 @@
     bottom: 2px;
     right: 10px;
   }
+
   /*For showing and hiding edit name textbox in javascript*/
   .show{
     display:block;
