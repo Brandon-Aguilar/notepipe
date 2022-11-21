@@ -163,7 +163,6 @@ drawAnimationsCheckboxElement.addEventListener("change", () => {
     console.log(drawAnimations);
 });
 
-
 // resize canvas
 function resize() {
   var inMemCanvas = document.createElement('canvas');
@@ -185,8 +184,6 @@ function initializeStudent() {
     const event = { type: "initializeStudent",  studentKey: studentKey, image: image};
     websocket.send(JSON.stringify(event))
 }
-
-
 
 //same as teacher draw function
 function draw(data) {
@@ -271,16 +268,11 @@ function arrayBuffr(){
 }   
 
 localUserList={}
-function retrieveUserList(){
-        //request and update name
-        let name="";
-        name= prompt ("Enter your name: ");
-        while(name == null || name == "" ){
-            name= prompt ("Please enter your name: ");
-        }
-    
-        const newStudentName= {type: "retrieveUserList", newName: name}
-        websocket.send(JSON.stringify(newStudentName))
+function createStudentName(){
+    let name =  Math.random().toString(16).slice(2); 
+    console.log('default name is:', name)
+    const newStudentName = {type: "retrieveUserList", newName: name}
+    websocket.send(JSON.stringify(newStudentName))
 }
 
 // Handle valid messages sent to client
