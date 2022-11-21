@@ -1,9 +1,9 @@
 import logging
 import secrets
 import json
-from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, wipestudent, imageToText, resett, fetchPage, fetchImage, canvasNewPage
+from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, newPageInsert, imageToText, resett, fetchPage, fetchImage, canvasNewPage, textToSpeech
 
-from Models.responses import initializeHostSuccess, initializeStudentSuccess, imageToTextRequest, pageFetched, imageFetched
+from Models.responses import initializeHostSuccess, initializeStudentSuccess, imageToTextRequest, textToSpeechRequest, pageFetched, imageFetched
 from Models.errorHandler import sendError
 from Models.userList import userList
 from Models.userList import userObject
@@ -43,7 +43,7 @@ async def initializeHost(websocket):
     # Store list of connections to be broadcasted to
     HOST_KEYS[hostKey] = studentKey
     JOINED[studentKey] = {websocket}
-    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(websocket.id, "DefaultTeacher", True, True)})
+    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(websocket.id, "DefaultTeacher", True, True)}, {})
 
     response = initializeHostSuccess()
     response.hostKey = hostKey
@@ -59,11 +59,12 @@ async def initializeHost(websocket):
         del HOST_KEYS[hostKey]
 
         # Some kind of way to deal with teacher dropping
-        USERS[studentKey].removeUser(websocket.id)
+        USERS[studentKey].removeUser(websocket.id, JOINED[studentKey])
 
 
 async def hostConnection(websocket, hostKey, studentKey):
     """Process messages for a host connection, loops until disconnected"""
+    users = USERS[studentKey]
     async for message in websocket:
         messageJSON = json.loads(message)
         log.info("Received message from host websocket %s with message type %s", websocket.id, messageJSON["type"])
@@ -75,10 +76,15 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "Addnewpage":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) 
                 await canvasNewPage(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])        
-                #await wipestudent(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey]) leave the client to decide to wipe
+            case "newPageInsert":
+                await newPageInsert(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])     
             case "resetcanvas":
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
+            case "updateName":
+               users.updateUserName(websocket.id, messageJSON["newName"])
+
+
 
 async def initializeStudent(websocket, studentKey, image):
     """Check for valid key and add connection to host's connections"""
@@ -92,7 +98,7 @@ async def initializeStudent(websocket, studentKey, image):
     connected.add(websocket)
     # Maybe add some kind of name randomizer
     users.addUser(websocket.id, userObject(websocket.id, "DefaultStudent", False, False))
-    
+
 
     response = initializeStudentSuccess()
     response.studentKey = studentKey
@@ -104,12 +110,12 @@ async def initializeStudent(websocket, studentKey, image):
         await studentConnection(websocket, studentKey)
     finally:
         connected.remove(websocket)
-        users.removeUser(websocket.id)
+        users.removeUser(websocket.id, JOINED[studentKey])
 
 
 async def studentConnection(websocket, studentKey):
     """Process messages for a student connection, loops until disconnected"""
-
+    users = USERS[studentKey]
     async for message in websocket:
         messageJSON = json.loads(message)
         log.info("Received message from student websocket %s with message type %s",
@@ -124,6 +130,14 @@ async def studentConnection(websocket, studentKey):
                 response.convertedText = rearrangeLines(reorderWords(readImage(response.imageURL)))
                 await websocket.send(response.toJson())
                 log.info("image was retrieved %s", response.imageURL)
+
+            case "textToSpeech":
+                response = textToSpeechRequest()
+                response.studentKey = studentKey
+                response.inputText = messageJSON["inputText"]
+                await textToSpeech(websocket, studentKey, response)
+                await websocket.send(response.toJson())
+                log.info("text was converted to speech %s", response.convertedAudio)
 
             case "fetchPage":
                 log.info("Fetching image for page %s", messageJSON["pageNumber"])
@@ -152,3 +166,10 @@ async def studentConnection(websocket, studentKey):
                     log.info("Failed to fetch image: %s", e)
                     sendError(websocket, "Failed to fetch image")
                 log.info("fetche image is "+response.imageURL)
+            case "updateName":
+                users.updateUserName(websocket.id, messageJSON["newName"],JOINED[studentKey])
+            case "retrieveUserList":
+                #add the new user's name to list
+                users.updateUserName(websocket.id, messageJSON["newName"], JOINED[studentKey])
+                #get the whole user's list
+                await users.fullUserList(websocket)

@@ -1,10 +1,12 @@
 from google.cloud import texttospeech
 import os
 import redis
+import base64
 import inspect # Used for inspect.stack()[0][3] within functions, which returns the function name it's called in
 
-# Replace `<json key filename>` and call testAudio() to test tts
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "<json key filename>"
+ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+FILE_PATH = os.path.join(ROOT_DIR, 'OCR', 'credentials.json')
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = FILE_PATH
 
 """ Retrieve text generated from ocr script (probably from redis database) """
 
@@ -23,8 +25,7 @@ def createAudio(text):
 
     # Create the audio and output it (as an mp3 file here)
     response = client.synthesize_speech(input = syn_input, voice = voice, audio_config = audio_config)
-    with open("test.mp3", "wb") as out:
-        out.write(response.audio_content)
+    return base64.b64encode(response.audio_content).decode('ascii')
 
 # Test the createAudio function
 def testAudio():

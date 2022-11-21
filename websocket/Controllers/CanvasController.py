@@ -4,7 +4,8 @@ import redis
 import json
 import os
 
-from Models.responses import newPageCreated
+from TTS.TextToSpeech import createAudio
+from Models.responses import newPageCreated,NewpagesInserted
 
 #from handwriting.websocket.Models.responses import response
 try:
@@ -14,7 +15,7 @@ except ValueError:
 
 
 
-from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage,resetbutton
+from Models.responses import canvasBroadcast, canvasUpdateSuccess, canvasDrawUpdateBroadcast, clearpage
 from Models.redisObjects import hostPages, loadHostPagesFromJSON
 
 log = logging.getLogger(__name__)
@@ -90,9 +91,7 @@ async def imageToText(websocket, studentKey, response, pageNumber):
     await websocket.send(response.toJson())
 
 async def textToSpeech(websocket, studentKey, response):
-    if redisServer.exists(studentKey):
-        pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
-        response.imageURL = pages.getLatestPage()
+    response.convertedAudio = createAudio(response.inputText)
     await websocket.send(response.toJson())
 
 async def fetchImage(studentKey, response, pageNumber):
@@ -104,4 +103,16 @@ async def canvasNewPage(websocket, messageJSON, connected, studentKey: str):
     log.info("Adding new page on websocket %s", websocket.id)
     response = newPageCreated()
     websockets.broadcast(connected, response.toJson())
+
+
+async def newPageInsert(websocket, messageJSON, connected, studentKey: str):
+    imageURL = messageJSON["imageURL"]
+    pageNumber = messageJSON["pageNumber"]
+    log.info("Inserted new page on websocket %s", websocket.id)
     
+    pages: hostPages = loadHostPagesFromJSON(redisServer.get(studentKey))
+    pages.insertnewPage(imageURL, pageNumber)
+    redisServer.set(studentKey, pages.toJson())
+    
+    response = NewpagesInserted(pageNumber)
+    websockets.broadcast(connected, response.toJson())     

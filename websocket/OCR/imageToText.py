@@ -73,14 +73,14 @@ def breakLines(unwrapped_text):
     Returns:
         wrapped_text (list); wrapped block of list of text
     """
-    LINE_TOLERANCE = 15
+    LINE_TOLERANCE = 20
     wrapped_text = [[unwrapped_text[0]]]
     prev_text_pos_y = unwrapped_text[0][1][1]
     curr_line = 0
 
     for text in unwrapped_text[1:]:
         # measure the diff in pos of current & previous text
-        if text[1][1]-prev_text_pos_y <= LINE_TOLERANCE:
+        if abs(text[1][1]-prev_text_pos_y) <= LINE_TOLERANCE:
             # if diff is below tolerance level, add 'text' to curr_line
             wrapped_text[curr_line].append(text)
         else: 

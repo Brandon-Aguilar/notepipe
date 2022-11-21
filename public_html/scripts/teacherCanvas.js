@@ -39,6 +39,10 @@ var canvasStack = [canvas];
 // used to check whether this is the first undo since that would be equal to the current state
 var undoHasBeenDone = false;
 
+var highlightDraw = false;
+
+
+
 
 resize();
 
@@ -87,6 +91,17 @@ websocket.addEventListener('open', initializeHost)
 var pageNumber = 0;
 var viewingPageNumber=0; //will keep track of current page being displayed (next/prev function)
 
+//for name change
+var newName = '' // what client chooses new username to be
+const updateName = document.getElementById('updateName');
+updateName.addEventListener('click', editName);
+//listen for input for edit name using input box in teacher.html
+
+window.addEventListener('input', (e) =>{
+    console.log('new name: ', e.target.value);
+    newName = e.target.value;
+}) 
+
 
 // get html elements
 updateMessageElement = document.getElementById("updateStatus");
@@ -96,6 +111,7 @@ currentPageNumberElement = document.getElementById('currentPageNumber');
 
 //instructor image saved locally
 const localImages=[];
+const TemplocalImages= [];
 
 //save button
 var updateSaveoption=document.getElementById('newpage')
@@ -129,8 +145,30 @@ function newpage(){
         setCurrentPageText();
     }
     else{
-        currentPageNumberElement.textContent="please be on page"+pageNumber+" to add a new page";
-        console.log("please be on last page to add a new page")
+      
+        pageNumber++;
+        viewingPageNumber++;
+        console.log("Adding new page number: ",pageNumber)
+        var imageURL = canvas.toDataURL("image/png", 0.2);
+             
+          
+
+        width = window.innerWidth;
+        height = window.innerHeight;  
+        ctx.clearRect(0, 0, width, height);
+
+        var message = {
+            type: "newPageInsert",
+            pageNumber: viewingPageNumber,
+            imageURL,
+        }  
+        websocket.send(JSON.stringify(message));
+        sendUpdate();
+        setCurrentPageText();
+        imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
+       
+        localImages.splice(viewingPageNumber,0,imageURL)
+         setCurrentPageText();
     }
 
 }
@@ -256,14 +294,32 @@ function sendUpdate() {
     var imageURL = canvas.toDataURL("image/png", 0.2);
     var message = {
         type: "canvasUpdate",
-        pageNumber: pageNumber,
+        pageNumber: viewingPageNumber,
         imageURL,
     }
     websocket.send(JSON.stringify(message))
 }
 
+// Change width of the marker based on input from a HTML slider
+function changeWidth(newWidth) {
+    markerWidth = newWidth;
+    eraserState= false;
+    ctx.globalCompositeOperation = 'source-over';
+};
+
+// shows the HTML slider located in slider-div
+function showSlider() {
+    var x = document.getElementById("slider-div");
+    if (x.style.display === "block") {
+      x.style.display = "none";
+    } else {
+      x.style.display = "block";
+    }
+  };
+
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
+    highlightDraw = false;
     color = newColor;
     eraserState= false;
     ctx.globalCompositeOperation = 'source-over';
@@ -273,19 +329,29 @@ function changeColor(newColor) {
 function eraser(){
     eraserState = true;
     // Erasing by using destination image to be on top of the drawn image in source image
-    ctx.globalCompositeOperation = "destination-out";
+   // ctx.globalCompositeOperation = "destination-out";
     console.log("Image erased: ", pageNumber)
 };
 
+
 function draw(data) {
-    ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
+    ctx.strokeStyle = data.color;//original default stroke color 
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = data.force;//stroke width
+    ctx.lineCap = 'round';
+
+    if (highlightDraw) {ctx.globalCompositeOperation = "overlay"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 0.8; ctx.lineWidth = 40;}
+    else if (data.eraserState) ctx.globalCompositeOperation = "destination-out";
+    else ctx.globalCompositeOperation = "source-over";
+
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
     ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
-    ctx.strokeStyle = data.color;//original default stroke color 
-    ctx.lineWidth = data.force;//stroke width
-    ctx.lineCap = 'round';
     ctx.stroke();//outlines the current or given path with the current stroke style
+    ctx.globalCompositeOperation = "source-over";
+}
+function startHighlight(){
+    highlightDraw = true;
 }
 
 function move(e) {
@@ -303,7 +369,7 @@ function move(e) {
             lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
             return;
         }
-
+        
         draw({
             lastPoint,//the x,y coordinate of the last stroke
             x: e.offsetX,//x-coordinate of the mouse pointer relative to the document
@@ -421,7 +487,7 @@ function navigateToPage(pageWanted){
 }
 
 var absoluteJoinLink = "";
-
+localUserList={}
 // Handle messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
@@ -440,9 +506,47 @@ function processMessage({ data }) {
             absoluteJoinLink = window.location.host + "/canvas/" + link;
             generateQRCode(absoluteJoinLink);
             break;
+            case "updateUserList":
+                //empty list
+                if(Object.keys(localUserList).length===0){
+                    addName("Users", event.id, event.name)
+                    lastId=event.id
+                }
+                //check we are updating student name
+                else if(event.id in localUserList){
+                    changeName(event.id, event.name)
+                }
+                //must be a new student 
+                else{
+                    addName(lastId, event.id, event.name)
+                    lastId=event.id
+                }
+                localUserList[event.id]=event.name
+                break;
+            case "removeUserFromList":
+                console.log("student left: "+localUserList[event.id])
+                //if lastId is removed and a new student joins, their name won't populate
+                delete localUserList[event.id];
+                if(lastId==event.id){
+                    var total= Object.keys(localUserList).length;
+                    lastId= Object.keys(localUserList)[total-1]
+                }
+                removeName(event.id) 
+                break;
     }
 }
-
+function addName(previousId, id, name) {
+    var full= "<h4 id='"+id+"'> "+name
+    document.getElementById(previousId).insertAdjacentHTML("afterend",full);
+}
+function changeName(id, name){
+    const full= document.getElementById(id)
+    full.innerHTML = name;
+}
+function removeName(name){
+    const element = document.getElementById(name);
+    element.remove()
+}
 
 document.onkeydown = checkKey;
 
@@ -464,8 +568,8 @@ function checkKey(e) {
 function generateQRCode(codeContent) {
     const qrcode = new QRCode(document.getElementById('qrcode'), {
         text: codeContent,
-        width: 128,
-        height: 128,
+        width: 350,
+        height: 350,
         colorDark : '#000',
         colorLight : '#fff',
         correctLevel : QRCode.CorrectLevel.H
@@ -488,3 +592,89 @@ function copyKeyOutFunc() {
 function setCurrentPageText() {
     currentPageNumberElement.textContent = (viewingPageNumber + 1).toString() + "/" + (pageNumber + 1).toString();
 }
+//edit name
+function editName(){
+    console.log('editName button was clicked and function called');
+    const request = {type: "updateName", newName: newName}; 
+    websocket.send(JSON.stringify(request))
+ } 
+
+ //show/hide textbox to input name
+ function showEditName(){
+    document.getElementById('nameTextBox').className="show";
+    document.getElementById('updateName').className="show";
+ }
+function hideEditName(){
+    document.getElementById('nameTextBox').className="hide";
+    document.getElementById('updateName').className="hide";
+}
+
+// QR Overlay
+function openQR(){
+    document.getElementById("qr-code-overlay").style.display = "block";
+}
+function closeQR(){
+    document.getElementById("qr-code-overlay").style.display = "none";
+}
+
+// Dropdown menu functions
+// function showSaveButtonDropdown() {
+//     document.getElementById("save-button-dropdown").classList.toggle("show-save-dropdown");
+// }
+
+//     // Close dropdown menu if clicked outside
+//     window.onclick = function(event) {
+//         if (!event.target.matches('.save-button' || '.save-icon')) {
+//           var dropdowns = document.getElementsByClassName("header-right-dropdown-content");
+//           var i;
+//           for (i = 0; i < dropdowns.length; i++) {
+//             var openDropdown = dropdowns[i];
+//             if (openDropdown.classList.contains('show-save-dropdown')) {
+//               openDropdown.classList.remove('show-save-dropdown');
+//             }
+//           }
+//         }
+//       } 
+    
+
+// function showMenuButtonDropdown() {
+//     document.getElementById("menu-button-dropdown").classList.toggle("show-dropdown");
+// }
+
+//     window.onclick = function(event) {
+//         if (!event.target.matches('.menu-button' || '.menu-icon')) {
+//         var dropdowns = document.getElementsByClassName("header-right-dropdown-content");
+//         var i;
+//         for (i = 0; i < dropdowns.length; i++) {
+//             var openDropdown = dropdowns[i];
+//             if (openDropdown.classList.contains('show-menu-dropdown')) {
+//             openDropdown.classList.remove('show-menu-dropdown');
+//             }
+//         }
+//         }
+//     } 
+
+
+
+
+/*
+uploadFile TODO:
+    - Add support for ppt/pptx, probably jpg/jpeg and pdf too
+        - Currently only works for png files
+    - Make the button look better maybe (in public_html/canvas/teacher.html)
+        - It's a default html `Choose File` button right now
+    - Maybe mess with formatting
+        - Currently draws the image on the top left corner
+*/
+function uploadFile() {
+    var file = document.getElementById("upload").files[0];
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function (e) {
+        var img = new Image();
+        img.src = e.target.result;
+        img.onload = function () {
+           ctx.drawImage(img, 10, 10);
+        };
+     }
+} 

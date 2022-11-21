@@ -22,6 +22,8 @@ if (window.location.host === "localhost:8080") {
 var websocket = new WebSocket(serverURL, "json");
 console.log("Connected to Websocket");
 
+//for name change
+var newName = '' // what client chooses new username to be
 
 // Copied canvas code
 // create canvas element and append it to document body
@@ -39,8 +41,10 @@ var image = new Image();
 resize();
 
 //Fetch HTML elements that need event listners
-var ocr = document.getElementById("TTS");
+var ocr = document.getElementById("editNote");
 const download = document.getElementById('download');
+const updateName = document.getElementById('updateName');
+
 
 // Event listeners to trigger functions
 //window.addEventListener('resize', resize);
@@ -48,18 +52,29 @@ websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeStudent)
 download.addEventListener('click', downloadbutton);
 ocr.addEventListener('click', showTextEditor);
+updateName.addEventListener('click', editName);
+
+//listen for input for edit name using input box in student.html
+window.addEventListener('input', (e) =>{
+    //console.log('new name: ', e.target.value);
+    newName = e.target.value;
+}) 
 
 function showTextEditor(){
     ocr.disabled = true;
 
     // Create editor container
     var html = [
-        "<button type='button' id='closeBtn' class='btn'>X</button>",
+        "<button type='button' id='closeBtn' class='btn'>x</button>",
         "<div style='background-color: #ffffff;'>" ,
             "<div id='editor'></div>" ,
         "</div>" ,
-        "<button type='button' id='saveAs' class='btn'>save as</button>" ,
-        "<button type='button' id='speechify' class='btn'>convert to speech</button>"
+        "<button type='button' id='saveAsPDF' class='btn'>download</button>" ,
+        "<button type='button' id='speechify' class='btn'>play</button>" ,
+        "<audio id='speech' controlsList='nodownload noplaybackrate'></audio>",
+        "<button type='button' id='minimize' style='display: none;'>",
+            "<span class='material-icons-outlined'>arrow_back_ios</span>",
+        "</button>"
     ].join("");
 
     // Wrap and insert editor container to document 
@@ -94,22 +109,36 @@ function showTextEditor(){
     // Invoke websocket request for OCR service
     imageToText();
 
+    var downloadBtn = document.getElementById('saveAsPDF');
+    var xBtn = document.getElementById('closeBtn');
+    playBtn = document.getElementById('speechify');
+    minimizeBtn = document.getElementById('minimize');
+
     // Event listener for 'X' button
-    const closeEditorBtn = document.getElementById('closeBtn');
-    closeEditorBtn.addEventListener('click', closeEditor);
+    xBtn.addEventListener('click', function(){
+        document.getElementById('textEditor').remove();
+        ocr.disabled = false;
+    });
 
-    // Event listener for 'Save As' button
-    const SaveAsBtn = document.getElementById('closeBtn');
-    SaveAsBtn.addEventListener('click', function(){});
+    // Event listener for 'Download' button
+    downloadBtn.addEventListener('click', function(){ 
+        var contentWrapper = document.createElement('div');
+        contentWrapper.innerHTML = quill.root.innerHTML;
+        $(contentWrapper).printThis();
+    });
 
-    // Event listener for 'Convert To Speech' button
-    const convertToSpeechBtn = document.getElementById('closeBtn');
-    convertToSpeechBtn.addEventListener('click', function(){});
-}
+    // Event listener for 'Play' button
+    playBtn.addEventListener('click', function(){
+        textToSpeech(quill.getText()); // Invoke websocket request for TTS service
+    });
 
-function closeEditor(){
-    document.getElementById('textEditor').remove();
-    ocr.disabled = false;
+    // Event listener for '<' button
+    minimizeBtn.addEventListener('click', function(){
+        if(!audio.paused && !audio.ended) { audio.pause(); }
+        minimizeBtn.style.display="none";
+        playBtn.style.display="";
+        audio.controls = false;
+    })
 }
 
 image.onload = function() {
@@ -133,7 +162,6 @@ drawAnimationsCheckboxElement.addEventListener("change", () => {
     drawAnimations = drawAnimationsCheckboxElement.checked;
     console.log(drawAnimations);
 });
-
 
 // resize canvas
 function resize() {
@@ -175,6 +203,12 @@ function imageToText(){
     websocket.send(JSON.stringify(request))
 }
 
+// request TTS service
+function textToSpeech(targetText){
+    const request = { type: "textToSpeech",  studentKey: studentKey, inputText: targetText};
+    websocket.send(JSON.stringify(request))
+}
+
 //Download the current page
 function downloadbutton(e) {
     console.log(canvas.toDataURL());
@@ -189,8 +223,7 @@ const zipfolder = document.getElementById('zipFolder');
 zipfolder.addEventListener('click', zipFolderbutton);
 
 //Download a zip folder
-function zipFolderbutton(e) {
-            
+function zipFolderbutton(e) {  
     for(let i = 0; i < localImages.length; i++){
         if(localImages[i]==undefined || localImages.length-1){
             console.log("Image not stored locally, fetch from redis", i)
@@ -233,9 +266,18 @@ function arrayBuffr(){
         }
     })();
 }   
+
+localUserList={}
+function createStudentName(){
+    let name =  Math.random().toString(16).slice(2); 
+    console.log('default name is:', name)
+    const newStudentName = {type: "retrieveUserList", newName: name}
+    websocket.send(JSON.stringify(newStudentName))
+}
+
 // Handle valid messages sent to client
 function processMessage({ data }) {
-    const event = JSON.parse(data);
+    const event = JSON.parse(data); 
     console.log(event)
     switch(event.__type__){
         case "initializeStudentSuccess":
@@ -254,11 +296,11 @@ function processMessage({ data }) {
             pageNumber = event.pageNumber;
             
             // initialize page drawInstructions
-            drawInstructions = Array(pageNumber+1).fill([]);
+            drawInstructions = Array.from({length: pageNumber+1}, () => new Array());
+            createStudentName();
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
-
             if(event.page == viewingPageNumber){
                 if(drawAnimations){
                     currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
@@ -277,9 +319,7 @@ function processMessage({ data }) {
                 });
                 
                 drawInstructions[event.page].push(parsedInstructions);
-            }
-            
-            
+            }        
             break;
         case "clearpage":
             // cancel all the current animations and draw them instantly
@@ -298,13 +338,36 @@ function processMessage({ data }) {
             ctx.clearRect(0, 0, width, height)
             break;
         case "newPageCreated":
-            console.log("New page has been created")
+
             // When we add page following, this should be an if
             // if following...viewingPageNumber = event.pageNumber
             //var imageURL = canvas.toDataURL("image/png", 0.2);
             //localImages[event.pageNumber]= imageURL;
+        
             pageNumber += 1;
             drawInstructions.push([]);
+            setCurrentPageText();
+            break;
+
+        case "NewpagesInserted":
+          
+            pageNumber += 1;  
+            width = window.innerWidth
+            height = window.innerHeight
+            
+            
+            if(event.insertIndex <= viewingPageNumber){
+                localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
+                ctx.clearRect(0, 0, width, height);
+
+                drawInstructions.splice(event.insertIndex, 0, []);
+                localImages.splice(event.insertIndex, 0, "");
+                // When we add follow teacher, then don't navigate if following
+                navigateToPage(viewingPageNumber + 1);
+            } else {
+                drawInstructions.splice(event.insertIndex, 0, []);
+                localImages.splice(event.insertIndex, 0, "");
+            }
             setCurrentPageText();
             break;
         case "pageFetched":
@@ -332,6 +395,37 @@ function processMessage({ data }) {
         case "imageToTextRequest":
             quill.setText(event.convertedText);
             break;
+        case "textToSpeechRequest":
+            console.log("audio file recieved")
+            audio = document.getElementById('speech');
+            audio.src = "data:audio/mpeg;base64," + event.convertedAudio;
+            audio.load();
+            playBtn.style.display="none";
+            minimizeBtn.style.display="";
+            audio.controls = true;
+            audio.play();
+            break;
+        case "fullUserList":
+            console.log("new list has been made")
+            for (const [key, value] of Object.entries(event.names)) {
+                localUserList[key]=value;
+            }
+          break;
+        case "updateUserList":
+            console.log("update has been called and the list is")
+            localUserList[event.id]=event.name
+            for (const [key, value] of Object.entries(localUserList)) {
+                console.log(key, value);
+              } 
+            break;
+        case "removeUserFromList":
+            
+            console.log("student left: "+localUserList[event.id])
+            delete localUserList[event.id];
+            for (const [key, value] of Object.entries(localUserList)) {
+                console.log(key, value);
+            } 
+            break;
 
     }   
 }
@@ -355,6 +449,7 @@ function navigateToPage(pageWanted){
     //acceptable range for pages to load
     if(pageWanted>=0 && pageWanted<=pageNumber){
         //before loading previous/next page, store the current page in local array
+        
         localImages[viewingPageNumber]= canvas.toDataURL("image/png", 0.2);
         //check if page wanted has been stord locally (in case where student joins late it might not be)
         if(localImages[pageWanted]!=undefined){
@@ -362,22 +457,22 @@ function navigateToPage(pageWanted){
             width = window.innerWidth;
             height = window.innerHeight;  
             ctx.clearRect(0, 0, width, height);
-
+            
             //load requested page
             image.src=localImages[pageWanted]
             image.onload = function() {//wait for image to load before trying to draw to canvas
                 ctx.drawImage(image, 0, 0);
-            }
 
-            if(drawInstructions[pageWanted].length !=0 ){
-                console.log("draw instructions need to execute");
-                drawInstructions[pageWanted].forEach((currInstructions) => {
-                    currInstructions.forEach((stroke) => {
-                        draw(stroke);
+                if (drawInstructions[pageWanted].length != 0) {
+                    console.log("draw instructions need to execute");
+                    drawInstructions[pageWanted].forEach((currInstructions) => {
+                        currInstructions.forEach((stroke) => {
+                            draw(stroke);
+                        });
                     });
-                });
 
-                drawInstructions[pageWanted]=[];
+                    drawInstructions[pageWanted] = [];
+                }
             }
 
             //update the page number currently being viewed 
@@ -396,6 +491,7 @@ function navigateToPage(pageWanted){
         // Probably dont need to show this in prod
         console.log("the page requested ("+pageWanted+") is out of bound")
     }
+   
 }
 
 currentDrawInstructions = [];
@@ -426,4 +522,20 @@ function cancelAllAnimationFrames() {
 
 function setCurrentPageText() {
     currentPageNumberElement.textContent = (viewingPageNumber + 1).toString() + "/" + (pageNumber + 1).toString();
+}
+
+//edit name
+function editName(){
+    console.log('editName button was clicked and function called');
+    const request = {type: "updateName", newName: newName}; 
+    websocket.send(JSON.stringify(request))
+ } 
+ //show/hide textbox to input name
+ function showEditName(){
+    document.getElementById('nameTextBox').className="show";
+    document.getElementById('updateName').className="show";
+ }
+function hideEditName(){
+    document.getElementById('nameTextBox').className="hide";
+    document.getElementById('updateName').className="hide";
 }

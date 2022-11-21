@@ -78,12 +78,13 @@ class imageToTextRequest(response):
         self.convertedText = ""
         
 class textToSpeechRequest(response):
-    def __init__(self, studentKey=None, imageURL=None) -> None:
+    def __init__(self, studentKey=None, inputText=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Text to speech function requested"
         self.studentKey = studentKey
-        self.imageURL= imageURL
+        self.inputText = inputText
+        self.convertedAudio = ""
 
 class pageFetched(response):
     def __init__(self, studentKey=None, pageNumber= None, imageURL=None) -> None:
@@ -116,3 +117,33 @@ class newPageCreated(response):
         self.__type__ = self.__class__.__name__
         self.message = "New Page Added"
 
+class fullUserList(response):
+    def __init__(self, name=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.names = name
+        self.message = "Retrieving full user list for new connection"
+
+class updateUserList(response):
+    def __init__(self, name=None, id=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.id = id
+        self.name = name
+        self.message = "Those already connected need to update their user list"
+
+class removeUserFromList(response):
+    def __init__(self, name=None, id=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.id = id
+        self.name = name
+        self.message = "Those already connected need to update their user list"
+
+class NewpagesInserted(response):
+    def __init__(self, insertIndexr=None,imageURL=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.insertIndex = insertIndexr
+        # self.imageURL= imageURL
+        self.message = "New page Inserted"
