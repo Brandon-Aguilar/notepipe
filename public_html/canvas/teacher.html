@@ -6,6 +6,7 @@
         <link rel="stylesheet" href="../styles/teacherCanvas.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         <script src="https://cdn.jsdelivr.net/g/filesaver.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.0.279/build/pdf.min.js"></script>
         <title>NotePipe-Teacher</title>
     </head>
     <body>
@@ -192,8 +193,37 @@
           <input class="hide" type="text" id="nameTextBox">
           <button class="hide" id="updateName" onclick="hideEditName()">Submit</button>
           <!--End Update Name-->
-          <input type="file" id="upload" accept="image/png" onchange="uploadFile()">
+          <input type="file" id="upload" onchange="interpretFile()">
         </div>
+
+        <!-- below script is for file upload -->
+        <script>
+          function interpretFile(){
+            var file = document.getElementById("upload").files[0];
+            if ((file.type == "image/png") || (file.type == "image/jpeg")) {
+              console.log("user has uploaded an image (png/jpeg) file");
+              uploadImageFile(); // function in teacherCanvas.js
+            }
+            else if (file.type == "application/pdf") {
+              console.log("user has uploaded a pdf file");
+              readAndUploadPDF(file);
+            }
+            else {
+              console.log("uploaded file type not supported");
+            }
+          }
+          function readAndUploadPDF(file) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.0.279/build/pdf.worker.min.js";
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (e) {
+              pdfjsLib.getDocument(e.target.result).promise.then((pdf_file) => {
+                //console.log("number of pages: " + pdf_file.numPages);
+                uploadPDF(pdf_file); // send pdf to function in teacherCanvas.js to be displayed on canvas
+              })
+            }
+          }
+        </script>
 
         <div class="status-check">
           <p id="updateStatus">Content Not Sent</p>
