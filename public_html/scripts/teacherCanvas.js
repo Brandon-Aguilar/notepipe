@@ -658,15 +658,13 @@ function closeQR(){
 
 
 /*
-uploadFile TODO:
-    - Add support for ppt/pptx, probably jpg/jpeg and pdf too
-        - Currently only works for png files
-    - Make the button look better maybe (in public_html/canvas/teacher.html)
-        - It's a default html `Choose File` button right now
+uploadImageFile TODO:
     - Maybe mess with formatting
         - Currently draws the image on the top left corner
+    - Alter how the upload file button looks
+        - Currently is the default `Choose File` button
 */
-function uploadFile() {
+function uploadImageFile() {
     var file = document.getElementById("upload").files[0];
     var reader = new FileReader();
     reader.readAsDataURL(file);
@@ -676,5 +674,18 @@ function uploadFile() {
         img.onload = function () {
            ctx.drawImage(img, 10, 10);
         };
-     }
+    }
 } 
+
+function uploadPDF(pdf_file) {
+    console.log("inside uploadPDF function. number of pages in pdf: " + pdf_file.numPages);
+    var viewport;
+    pdf_file.getPage(1).then(page => {
+        viewport = page.getViewport({scale: 1, rotation: 360});
+        page.render({
+            canvasContext: ctx,
+            viewport: viewport
+        });
+    });
+    // TODO: need to render every page of pdf_file
+}
