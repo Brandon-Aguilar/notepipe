@@ -286,7 +286,7 @@ function processMessage({ data }) {
             image.src = event.imageURL;
             image.onload = function() {//wait for image to load before trying to draw to canvas
                 ctx.drawImage(image, 0, 0);
-                localImages[event.pageNumber]=image;
+                localImages[event.pageNumber] = event.imageURL;
                 viewingPageNumber=event.pageNumber;
                 setCurrentPageText();
                 console.log("initialized on page "+viewingPageNumber);
