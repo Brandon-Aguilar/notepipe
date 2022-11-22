@@ -81,15 +81,22 @@
 
   .header-middle{
     display: flex;
-    background-color: #323336;
-    align-content: space-between;
-    justify-content: space-between;
-    width: 200px;
-    height: 40px;
-    border-radius: 20px;
   }
 
-  .header-middle button{
+  .header-middle button {
+    height: 40px;
+    width: 40px;
+    border-radius: 20px;
+    border: none;
+    background-color: #323336;
+    margin-right: 5px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page-navigation-bar button{
     height: 32px;
     width: 32px;
     border-radius: 16px;
@@ -103,6 +110,17 @@
     margin-right: 4px;
   }
 
+  .page-navigation-bar{
+    display: flex;
+    background-color: #323336;
+    align-content: space-between;
+    justify-content: space-between;
+    width: 200px;
+    height: 40px;
+    border-radius: 20px;
+    margin-right: 5px;
+  }
+  
   .current-page-counter{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     color: white;
@@ -114,7 +132,19 @@
   .navigation-icon{
     padding: 5px;
   }
+
+  .new-page-icon{
+    height: 24px;
+  }
   
+  .reset-page-icon{
+    height: 22px;
+  }
+
+  .upload-icon{
+    height: 24px;
+  }
+
   .header-right{
     display: flex;
   }
@@ -135,13 +165,18 @@
     margin-right: 5px;
   }
 
-  .menu-icon{
-    height: 15px;
+  .link-icon{
+    height: 23px;
     background: none;
   }
 
   .save-icon{
     height: 30px;
+    background: none;
+  }
+
+  .users-icon{
+    height: 26px;
     background: none;
   }
 
