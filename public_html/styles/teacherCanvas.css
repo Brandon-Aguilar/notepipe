@@ -1,3 +1,7 @@
+/*disable highlighting buttons when drawing*/
+*{
+  user-select: none;
+}
 /* Dropdown Button */
 .dropbtn {
     background-color: #3498DB;
@@ -429,14 +433,34 @@
   .hide{
     display: none;
   }
-  .list{
-    position: absolute;
-    top: 10;
-    right: 0;
-    width: 100px;
-    height: 400px;
-    background: rgb(221, 225, 226);
-    box-shadow: 0px 1px 12px rgb(0, 0, 0, 0.5);
-    border-radius:10px; 
-    overflow-y: auto;
-  }
+  /* panel layout mechanics */
+.panel-wrap {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 30em;
+  transform: translateX(100%);
+  transition: .3s ease-out;
+}
+.panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #333;
+  color: #eee;
+  overflow: auto;
+  padding: 1em;
+}
+
+/* simulate panel state control --
+this can also be triggered by a 
+class name added to the body tag. 
+Just using a checkbox sibling here
+for simplicity
+*/ 
+[type="button"]:active ~ .panel-wrap {
+  transform: translateX(0%);
+}
