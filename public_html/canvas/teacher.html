@@ -74,13 +74,28 @@
                 <p onclick="openQR()">Show QR Code</p>
               </div>
             </div>
-
-            <div class="header-right-dropdown">
+            <!--
+              <div class="header-right-dropdown">
               <button class="users-button">
                 <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
               </button>
             </div>
+            -->
+            
+               <div class="header-right-dropdown">
+              <button class="users-button" type="button">
+                <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
+              </button>
+              <div class="panel-wrap">
+                <div class="panel">
+                  <div class="list">
+                    <div id="Users"></div>
+                  </div>
+              </div>
+            </div>
           </div>
+          
+           
 
           <!-- Prototype
             <button class="clicker" type="button" >
@@ -273,9 +288,12 @@
         <div id="qrcode"></div>
       </div>
       <!-- For user list-->
-      <!-- <div class="list">
+      <!--
+        <div class="list">
         <div id="Users"></div>
-      </div> -->
+      </div>
+      --> 
+      
     </body>
 
 </html>
