@@ -195,6 +195,7 @@ function draw(data) {
     ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
     ctx.stroke();//outlines the current or given path with the current stroke style
+    ctx.globalCompositeOperation = "source-over";
 }
 
 // request OCR service
