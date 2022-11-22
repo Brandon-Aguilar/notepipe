@@ -1,3 +1,7 @@
+/*disable highlighting buttons when drawing*/
+*{
+  user-select: none;
+}
 /* Dropdown Button */
 .dropbtn {
     background-color: #3498DB;
@@ -81,15 +85,22 @@
 
   .header-middle{
     display: flex;
-    background-color: #323336;
-    align-content: space-between;
-    justify-content: space-between;
-    width: 200px;
-    height: 40px;
-    border-radius: 20px;
   }
 
-  .header-middle button{
+  .header-middle button {
+    height: 40px;
+    width: 40px;
+    border-radius: 20px;
+    border: none;
+    background-color: #323336;
+    margin-right: 5px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page-navigation-bar button{
     height: 32px;
     width: 32px;
     border-radius: 16px;
@@ -103,6 +114,17 @@
     margin-right: 4px;
   }
 
+  .page-navigation-bar{
+    display: flex;
+    background-color: #323336;
+    align-content: space-between;
+    justify-content: space-between;
+    width: 200px;
+    height: 40px;
+    border-radius: 20px;
+    margin-right: 5px;
+  }
+  
   .current-page-counter{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     color: white;
@@ -114,7 +136,19 @@
   .navigation-icon{
     padding: 5px;
   }
+
+  .new-page-icon{
+    height: 24px;
+  }
   
+  .reset-page-icon{
+    height: 22px;
+  }
+
+  .upload-icon{
+    height: 24px;
+  }
+
   .header-right{
     display: flex;
   }
@@ -135,13 +169,18 @@
     margin-right: 5px;
   }
 
-  .menu-icon{
-    height: 15px;
+  .link-icon{
+    height: 23px;
     background: none;
   }
 
   .save-icon{
     height: 30px;
+    background: none;
+  }
+
+  .users-icon{
+    height: 26px;
     background: none;
   }
 
@@ -472,14 +511,45 @@
   .hide{
     display: none;
   }
-  .list{
-    position: absolute;
-    top: 10;
-    right: 0;
-    width: 100px;
-    height: 400px;
-    background: rgb(221, 225, 226);
-    box-shadow: 0px 1px 12px rgb(0, 0, 0, 0.5);
-    border-radius:10px; 
-    overflow-y: auto;
-  }
+  /* panel layout mechanics */
+.panel-wrap {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 30em;
+  transform: translateX(100%);
+  transition: .3s ease-out;
+}
+.panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #333;
+  color: #eee;
+  overflow: auto;
+  padding: 1em;
+}
+
+/* simulate panel state control --
+this can also be triggered by a 
+class name added to the body tag. 
+Just using a checkbox sibling here
+for simplicity
+*/ 
+[type="button"]:active ~ .panel-wrap {
+  transform: translateX(0%);
+}
+/*.list{
+  position: absolute;
+  top: 10;
+  right: 0;
+  width: 100px;
+  height: 400px;
+  background: rgb(221, 225, 226);
+  box-shadow: 0px 1px 12px rgb(0, 0, 0, 0.5);
+  border-radius:10px;
+  overflow-y: auto;
+}*/

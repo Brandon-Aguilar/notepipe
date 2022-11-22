@@ -14,25 +14,44 @@
           
           <div class="header-left">
             <a class="home-link" href="../index.html">
-              <img src="../icons/home-icon.svg" alt="Home">
+              <img class="new-page-icon" src="../icons/home-icon.svg" alt="Home">
             </a>
           </div>
           
           <div class="header-middle">
-            <div class="page-navigation-button">
-              <button id="previousPage">
-                  <img class="navigation-icon" src="../icons/left-arrow.svg" alt="Previous Page">
+            <div class="page-navigation-bar">
+              <div class="page-navigation-button">
+                <button id="previousPage">
+                    <img class="navigation-icon" src="../icons/left-arrow.svg" alt="Previous Page">
+                </button>
+              </div>
+              <div class="current-page-counter"> 
+                <p id="currentPageNumber">1/1</p>
+              </div>
+              <div class="page-navigation-button"> 
+                <button id="nextPage">
+                  <img class="navigation-icon" src="../icons/right-arrow.svg" alt="Next Page">
+                </button>
+              </div>
+            </div>
+            <div class="new-page-button">
+              <button id="newpage">
+                <img class="new-page-icon" id="n" src="../icons/new-page-icon.svg" alt="New Page">
               </button>
             </div>
-            <div class="current-page-counter"> 
-              <p id="currentPageNumber">1/1</p>
-            </div>
-            <div class="page-navigation-button"> 
-              <button id="nextPage">
-                <img class="navigation-icon" src="../icons/right-arrow.svg" alt="Next Page">
+            <div class="reset-page-button">
+              <button>
+                <img class="reset-page-icon" src="../icons/reset-page.svg" alt="Reset Page">
               </button>
-            </div> 
+            </div>
+            <div class="upload-button">
+              <button>
+                <img class="upload-icon" src="../icons/upload-icon.svg" alt="Upload File">
+              </button>
+            </div>
           </div>
+
+
           
           <div class="header-right">
 
@@ -41,22 +60,56 @@
                 <img class="save-icon" src="../icons/save-icon.svg" alt="Save">
               </button>
               <div class="header-right-dropdown-content">
-                <!-- <p id="zipFolder">Download All</p>
-                <p id="download">Download Current Page</p> -->
+                <p id="zipFolder">Download All</p>
+                <p id="download">Download Current Page</p>
               </div>
             </div>
 
             <div class="header-right-dropdown">
-              <button class="menu-button">
-                <img class="menu-icon" src="../icons/menu-icon.svg" alt="Menu">
+              <button class="link-button">
+                <img class="link-icon" src="../icons/link-icon.svg" alt="Link">
               </button>
               <div class="header-right-dropdown-content">
                 <p onclick="copyJoinKey()">Copy Room Link</p>
                 <p onclick="openQR()">Show QR Code</p>
               </div>
             </div>
+            <!--
+              <div class="header-right-dropdown">
+              <button class="users-button">
+                <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
+              </button>
+            </div>
+            -->
+            
+               <div class="header-right-dropdown">
+              <button class="users-button" type="button">
+                <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
+              </button>
+              <div class="panel-wrap">
+                <div class="panel">
+                  <div class="list">
+                    <div id="Users"></div>
+                  </div>
+              </div>
+            </div>
           </div>
+          
+           
 
+          <!-- Prototype
+            <button class="clicker" type="button" >
+            put button image here
+          </button>
+          <div class="panel-wrap">
+            <div class="panel">
+              <div class="list">
+                <div id="Users"></div>
+              </div>
+          </div>
+          -->
+          
+    
           <!-- Hiding for now, will add as functionality inside menu icon
             <div>
               <div class="tooltip">
@@ -235,9 +288,12 @@
         <div id="qrcode"></div>
       </div>
       <!-- For user list-->
-      <div class="list">
+      <!--
+        <div class="list">
         <div id="Users"></div>
       </div>
+      --> 
+      
     </body>
 
 </html>
