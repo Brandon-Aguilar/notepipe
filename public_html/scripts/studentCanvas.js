@@ -225,8 +225,8 @@ zipfolder.addEventListener('click', zipFolderbutton);
 
 //Download a zip folder
 function zipFolderbutton(e) {  
-    for(let i = 0; i < localImages.length; i++){
-        if(localImages[i]==undefined || localImages.length-1){
+    for(let i = 0; i <= pageNumber; i++){
+        if(localImages[i]==undefined || pageNumber){
             console.log("Image not stored locally, fetch from redis", i)
             const request = { type: "fetchImage", pageNumber:i, studentKey: studentKey};
             websocket.send(JSON.stringify(request))
@@ -254,7 +254,7 @@ function arrayBuffr(){
     }
 
     (function load() {
-        if (index < localImages.length) {
+        if (index <= pageNumber) {
             Buffer(localImages[index++], function(buffer, url) {
                 zip.file(index+"page.png", buffer); 
                 load(); 
