@@ -517,7 +517,7 @@
   top: 0;
   bottom: 0;
   right: 0;
-  width: 30em;
+  width: 20em;
   transform: translateX(100%);
   transition: .3s ease-out;
 }
@@ -539,10 +539,15 @@ class name added to the body tag.
 Just using a checkbox sibling here
 for simplicity
 */ 
-[type="button"]:active ~ .panel-wrap {
+
+[type="checkbox"]:checked ~ .panel-wrap {
   transform: translateX(0%);
 }
-/*.list{
+
+/* [type="button"]:active ~ .panel-wrap {
+  transform: translateX(0%);
+} */
+/* .list{
   position: absolute;
   top: 10;
   right: 0;
@@ -552,4 +557,4 @@ for simplicity
   box-shadow: 0px 1px 12px rgb(0, 0, 0, 0.5);
   border-radius:10px;
   overflow-y: auto;
-}*/
+} */

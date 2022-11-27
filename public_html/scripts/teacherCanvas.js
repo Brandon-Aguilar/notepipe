@@ -41,9 +41,6 @@ var undoHasBeenDone = false;
 
 var highlightDraw = false;
 
-
-
-
 resize();
 
 // last known position
@@ -108,6 +105,34 @@ updateMessageElement = document.getElementById("updateStatus");
 studentLinkElement = document.getElementById("studentLink");
 studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 currentPageNumberElement = document.getElementById('currentPageNumber');
+showUserListElement = document.getElementById("showUserList");
+
+var timer
+showUserListElement.addEventListener('change', () => {
+    if(showUserListElement.checked){
+        console.log("user list has been requested ")
+        getUserlist()
+        timer= setInterval(getUserlist, 4000);
+    }
+    else{
+        clearInterval(timer)
+        clearUserList()
+    }
+});
+
+function getUserlist(){
+    clearUserList()
+    const event = { type: "retrieveUserList"};
+    websocket.send(JSON.stringify(event))
+}
+
+function clearUserList(){
+    const container = document.getElementById("userList");
+    container.innerHTML="";
+    var full= '<div id="Users"></div>'
+    container.insertAdjacentHTML("beforeend", full)
+    previousId="Users"
+}
 
 //instructor image saved locally
 const localImages=[];
@@ -150,9 +175,7 @@ function newpage(){
         viewingPageNumber++;
         console.log("Adding new page number: ",pageNumber)
         var imageURL = canvas.toDataURL("image/png", 0.2);
-             
-          
-
+ 
         width = window.innerWidth;
         height = window.innerHeight;  
         ctx.clearRect(0, 0, width, height);
@@ -303,7 +326,7 @@ function sendUpdate() {
 // Change width of the marker based on input from a HTML slider
 function changeWidth(newWidth) {
     markerWidth = newWidth;
-    eraserState= false;
+    //eraserState= false;
     ctx.globalCompositeOperation = 'source-over';
 };
 
@@ -487,7 +510,7 @@ function navigateToPage(pageWanted){
 }
 
 var absoluteJoinLink = "";
-localUserList={}
+previousId= "Users"
 // Handle messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
@@ -506,48 +529,23 @@ function processMessage({ data }) {
             absoluteJoinLink = window.location.host + "/canvas/" + link;
             generateQRCode(absoluteJoinLink);
             break;
-            case "updateUserList":
-                //empty list
-                if(Object.keys(localUserList).length===0){
-                    addName("Users", event.id, event.name)
-                    lastId=event.id
-                }
-                //check we are updating student name
-                else if(event.id in localUserList){
-                    changeName(event.id, event.name)
-                }
-                //must be a new student 
-                else{
-                    addName(lastId, event.id, event.name)
-                    lastId=event.id
-                }
-                localUserList[event.id]=event.name
-                break;
-            case "removeUserFromList":
-                console.log("student left: "+localUserList[event.id])
-                //if lastId is removed and a new student joins, their name won't populate
-                delete localUserList[event.id];
-                if(lastId==event.id){
-                    var total= Object.keys(localUserList).length;
-                    lastId= Object.keys(localUserList)[total-1]
-                }
-                removeName(event.id) 
-                break;
+        case "fullUserList":
+            newObj = JSON.parse(event.names);
+            for (const [key, value] of Object.entries(newObj)) {
+                //the key here is UUID and value is [object, object]
+                console.log("key is: "+ key+" and value is : " + value.name+ "and prev id is: "+previousId);
+                var full= "<h4 id='"+value.id+"'> "+value.name+"</h4>"
+                document.getElementById(previousId).insertAdjacentHTML("afterend",full);
+                previousId= value.id
+            //THIS IS FOR DEBUGGING
+                // for(const [key1, value1] of Object.entries(value)){
+                //     //keys are id, name, canBroadcast, isTeacher
+                //     console.log("key1 is: "+key1+" and value1 is: "+value1);
+                // }    
+            } 
+            break
     }
 }
-function addName(previousId, id, name) {
-    var full= "<h4 id='"+id+"'> "+name
-    document.getElementById(previousId).insertAdjacentHTML("afterend",full);
-}
-function changeName(id, name){
-    const full= document.getElementById(id)
-    full.innerHTML = name;
-}
-function removeName(name){
-    const element = document.getElementById(name);
-    element.remove()
-}
-
 document.onkeydown = checkKey;
 
 function checkKey(e) {

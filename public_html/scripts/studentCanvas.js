@@ -268,13 +268,30 @@ function arrayBuffr(){
     })();
 }   
 
-localUserList={}
+
 function createStudentName(){
     let name =  Math.random().toString(16).slice(2); 
     console.log('default name is:', name)
-    const newStudentName = {type: "retrieveUserList", newName: name}
+    const newStudentName = {type: "updateName", newName: name}
     websocket.send(JSON.stringify(newStudentName))
 }
+
+showUserListElement = document.getElementById("showUserList");
+
+var timer
+showUserListElement.addEventListener('change', () => {
+    if(showUserListElement.checked){
+        console.log("user list has been requested ")
+        getUserlist()
+        timer= setInterval(getUserlist, 4000);
+    }
+    else{
+        clearInterval(timer)
+        clearUserList()
+    }
+});
+
+previousId= "Users"
 
 // Handle valid messages sent to client
 function processMessage({ data }) {
@@ -339,7 +356,6 @@ function processMessage({ data }) {
             ctx.clearRect(0, 0, width, height)
             break;
         case "newPageCreated":
-
             // When we add page following, this should be an if
             // if following...viewingPageNumber = event.pageNumber
             //var imageURL = canvas.toDataURL("image/png", 0.2);
@@ -350,12 +366,10 @@ function processMessage({ data }) {
             setCurrentPageText();
             break;
 
-        case "NewpagesInserted":
-          
+        case "NewpagesInserted":    
             pageNumber += 1;  
             width = window.innerWidth
             height = window.innerHeight
-            
             
             if(event.insertIndex <= viewingPageNumber){
                 localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
@@ -407,30 +421,30 @@ function processMessage({ data }) {
             audio.play();
             break;
         case "fullUserList":
-            console.log("new list has been made")
-            for (const [key, value] of Object.entries(event.names)) {
-                localUserList[key]=value;
-            }
-          break;
-        case "updateUserList":
-            console.log("update has been called and the list is")
-            localUserList[event.id]=event.name
-            for (const [key, value] of Object.entries(localUserList)) {
-                console.log(key, value);
-              } 
-            break;
-        case "removeUserFromList":
-            
-            console.log("student left: "+localUserList[event.id])
-            delete localUserList[event.id];
-            for (const [key, value] of Object.entries(localUserList)) {
-                console.log(key, value);
+            newObj = JSON.parse(event.names);
+            for (const [key, value] of Object.entries(newObj)) {
+                console.log("key is: "+ key+" and value is : " + value);
+                var full= "<h4 id='"+value.id+"'> "+value.name+"</h4>"
+                document.getElementById(previousId).insertAdjacentHTML("afterend",full);
+                previousId= value.id
             } 
-            break;
-
+            break;  
     }   
 }
 
+function getUserlist(){
+    clearUserList()
+    const event = { type: "retrieveUserList"};
+    websocket.send(JSON.stringify(event))
+}
+
+function clearUserList(){
+    const container = document.getElementById("userList");
+    container.innerHTML="";
+    var full= '<div id="Users"></div>'
+    container.insertAdjacentHTML("beforeend", full)
+    previousId="Users"
+}
 
 //implement previous and next page requests 
 var image = new Image();

@@ -82,7 +82,7 @@
             </div>
             -->
             
-               <div class="header-right-dropdown">
+               <!-- <div class="header-right-dropdown">
               <button class="users-button" type="button">
                 <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
               </button>
@@ -93,7 +93,7 @@
                   </div>
               </div>
             </div>
-          </div>
+          </div> -->
           
            
 
@@ -237,6 +237,19 @@
 
         <!--TODO: FIX THIS RESTORING THESE BUTTONS FOR NOW-->
         <div class="TMPFIXFIXTHIS">
+          <!-- temporary solution using checkbox. Implement using button instead -->
+          <div>
+            <input id="showUserList" type="checkbox" />
+            <label for="showUserList">Userlist</label>
+            <div class="panel-wrap">
+              <div class="panel">
+                <div class="list" id="userList">
+                  <div id="Users"></div>
+                </div>
+            </div>
+          </div>
+        </div>
+
           <button id="newpage">NewPage</button>
           <button id="reset">Reset</button>
           <button id="zipFolder">ZipFolder</button>

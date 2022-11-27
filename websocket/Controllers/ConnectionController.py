@@ -43,7 +43,7 @@ async def initializeHost(websocket):
     # Store list of connections to be broadcasted to
     HOST_KEYS[hostKey] = studentKey
     JOINED[studentKey] = {websocket}
-    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(websocket.id, "DefaultTeacher", True, True)}, {})
+    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(str(websocket.id), "defaultTeacher", True, True)})
 
     response = initializeHostSuccess()
     response.hostKey = hostKey
@@ -82,7 +82,9 @@ async def hostConnection(websocket, hostKey, studentKey):
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
             case "updateName":
-               users.updateUserName(websocket.id, messageJSON["newName"])
+                users.updateUserName(websocket.id, messageJSON["newName"],JOINED[studentKey])
+            case "retrieveUserList":
+                await users.fullUserList(websocket)
 
 
 
@@ -97,7 +99,7 @@ async def initializeStudent(websocket, studentKey, image):
 
     connected.add(websocket)
     # Maybe add some kind of name randomizer
-    users.addUser(websocket.id, userObject(websocket.id, "DefaultStudent", False, False))
+    users.addUser(websocket.id, userObject(str(websocket.id), "defaultStudent", False, False))
 
 
     response = initializeStudentSuccess()
@@ -169,7 +171,5 @@ async def studentConnection(websocket, studentKey):
             case "updateName":
                 users.updateUserName(websocket.id, messageJSON["newName"],JOINED[studentKey])
             case "retrieveUserList":
-                #add the new user's name to list
-                users.updateUserName(websocket.id, messageJSON["newName"], JOINED[studentKey])
                 #get the whole user's list
                 await users.fullUserList(websocket)
