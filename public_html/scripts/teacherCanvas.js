@@ -408,7 +408,8 @@ function move(e) {
             y: e.offsetY,
             color: color || 'green',
             force: force,
-            eraserState
+            eraserState,
+            highlightDraw
         });
 
         drawInstructions.push(drawData);//store drawData in drawInstructions

@@ -188,12 +188,15 @@ function initializeStudent() {
 //same as teacher draw function
 function draw(data) {
     ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
-    ctx.beginPath();
-    ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
-    ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
     ctx.strokeStyle = data.color;//original default stroke color 
     ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
+    if (data.highlightDraw) {ctx.globalCompositeOperation = "overlay"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 0.8; ctx.lineWidth = 40;}
+
+    ctx.beginPath();
+    ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
+    ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
+
     ctx.stroke();//outlines the current or given path with the current stroke style
     ctx.globalCompositeOperation = "source-over";
 }
