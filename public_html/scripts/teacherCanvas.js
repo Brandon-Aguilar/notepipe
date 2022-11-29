@@ -95,7 +95,7 @@ updateName.addEventListener('click', editName);
 //listen for input for edit name using input box in teacher.html
 
 window.addEventListener('input', (e) =>{
-    console.log('new name: ', e.target.value);
+    //console.log('new name: ', e.target.value);
     newName = e.target.value;
 }) 
 
@@ -534,8 +534,12 @@ function processMessage({ data }) {
             newObj = JSON.parse(event.names);
             for (const [key, value] of Object.entries(newObj)) {
                 //the key here is UUID and value is [object, object]
-                console.log("key is: "+ key+" and value is : " + value.name+ "and prev id is: "+previousId);
-                var full= "<h4 id='"+value.id+"'> "+value.name+"</h4>"
+                // console.log("key is: "+ key+" and value is : " + value.name+ "and prev id is: "+previousId);
+                if(value.name== "defaultTeacher")
+                    full= "<h4 id='"+value.id+"'>"+value.name+"</h4>"
+                else
+                    full= "<h4 >"+value.name+"<button id='"+value.id+"' onclick='canBroadcast(this.id)' class='canBroadcast'> canBroadcast</button> </h4>"
+             
                 document.getElementById(previousId).insertAdjacentHTML("afterend",full);
                 previousId= value.id
             //THIS IS FOR DEBUGGING
@@ -547,6 +551,25 @@ function processMessage({ data }) {
             break
     }
 }
+
+var broadcastingStudent=undefined;
+function canBroadcast(id){
+    if(broadcastingStudent==undefined){
+        grantPermission = { type: "updateUserPermission", id: id, allowBroadcast:true};
+        broadcastingStudent=id;
+        console.log("no other studet is bradcasting " +broadcastingStudent);
+        websocket.send(JSON.stringify(grantPermission))
+    }
+    else{
+        removePermission = { type: "updateUserPermission", id: broadcastingStudent, allowBroadcast:false};
+        websocket.send(JSON.stringify(removePermission))
+        grantPermission = { type: "updateUserPermission", id: id, allowBroadcast:true};
+        websocket.send(JSON.stringify(grantPermission))
+        console.log("previous: "+broadcastingStudent+" new:"+id)
+        broadcastingStudent=id;
+    }
+}
+
 document.onkeydown = checkKey;
 
 function checkKey(e) {

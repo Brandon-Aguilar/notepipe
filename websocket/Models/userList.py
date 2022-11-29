@@ -1,10 +1,11 @@
 import logging
 import jsonpickle
+import uuid
 import time
 import websockets
 
 from dataclasses import dataclass
-from Models.responses import fullUserList, updateUserList, removeUserFromList
+from Models.responses import fullUserList
 
 log = logging.getLogger(__name__)
 
@@ -44,7 +45,7 @@ class userList:
         except Exception as e:
             log.warn("Failed to sort dictionary")
 
-    def removeUser(self, id: str, connected):
+    def removeUser(self, id: str):
         """Remove a user with a id"""
 
         log.info("Removing user %s from %s", id, self.studentKey)
@@ -54,7 +55,7 @@ class userList:
             log.warn("Failed to delete object %s, %s", id, e)
 
 
-    def updateUserName(self, id:str, name: str, connected):
+    def updateUserName(self, id:str, name: str):
         """Update the name of a user by id"""
 
         log.info("Updating id %s with name %s", id, name)
@@ -69,9 +70,9 @@ class userList:
 
         log.info("Updating id %s with permission %s", id, canBroadcast)
         try:
-            if self.users[id].isTeacher:
+            if self.users[uuid.UUID(id)].isTeacher:
                 raise "Can't change Teacher permission"
-            self.users[id].canBroadcast = canBroadcast
+            self.users[uuid.UUID(id)].canBroadcast = canBroadcast
         except Exception as e:
             log.warn("Failed to update permission of id %s, %s", id, e)
 

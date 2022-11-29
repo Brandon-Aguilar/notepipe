@@ -59,7 +59,7 @@ async def initializeHost(websocket):
         del HOST_KEYS[hostKey]
 
         # Some kind of way to deal with teacher dropping
-        USERS[studentKey].removeUser(websocket.id, JOINED[studentKey])
+        USERS[studentKey].removeUser(websocket.id)
 
 
 async def hostConnection(websocket, hostKey, studentKey):
@@ -82,9 +82,11 @@ async def hostConnection(websocket, hostKey, studentKey):
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
             case "updateName":
-                users.updateUserName(websocket.id, messageJSON["newName"],JOINED[studentKey])
+                users.updateUserName(websocket.id, messageJSON["newName"])
             case "retrieveUserList":
                 await users.fullUserList(websocket)
+            case "updateUserPermission":
+                users.updateUserPermissions(messageJSON["id"], messageJSON["allowBroadcast"])
 
 
 
@@ -112,7 +114,7 @@ async def initializeStudent(websocket, studentKey, image):
         await studentConnection(websocket, studentKey)
     finally:
         connected.remove(websocket)
-        users.removeUser(websocket.id, JOINED[studentKey])
+        users.removeUser(websocket.id)
 
 
 async def studentConnection(websocket, studentKey):
@@ -169,7 +171,7 @@ async def studentConnection(websocket, studentKey):
                     sendError(websocket, "Failed to fetch image")
                 log.info("fetche image is "+response.imageURL)
             case "updateName":
-                users.updateUserName(websocket.id, messageJSON["newName"],JOINED[studentKey])
+                users.updateUserName(websocket.id, messageJSON["newName"])
             case "retrieveUserList":
                 #get the whole user's list
                 await users.fullUserList(websocket)
