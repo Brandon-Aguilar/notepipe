@@ -560,6 +560,12 @@ function canBroadcast(id){
         console.log("no other studet is bradcasting " +broadcastingStudent);
         websocket.send(JSON.stringify(grantPermission))
     }
+    else if(broadcastingStudent==id){
+        removePermission = { type: "updateUserPermission", id: broadcastingStudent, allowBroadcast:false};
+        websocket.send(JSON.stringify(removePermission))
+        console.log("remove broadcasting: "+broadcastingStudent)
+        broadcastingStudent=undefined;
+    }
     else{
         removePermission = { type: "updateUserPermission", id: broadcastingStudent, allowBroadcast:false};
         websocket.send(JSON.stringify(removePermission))
