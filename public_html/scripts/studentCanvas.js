@@ -49,7 +49,7 @@ const updateName = document.getElementById('updateName');
 // Event listeners to trigger functions
 //window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
-websocket.addEventListener('open', initializeStudent)
+websocket.addEventListener('open', createStudentName)
 download.addEventListener('click', downloadbutton);
 ocr.addEventListener('click', showTextEditor);
 updateName.addEventListener('click', editName);
@@ -179,9 +179,15 @@ function resize() {
   ctx.drawImage(inMemCanvas, 0, 0);
 }
 
+function createStudentName(){
+    let name =  Math.random().toString(16).slice(2); 
+    console.log('default name is:', name)
+    initializeStudent(name)
+}
+
 // Initialize connection
-function initializeStudent() {
-    const event = { type: "initializeStudent",  studentKey: studentKey, image: image};
+function initializeStudent(name) {
+    const event = { type: "initializeStudent",  studentKey: studentKey, image: image, name: name};
     websocket.send(JSON.stringify(event))
 }
 
@@ -270,14 +276,6 @@ function arrayBuffr(){
         }
     })();
 }   
-
-
-function createStudentName(){
-    let name =  Math.random().toString(16).slice(2); 
-    console.log('default name is:', name)
-    const newStudentName = {type: "updateName", newName: name}
-    websocket.send(JSON.stringify(newStudentName))
-}
 
 showUserListElement = document.getElementById("showUserList");
 
@@ -432,14 +430,7 @@ function processMessage({ data }) {
             for (const [key, value] of Object.entries(newObj)) {
                 //the key here is UUID and value is [object, object]
                 // console.log("key is: "+ key+" and value is : " + value.name+ "and prev id is: "+previousId);
-                tmpContent+= "<h4 id='"+value.id+"'> "+value.name+"</h4>"
-                //document.getElementById(previousId).insertAdjacentHTML("afterend",full);
-                //previousId= value.id
-                //THIS IS FOR DEBUGGING
-                // for(const [key1, value1] of Object.entries(value)){
-                //     //keys are id, name, canBroadcast, isTeacher
-                //     console.log("key1 is: "+key1+" and value1 is: "+value1);
-                // }    
+                tmpContent+= "<h4 id='"+value.id+"'> "+value.name+"</h4>"   
             }
             newUserListDiv.setHTML(tmpContent);
             currentUserListDiv.replaceWith(newUserListDiv);

@@ -59,7 +59,7 @@ async def initializeHost(websocket):
         del HOST_KEYS[hostKey]
 
         # Some kind of way to deal with teacher dropping
-        USERS[studentKey].removeUser(websocket.id)
+        USERS[studentKey].removeUser(websocket.id, JOINED[studentKey])
 
 
 async def hostConnection(websocket, hostKey, studentKey):
@@ -82,7 +82,7 @@ async def hostConnection(websocket, hostKey, studentKey):
                 await canvasUpdate(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])         
                 await resett(websocket, messageJSON, JOINED[studentKey], HOST_KEYS[hostKey])
             case "updateName":
-                users.updateUserName(websocket.id, messageJSON["newName"])
+                users.updateUserName(websocket.id, messageJSON["newName"], JOINED[studentKey])
             case "retrieveUserList":
                 await users.fullUserList(websocket)
             case "updateUserPermission":
@@ -90,7 +90,7 @@ async def hostConnection(websocket, hostKey, studentKey):
 
 
 
-async def initializeStudent(websocket, studentKey, image):
+async def initializeStudent(websocket, studentKey, image, name):
     """Check for valid key and add connection to host's connections"""
     try:
         connected = JOINED[studentKey]
@@ -101,7 +101,7 @@ async def initializeStudent(websocket, studentKey, image):
 
     connected.add(websocket)
     # Maybe add some kind of name randomizer
-    users.addUser(websocket.id, userObject(str(websocket.id), "defaultStudent", False, False))
+    users.addUser(websocket.id, userObject(str(websocket.id), name, False, False), JOINED[studentKey])
 
 
     response = initializeStudentSuccess()
@@ -114,7 +114,7 @@ async def initializeStudent(websocket, studentKey, image):
         await studentConnection(websocket, studentKey)
     finally:
         connected.remove(websocket)
-        users.removeUser(websocket.id)
+        users.removeUser(websocket.id, JOINED[studentKey])
 
 
 async def studentConnection(websocket, studentKey):
@@ -171,7 +171,7 @@ async def studentConnection(websocket, studentKey):
                     sendError(websocket, "Failed to fetch image")
                 log.info("fetche image is "+response.imageURL)
             case "updateName":
-                users.updateUserName(websocket.id, messageJSON["newName"])
+                users.updateUserName(websocket.id, messageJSON["newName"], JOINED[studentKey])
             case "retrieveUserList":
                 #get the whole user's list
                 await users.fullUserList(websocket)

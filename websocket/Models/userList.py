@@ -5,7 +5,7 @@ import time
 import websockets
 
 from dataclasses import dataclass
-from Models.responses import fullUserList
+from Models.responses import fullUserList, updateUserName, removeUserFromList, newUserJoined
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class userList:
     studentKey: str
     users: dict[str, userObject]
 
-    def addUser(self, id: str, user: userObject):
+    def addUser(self, id: str, user: userObject, connected):
         """Add or update a user with a userObject"""
 
         log.info("Updating user %s for %s with userObject %s", id,  self.studentKey, user)
@@ -29,6 +29,10 @@ class userList:
             self.users.update({id: user})
         except Exception as e:
             log.warn("Failed to update id %s, %s", id, e)
+        broadcast= newUserJoined()
+        broadcast.id= str(id)
+        broadcast.name= user.name
+        websockets.broadcast(connected, broadcast.toJson())        
 
 
     async def fullUserList(self, websocket): 
@@ -45,7 +49,7 @@ class userList:
         except Exception as e:
             log.warn("Failed to sort dictionary")
 
-    def removeUser(self, id: str):
+    def removeUser(self, id: str, connected):
         """Remove a user with a id"""
 
         log.info("Removing user %s from %s", id, self.studentKey)
@@ -53,9 +57,12 @@ class userList:
             del self.users[id]
         except Exception as e:
             log.warn("Failed to delete object %s, %s", id, e)
+        broadcast=removeUserFromList()
+        broadcast.id= str(id)
+        websockets.broadcast(connected, broadcast.toJson())
 
 
-    def updateUserName(self, id:str, name: str):
+    def updateUserName(self, id:str, name: str, connected):
         """Update the name of a user by id"""
 
         log.info("Updating id %s with name %s", id, name)
@@ -63,6 +70,10 @@ class userList:
             self.users[id].name = name
         except Exception as e:
             log.warn("Failed to update name of id %s, %s", id, e)
+        broadcast= updateUserName()
+        broadcast.id= str(id)
+        broadcast.name= name
+        websockets.broadcast(connected, broadcast.toJson())
 
 
     def updateUserPermissions(self, id:str, canBroadcast: bool):
