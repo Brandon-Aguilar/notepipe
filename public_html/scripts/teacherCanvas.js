@@ -740,6 +740,7 @@ function uploadImageFile() {
         img.src = e.target.result;
         img.onload = function () {
            ctx.drawImage(img, 10, 10);
+           sendDrawUpdate();
         };
     }
 } 
@@ -749,9 +750,13 @@ function uploadPDF(pdf_file) {
     var viewport;
     pdf_file.getPage(1).then(page => {
         viewport = page.getViewport({scale: 1, rotation: 360});
-        page.render({
+        var pageRender = page.render({
             canvasContext: ctx,
             viewport: viewport
+        });
+
+        pageRender.promise.then(function () {
+            sendDrawUpdate();
         });
     });
     // TODO: need to render every page of pdf_file
