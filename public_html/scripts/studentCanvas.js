@@ -432,11 +432,7 @@ function processMessage({ data }) {
             for (const [key, value] of Object.entries(newObj)) {
                 //the key here is UUID and value is [object, object]
                 // console.log("key is: "+ key+" and value is : " + value.name+ "and prev id is: "+previousId);
-                if (value.name == "defaultTeacher")
-                    tmpContent += "<h4 id='" + value.id + "'>" + value.name + "</h4>"
-                else
-                    tmpContent += "<h4 >" + value.name + "<button id='" + value.id + "' onclick='canBroadcast(this.id)' class='canBroadcast'> canBroadcast</button> </h4>"
-
+                tmpContent+= "<h4 id='"+value.id+"'> "+value.name+"</h4>"
                 //document.getElementById(previousId).insertAdjacentHTML("afterend",full);
                 //previousId= value.id
                 //THIS IS FOR DEBUGGING
