@@ -445,7 +445,7 @@ function processMessage({ data }) {
                 //     console.log("key1 is: "+key1+" and value1 is: "+value1);
                 // }    
             }
-            newUserListDiv.setHTML(tmpContent);
+            newUserListDiv.innerHTML = tmpContent;
             currentUserListDiv.replaceWith(newUserListDiv);
             newUserListDiv.id = userListHtmlId;
             break
