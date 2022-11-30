@@ -38,7 +38,7 @@ async def handler(websocket):
                 case "initializeHost":
                     await initializeHost(websocket)
                 case "initializeStudent":
-                    await initializeStudent(websocket, messageJSON["studentKey"], messageJSON["image"])
+                    await initializeStudent(websocket, messageJSON["studentKey"], messageJSON["image"], messageJSON["name"])
 
         except websockets.ConnectionClosedOK:
             break

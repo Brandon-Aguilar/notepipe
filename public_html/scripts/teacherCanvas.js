@@ -107,22 +107,23 @@ studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 currentPageNumberElement = document.getElementById('currentPageNumber');
 showUserListElement = document.getElementById("showUserList");
 
-var timer
+var showUserListBool=false;
 showUserListElement.addEventListener('change', () => {
     if(showUserListElement.checked){
         console.log("user list has been requested ")
         getUserlist()
-        timer= setInterval(getUserlist, 4000);
+        showUserListBool=true
     }
     else{
-        clearInterval(timer)
         clearUserList()
+        localUserList={}
+        showUserListBool=false
     }
 });
 
 function getUserlist(){
     clearUserList()
-    const event = { type: "retrieveUserList"};
+    const event = {type: "retrieveUserList"};
     websocket.send(JSON.stringify(event))
 }
 
@@ -469,7 +470,6 @@ function zipFolderbutton(e) {
 const download = document.getElementById('download');
 download.addEventListener('click', downloadbutton);
 
-
 function downloadbutton(e) {
     console.log(canvas.toDataURL());
     const link = document.createElement('a');
@@ -491,12 +491,10 @@ previousPageElement.addEventListener('click', function (){
 
 function navigateToPage(pageWanted){
     if(pageWanted>=0 && pageWanted<=pageNumber){
-        console.log("1) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
         //clear the current page
         width = window.innerWidth;
         height = window.innerHeight;  
         ctx.clearRect(0, 0, width, height);
-
 
         image.src=localImages[pageWanted]
         image.onload = function() {//wait for image to load before trying to draw to canvas
@@ -504,12 +502,11 @@ function navigateToPage(pageWanted){
         }
         viewingPageNumber = pageWanted;
         setCurrentPageText();
-
-        console.log("2) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+pageNumber);
     }
         
 }
 
+localUserList={}
 var absoluteJoinLink = "";
 var userListHtmlId= "Users"
 // Handle messages sent to client
@@ -532,52 +529,88 @@ function processMessage({ data }) {
             break;
         case "fullUserList":
             newObj = JSON.parse(event.names);
-            var newUserListDiv = document.createElement("div");
             var tmpContent = "";
-            var currentUserListDiv = document.getElementById(userListHtmlId);
+            var headerId="";
             for (const [key, value] of Object.entries(newObj)) {
                 //the key here is UUID and value is [object, object]
                 // console.log("key is: "+ key+" and value is : " + value.name+ "and prev id is: "+previousId);
-                if(value.name== "defaultTeacher")
-                    tmpContent += "<h4 id='"+value.id+"'>"+value.name+"</h4>"
-                else
-                    tmpContent += "<h4 >"+value.name+"<button id='"+value.id+"' onclick='canBroadcast(this.id)' class='canBroadcast'> canBroadcast</button> </h4>"
-                
-                //document.getElementById(previousId).insertAdjacentHTML("afterend",full);
-                //previousId= value.id
+                localUserList[value.id]=value.name
+                headerId=value.id+"#"
+                if(value.name== "defaultTeacher"){
+                    tmpContent = "<h4 id='"+headerId+"'>"+value.name+"</h4>"
+                    document.getElementById(previousId).insertAdjacentHTML("afterend",tmpContent);
+                    previousId= headerId
+                }  
+                else{
+                    if(value.canBroadcast)
+                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' onclick='canBroadcast(this.id)' class='canBroadcast'> Broadcasting</button>"
+                    else
+                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' onclick='canBroadcast(this.id)' class='canBroadcast'> Allow Broadcast</button>"
+                    document.getElementById(previousId).insertAdjacentHTML("afterend",tmpContent);
+                    previousId= value.id
+                }
+                    
             //THIS IS FOR DEBUGGING
                 // for(const [key1, value1] of Object.entries(value)){
                 //     //keys are id, name, canBroadcast, isTeacher
                 //     console.log("key1 is: "+key1+" and value1 is: "+value1);
                 // }    
             }
-            newUserListDiv.innerHTML = tmpContent;
-            currentUserListDiv.replaceWith(newUserListDiv);
-            newUserListDiv.id = userListHtmlId;
             break
+        case "updateUserName":
+            if(showUserListBool){//only implement updates if teacher has user list showing
+                var headerId=event.id+"#"
+                document.getElementById(headerId).innerHTML=event.name//change name value
+                localUserList[event.id]=event.name//update name in local list
+                //the updated name might force alphabetizing of list
+            }
+            break;
+        case "removeUserFromList":
+            if(showUserListBool){
+                var headerId=event.id+"#"
+                document.getElementById(headerId).remove()//delete the name 
+                document.getElementById(event.id).remove()//delete the button
+                delete localUserList[event.id]//delete user from local list
+                if(event.id==previousId){
+                    var total= Object.keys(localUserList).length;
+                    previousId= Object.keys(localUserList)[total-1]
+                }
+            }
+            break
+        case "newUserJoined":
+            if(showUserListBool){
+                var headerId=event.id+"#"
+                tmpContent= "<h4 id='"+headerId+"'>"+event.name+"</h4> <button id='"+event.id+"' onclick='canBroadcast(this.id)' class='canBroadcast'> Allow Broadcast</button>"
+                document.getElementById(previousId).insertAdjacentHTML("afterend",tmpContent);
+                previousId= event.id
+                localUserList[event.id]=event.name
+                //the updated name might force alphabetizing of list
+            }
+            
     }
 }
 
 var broadcastingStudent=undefined;
 function canBroadcast(id){
     if(broadcastingStudent==undefined){
+        document.getElementById(id).innerHTML = "Broadcasting";
         grantPermission = { type: "updateUserPermission", id: id, allowBroadcast:true};
         broadcastingStudent=id;
-        console.log("no other studet is bradcasting " +broadcastingStudent);
         websocket.send(JSON.stringify(grantPermission))
     }
     else if(broadcastingStudent==id){
+        document.getElementById(id).innerHTML = "Allow Broadcast";
         removePermission = { type: "updateUserPermission", id: broadcastingStudent, allowBroadcast:false};
         websocket.send(JSON.stringify(removePermission))
-        console.log("remove broadcasting: "+broadcastingStudent)
         broadcastingStudent=undefined;
     }
     else{
+        document.getElementById(broadcastingStudent).innerHTML = "Allow Broadcast";
         removePermission = { type: "updateUserPermission", id: broadcastingStudent, allowBroadcast:false};
         websocket.send(JSON.stringify(removePermission))
+        document.getElementById(id).innerHTML = "Broadcasting";
         grantPermission = { type: "updateUserPermission", id: id, allowBroadcast:true};
         websocket.send(JSON.stringify(grantPermission))
-        console.log("previous: "+broadcastingStudent+" new:"+id)
         broadcastingStudent=id;
     }
 }

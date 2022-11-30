@@ -124,6 +124,29 @@ class fullUserList(response):
         self.names = name
         self.message = "Retrieving full user list for new connection"
 
+class newUserJoined(response):
+    def __init__(self, name=None, id=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.id = id
+        self.name = name
+        self.message = "New user has joined"
+
+class updateUserName(response):
+    def __init__(self, name=None, id=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.id = id
+        self.name = name
+        self.message = "Update the user list"
+
+class removeUserFromList(response):
+    def __init__(self, id=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.id = id
+        self.message = "User has left"
+
 class NewpagesInserted(response):
     def __init__(self, insertIndex=None,imageURL=None) -> None:
         super().__init__()
