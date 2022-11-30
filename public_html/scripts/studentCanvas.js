@@ -425,13 +425,30 @@ function processMessage({ data }) {
             break;
         case "fullUserList":
             newObj = JSON.parse(event.names);
+            var userListHtmlId = "Users";
+            var newUserListDiv = document.createElement("div");
+            var tmpContent = "";
+            var currentUserListDiv = document.getElementById(userListHtmlId);
             for (const [key, value] of Object.entries(newObj)) {
-                console.log("key is: "+ key+" and value is : " + value);
-                var full= "<h4 id='"+value.id+"'> "+value.name+"</h4>"
-                document.getElementById(previousId).insertAdjacentHTML("afterend",full);
-                previousId= value.id
-            } 
-            break;  
+                //the key here is UUID and value is [object, object]
+                // console.log("key is: "+ key+" and value is : " + value.name+ "and prev id is: "+previousId);
+                if (value.name == "defaultTeacher")
+                    tmpContent += "<h4 id='" + value.id + "'>" + value.name + "</h4>"
+                else
+                    tmpContent += "<h4 >" + value.name + "<button id='" + value.id + "' onclick='canBroadcast(this.id)' class='canBroadcast'> canBroadcast</button> </h4>"
+
+                //document.getElementById(previousId).insertAdjacentHTML("afterend",full);
+                //previousId= value.id
+                //THIS IS FOR DEBUGGING
+                // for(const [key1, value1] of Object.entries(value)){
+                //     //keys are id, name, canBroadcast, isTeacher
+                //     console.log("key1 is: "+key1+" and value1 is: "+value1);
+                // }    
+            }
+            newUserListDiv.setHTML(tmpContent);
+            currentUserListDiv.replaceWith(newUserListDiv);
+            newUserListDiv.id = userListHtmlId;
+            break
     }   
 }
 
