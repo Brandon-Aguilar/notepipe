@@ -811,7 +811,6 @@ function uploadPDF(pdf_file) {
             canvasContext: ctx,
             viewport: viewport
         });
-        
         pageRender.promise.then(function () {
             sendDrawUpdate();
         });
