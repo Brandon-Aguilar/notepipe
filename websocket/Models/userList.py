@@ -54,12 +54,15 @@ class userList:
 
         log.info("Removing user %s from %s", id, self.studentKey)
         try:
+            broadcast=removeUserFromList()
+            broadcast.id= str(id)
+            broadcast.canBroadcast= self.users[id].canBroadcast
+            websockets.broadcast(connected, broadcast.toJson())
+
             del self.users[id]
         except Exception as e:
             log.warn("Failed to delete object %s, %s", id, e)
-        broadcast=removeUserFromList()
-        broadcast.id= str(id)
-        websockets.broadcast(connected, broadcast.toJson())
+
 
 
     def updateUserName(self, id:str, name: str, connected):
@@ -73,6 +76,7 @@ class userList:
         broadcast= updateUserName()
         broadcast.id= str(id)
         broadcast.name= name
+        broadcast.canBroadcast= self.users[id].canBroadcast
         websockets.broadcast(connected, broadcast.toJson())
 
 
@@ -81,8 +85,8 @@ class userList:
 
         log.info("Updating id %s with permission %s", id, canBroadcast)
         try:
-            if self.users[uuid.UUID(id)].isTeacher:
-                raise "Can't change Teacher permission"
+            #if self.users[uuid.UUID(id)].isTeacher:
+                #raise "Can't change Teacher permission"
             self.users[uuid.UUID(id)].canBroadcast = canBroadcast
         except Exception as e:
             log.warn("Failed to update permission of id %s, %s", id, e)
