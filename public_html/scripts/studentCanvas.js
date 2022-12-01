@@ -279,20 +279,22 @@ function arrayBuffr(){
 
 showUserListElement = document.getElementById("showUserList");
 
-var timer
+var showUserListBool=false;
 showUserListElement.addEventListener('change', () => {
     if(showUserListElement.checked){
-        console.log("user list has been requested ")
+
         getUserlist()
-        timer= setInterval(getUserlist, 4000);
+        showUserListBool=true
     }
     else{
-        clearInterval(timer)
+
         clearUserList()
+        showUserListBool=false
     }
 });
 
-previousId= "Users"
+var localUserListID=[]
+var localUserListName=[]
 
 // Handle valid messages sent to client
 function processMessage({ data }) {
@@ -421,21 +423,76 @@ function processMessage({ data }) {
             audio.controls = true;
             audio.play();
             break;
-        case "fullUserList":
+       case "fullUserList":
             newObj = JSON.parse(event.names);
-            var userListHtmlId = "Users";
-            var newUserListDiv = document.createElement("div");
             var tmpContent = "";
-            var currentUserListDiv = document.getElementById(userListHtmlId);
             for (const [key, value] of Object.entries(newObj)) {
-                //the key here is UUID and value is [object, object]
-                // console.log("key is: "+ key+" and value is : " + value.name+ "and prev id is: "+previousId);
-                tmpContent+= "<h4 id='"+value.id+"'> "+value.name+"</h4>"   
+                tmpContent= "<h4 id='"+value.id+"'> "+value.name+"</h4>"   
+                if(localUserListID.length == 0)
+                    document.getElementById("Users").insertAdjacentHTML("afterend", tmpContent);
+                else{
+                    document.getElementById(localUserListID[localUserListID.length-1]).insertAdjacentHTML("afterend", tmpContent);
+                }
+                //store into local arrays
+                localUserListID.push(value.id)
+                localUserListName.push(value.name)
             }
-            newUserListDiv.setHTML(tmpContent);
-            currentUserListDiv.replaceWith(newUserListDiv);
-            newUserListDiv.id = userListHtmlId;
             break
+            case "removeUserFromList":
+                if(showUserListBool){
+                    document.getElementById(event.id).remove()
+                    //update local arrays
+                    found = localUserListID.findIndex(element => element == event.id);
+                    localUserListID.splice(found,1)
+                    localUserListName.splice(found, 1)
+                }
+                break
+            case "updateUserName":
+                if(showUserListBool){
+                    //delete current user name from user list html
+                    document.getElementById(event.id).remove()//delete the button
+    
+                    //delete from user name from local arrays
+                    found = localUserListID.findIndex(element => element == event.id);
+                    localUserListID.splice(found,1)
+                    localUserListName.splice(found, 1)
+    
+                    //add updated name to local arrays 
+                    localUserListName.push(event.name)//add name to list
+                    localUserListName.sort()//sort the list
+                    found = localUserListName.findIndex(element => element == event.name);//find index of new name
+                    localUserListID.splice(found, 0, event.id)//insert user id in proper index
+    
+                    //check if user had broadcasting privilage 
+                    tmpContent= "<h4 id='"+event.id+"'> "+event.name+"</h4>" 
+    
+                    //insert alphabetical location
+                    if(found == 0){//insert at the beginning of the list
+                        document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
+                    }
+                    else{//insert anywhere else 
+                        document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
+                    }
+                }
+                break;
+            case "newUserJoined":
+                if(showUserListBool){
+                    localUserListName.push(event.name)//add name to list
+                    localUserListName.sort()//sort the list
+                    found = localUserListName.findIndex(element => element == event.name);//find index of new user
+                    localUserListID.splice(found, 0, event.id)//insert user id in proper index
+    
+                    //create the name and button that needs to be added
+                    tmpContent= "<h4 id='"+event.id+"'> "+event.name+"</h4>" 
+    
+                    if(found == 0){//insert at the beginning of the list
+                        document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
+                    }
+                    else{//insert anywhere else 
+                        document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
+                    }
+                }
+                break
     }   
 }
 
@@ -450,7 +507,8 @@ function clearUserList(){
     container.innerHTML="";
     var full= '<div id="Users"></div>'
     container.insertAdjacentHTML("beforeend", full)
-    previousId="Users"
+    localUserListID=[]
+    localUserListName=[]
 }
 
 //implement previous and next page requests 
