@@ -12,9 +12,7 @@
         <title>NotePipe-Student</title>
     </head>
     <body>
-      
         <div id="header "class="header">
-          
           <div class="header-left">
             <a class="home-link" href="../index.html">
               <img src="../icons/home-icon.svg" alt="Home">
@@ -55,7 +53,6 @@
           </div>
 
           <div class="header-right">
-
             <div class="header-right-dropdown">
               <button class="save-button">
                 <img class="save-icon" src="../icons/save-icon.svg" alt="Save">
@@ -75,6 +72,7 @@
                 <p onclick="openQR()">Show QR Code</p>
               </div>
             </div>
+          </div>
             <!--
               <div class="header-right-dropdown">
               <button class="users-button">
@@ -154,8 +152,8 @@
         <div class="qrcode-container" id="qrcode"></div>
       </div>
       
-    <div class="top-border"></div>
-    <div class="left-border"></div>
+      <div class="top-border"></div>
+      <div class="left-border"></div>
 
       <!-- Place experimental features/buttons here -->
       <div class="feature-testing">
@@ -194,11 +192,11 @@
               <p id="updateStatus">Content Not Sent</p>
       </div>       
 
-        <div style="position: relative;">
-          <canvas id="viewingCanvas" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
-          <canvas id="studentCanvas"  style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
-          <canvas id="highlightCanvas" style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>
-        </div>
+      <div style="position: relative;">
+        <canvas id="viewingCanvas" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+        <canvas id="studentCanvas"  style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+        <canvas id="highlightCanvas" style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>
+      </div>
     </body>
 
 </html>
