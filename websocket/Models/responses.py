@@ -122,7 +122,7 @@ class fullUserList(response):
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.names = name
-        self.message = "Retrieving full user list for new connection"
+        self.message = "Retrieving full user list"
 
 class newUserJoined(response):
     def __init__(self, name=None, id=None) -> None:
@@ -133,18 +133,20 @@ class newUserJoined(response):
         self.message = "New user has joined"
 
 class updateUserName(response):
-    def __init__(self, name=None, id=None) -> None:
+    def __init__(self, name=None, id=None, canBroadcast=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.id = id
         self.name = name
-        self.message = "Update the user list"
+        self.canBroadcast= canBroadcast
+        self.message = "user updated name"
 
 class removeUserFromList(response):
-    def __init__(self, id=None) -> None:
+    def __init__(self, id=None, canBroadcast=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.id = id
+        self.canBroadcast= canBroadcast
         self.message = "User has left"
 
 class NewpagesInserted(response):

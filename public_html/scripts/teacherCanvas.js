@@ -116,7 +116,6 @@ showUserListElement.addEventListener('change', () => {
     }
     else{
         clearUserList()
-        localUserList={}
         showUserListBool=false
     }
 });
@@ -132,7 +131,8 @@ function clearUserList(){
     container.innerHTML="";
     var full= '<div id="Users"></div>'
     container.insertAdjacentHTML("beforeend", full)
-    previousId="Users"
+    localUserListID=[]
+    localUserListName=[]
 }
 
 //instructor image saved locally
@@ -506,9 +506,11 @@ function navigateToPage(pageWanted){
         
 }
 
-localUserList={}
+var localUserListID=[]
+var localUserListName=[]
 var absoluteJoinLink = "";
 var userListHtmlId= "Users"
+var instructorBroadcasting=undefined
 // Handle messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
@@ -532,85 +534,143 @@ function processMessage({ data }) {
             var tmpContent = "";
             var headerId="";
             for (const [key, value] of Object.entries(newObj)) {
-                //the key here is UUID and value is [object, object]
-                // console.log("key is: "+ key+" and value is : " + value.name+ "and prev id is: "+previousId);
-                localUserList[value.id]=value.name
                 headerId=value.id+"#"
                 if(value.name== "defaultTeacher"){
-                    tmpContent = "<h4 id='"+headerId+"'>"+value.name+"</h4>"
-                    document.getElementById(previousId).insertAdjacentHTML("afterend",tmpContent);
-                    previousId= headerId
+                    if(value.canBroadcast)
+                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' class='activeButton'> Broadcasting</button>"
+                    else
+                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' class='inactiveButton'> Not Broadcasting</button>"
+                    instructorBroadcasting=value.id
                 }  
                 else{
                     if(value.canBroadcast)
-                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' onclick='canBroadcast(this.id)' class='canBroadcast'> Broadcasting</button>"
+                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' onclick='canBroadcast(this.id)' class='activeButton'> Broadcasting</button>"
                     else
-                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' onclick='canBroadcast(this.id)' class='canBroadcast'> Allow Broadcast</button>"
-                    document.getElementById(previousId).insertAdjacentHTML("afterend",tmpContent);
-                    previousId= value.id
+                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' onclick='canBroadcast(this.id)' class='inactiveButton'> Allow Broadcast</button>"
                 }
-                    
-            //THIS IS FOR DEBUGGING
-                // for(const [key1, value1] of Object.entries(value)){
-                //     //keys are id, name, canBroadcast, isTeacher
-                //     console.log("key1 is: "+key1+" and value1 is: "+value1);
-                // }    
+                if(localUserListID.length == 0)
+                    document.getElementById("Users").insertAdjacentHTML("afterend", tmpContent);
+                else{
+                    document.getElementById(localUserListID[localUserListID.length-1]).insertAdjacentHTML("afterend", tmpContent);
+                }
+
+                //store into local arrays
+                localUserListID.push(value.id)
+                localUserListName.push(value.name)
             }
             break
-        case "updateUserName":
-            if(showUserListBool){//only implement updates if teacher has user list showing
-                var headerId=event.id+"#"
-                document.getElementById(headerId).innerHTML=event.name//change name value
-                localUserList[event.id]=event.name//update name in local list
-                //the updated name might force alphabetizing of list
-            }
-            break;
         case "removeUserFromList":
             if(showUserListBool){
                 var headerId=event.id+"#"
                 document.getElementById(headerId).remove()//delete the name 
                 document.getElementById(event.id).remove()//delete the button
-                delete localUserList[event.id]//delete user from local list
-                if(event.id==previousId){
-                    var total= Object.keys(localUserList).length;
-                    previousId= Object.keys(localUserList)[total-1]
+
+                //update local arrays
+                found = localUserListID.findIndex(element => element == event.id);
+                localUserListID.splice(found,1)
+                localUserListName.splice(found, 1)
+
+                if(event.canBroadcast){
+                    //student that was broadcasting has left, return privilage to instructor
+                    broadcastingStudent=undefined 
+                    grantBroadcastingPrivilege(instructorBroadcasting)
                 }
             }
             break
+        case "updateUserName":
+            if(showUserListBool){
+                //delete current user name from user list html
+                var headerId=event.id+"#"
+                document.getElementById(headerId).remove()//delete the name 
+                document.getElementById(event.id).remove()//delete the button
+
+                //delete from user name from local arrays
+                found = localUserListID.findIndex(element => element == event.id);
+                localUserListID.splice(found,1)
+                localUserListName.splice(found, 1)
+
+                //add updated name to local arrays 
+                localUserListName.push(event.name)//add name to list
+                localUserListName.sort()//sort the list
+                found = localUserListName.findIndex(element => element == event.name);//find index of new name
+                localUserListID.splice(found, 0, event.id)//insert user id in proper index
+
+                //check if user had broadcasting privilage 
+                if(event.canBroadcast)
+                    tmpContent= "<h4 id='"+headerId+"'>"+event.name+"</h4> <button id='"+event.id+"' onclick='canBroadcast(this.id)' class='activeButton'> Broadcasting</button>"
+                else
+                    tmpContent= "<h4 id='"+headerId+"'>"+event.name+"</h4> <button id='"+event.id+"' onclick='canBroadcast(this.id)' class='inactiveButton'> Allow Broadcast</button>"
+
+                //insert alphabetical location
+                if(found == 0){//insert at the beginning of the list
+                    document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
+                }
+                else{//insert anywhere else 
+                    document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
+                }
+            }
+            break;
         case "newUserJoined":
             if(showUserListBool){
+                localUserListName.push(event.name)//add name to list
+                localUserListName.sort()//sort the list
+                found = localUserListName.findIndex(element => element == event.name);//find index of new user
+                localUserListID.splice(found, 0, event.id)//insert user id in proper index
+
+                //create the name and button that needs to be added
                 var headerId=event.id+"#"
-                tmpContent= "<h4 id='"+headerId+"'>"+event.name+"</h4> <button id='"+event.id+"' onclick='canBroadcast(this.id)' class='canBroadcast'> Allow Broadcast</button>"
-                document.getElementById(previousId).insertAdjacentHTML("afterend",tmpContent);
-                previousId= event.id
-                localUserList[event.id]=event.name
-                //the updated name might force alphabetizing of list
+                tmpContent= "<h4 id='"+headerId+"'>"+event.name+"</h4> <button id='"+event.id+"' onclick='canBroadcast(this.id)' class='inactiveButton'> Allow Broadcast</button>"
+
+                if(found == 0){//insert at the beginning of the list
+                    document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
+                }
+                else{//insert anywhere else 
+                    document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
+                }
             }
-            
+            break
     }
+}
+function grantBroadcastingPrivilege(id){
+    grantPermission = { type: "updateUserPermission", id: id, allowBroadcast:true};
+    websocket.send(JSON.stringify(grantPermission))
+    document.getElementById(id).innerHTML="Broadcasting"
+    document.getElementById(id).className = 'activeButton'
+}
+
+function removeBroadcastingPrivilege(id){
+    removePermission = { type: "updateUserPermission", id: id, allowBroadcast:false};
+    websocket.send(JSON.stringify(removePermission))
+
+    if(id==instructorBroadcasting)
+        document.getElementById(id).innerHTML="Not Broadcasting"
+    else
+        document.getElementById(id).innerHTML="Allow Broadcast"    
+    document.getElementById(id).className = 'inactiveButton'
 }
 
 var broadcastingStudent=undefined;
 function canBroadcast(id){
     if(broadcastingStudent==undefined){
-        document.getElementById(id).innerHTML = "Broadcasting";
-        grantPermission = { type: "updateUserPermission", id: id, allowBroadcast:true};
+        //instructor no longer broadcasting 
+        removeBroadcastingPrivilege(instructorBroadcasting)
+        //student can broadcast 
         broadcastingStudent=id;
-        websocket.send(JSON.stringify(grantPermission))
+        grantBroadcastingPrivilege(id)
     }
     else if(broadcastingStudent==id){
-        document.getElementById(id).innerHTML = "Allow Broadcast";
-        removePermission = { type: "updateUserPermission", id: broadcastingStudent, allowBroadcast:false};
-        websocket.send(JSON.stringify(removePermission))
+        //student no longer broadcasting 
         broadcastingStudent=undefined;
+        removeBroadcastingPrivilege(id)
+        //instructor can broadcast now
+        grantBroadcastingPrivilege(instructorBroadcasting)
+
     }
     else{
-        document.getElementById(broadcastingStudent).innerHTML = "Allow Broadcast";
-        removePermission = { type: "updateUserPermission", id: broadcastingStudent, allowBroadcast:false};
-        websocket.send(JSON.stringify(removePermission))
-        document.getElementById(id).innerHTML = "Broadcasting";
-        grantPermission = { type: "updateUserPermission", id: id, allowBroadcast:true};
-        websocket.send(JSON.stringify(grantPermission))
+        //current broadcasting student can no longer broadcast
+        removeBroadcastingPrivilege(broadcastingStudent)
+        //different student can broadcast 
+        grantBroadcastingPrivilege(id)
         broadcastingStudent=id;
     }
 }
@@ -664,13 +724,13 @@ function editName(){
     console.log('editName button was clicked and function called');
     const request = {type: "updateName", newName: newName}; 
     websocket.send(JSON.stringify(request))
- } 
+} 
 
  //show/hide textbox to input name
  function showEditName(){
     document.getElementById('nameTextBox').className="show";
     document.getElementById('updateName').className="show";
- }
+}
 function hideEditName(){
     document.getElementById('nameTextBox').className="hide";
     document.getElementById('updateName').className="hide";
@@ -721,9 +781,6 @@ function closeQR(){
 //         }
 //     } 
 
-
-
-
 /*
 uploadImageFile TODO:
     - Maybe mess with formatting
@@ -740,19 +797,34 @@ function uploadImageFile() {
         img.src = e.target.result;
         img.onload = function () {
            ctx.drawImage(img, 10, 10);
+           sendDrawUpdate();
         };
     }
 } 
 
+var pdf_page;
+
+function renderPages(pdf_file) {
+    if (pdf_page <= pdf_file.numPages) {
+        var viewport;
+        pdf_file.getPage(pdf_page).then(page => {
+            viewport = page.getViewport({scale: 1, rotation: 360});
+            var pageRender = page.render({
+                canvasContext: ctx,
+                viewport: viewport
+            });
+            pageRender.promise.then(function () {
+                sendDrawUpdate();
+                newpage();
+                pdf_page++;
+                renderPages(pdf_file);
+            });
+        });
+    }
+}
+
 function uploadPDF(pdf_file) {
     console.log("inside uploadPDF function. number of pages in pdf: " + pdf_file.numPages);
-    var viewport;
-    pdf_file.getPage(1).then(page => {
-        viewport = page.getViewport({scale: 1, rotation: 360});
-        page.render({
-            canvasContext: ctx,
-            viewport: viewport
-        });
-    });
-    // TODO: need to render every page of pdf_file
+    pdf_page = 1;
+    renderPages(pdf_file);
 }
