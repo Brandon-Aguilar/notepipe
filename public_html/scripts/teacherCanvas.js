@@ -802,18 +802,29 @@ function uploadImageFile() {
     }
 } 
 
+var pdf_page;
+
+function renderPages(pdf_file) {
+    if (pdf_page <= pdf_file.numPages) {
+        var viewport;
+        pdf_file.getPage(pdf_page).then(page => {
+            viewport = page.getViewport({scale: 1, rotation: 360});
+            var pageRender = page.render({
+                canvasContext: ctx,
+                viewport: viewport
+            });
+            pageRender.promise.then(function () {
+                sendDrawUpdate();
+                newpage();
+                pdf_page++;
+                renderPages(pdf_file);
+            });
+        });
+    }
+}
+
 function uploadPDF(pdf_file) {
     console.log("inside uploadPDF function. number of pages in pdf: " + pdf_file.numPages);
-    var viewport;
-    pdf_file.getPage(1).then(page => {
-        viewport = page.getViewport({scale: 1, rotation: 360});
-        var pageRender = page.render({
-            canvasContext: ctx,
-            viewport: viewport
-        });
-        pageRender.promise.then(function () {
-            sendDrawUpdate();
-        });
-    });
-    // TODO: need to render every page of pdf_file
+    pdf_page = 1;
+    renderPages(pdf_file);
 }
