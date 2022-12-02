@@ -738,7 +738,7 @@ function hideEditName(){
 
 // QR Overlay
 function openQR(){
-    document.getElementById("qr-code-overlay").style.display = "block";
+    document.getElementById("qr-code-overlay").style.display = "flex";
 }
 function closeQR(){
     document.getElementById("qr-code-overlay").style.display = "none";

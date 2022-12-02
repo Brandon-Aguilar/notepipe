@@ -35,7 +35,6 @@ document.body.appendChild(canvas);
 document.body.style.margin = 0;
 canvas.style.position = 'absolute';
 
-
 var ctx = canvas.getContext('2d');
 var image = new Image();
 resize();
@@ -618,4 +617,33 @@ function editName(){
 function hideEditName(){
     document.getElementById('nameTextBox').className="hide";
     document.getElementById('updateName').className="hide";
+}
+
+// QR Code generation
+function generateQRCode(codeContent) {
+    const qrcode = new QRCode(document.getElementById('qrcode'), {
+        text: codeContent,
+        width: 350,
+        height: 350,
+        colorDark : '#000',
+        colorLight : '#fff',
+        correctLevel : QRCode.CorrectLevel.H
+    });
+}
+
+// QR Overlay
+function openQR(){
+    document.getElementById("qr-code-overlay").style.display = "flex";
+}
+function closeQR(){
+    document.getElementById("qr-code-overlay").style.display = "none";
+}
+
+// Join Key
+function copyJoinKey() {
+    // TO DO get join key text
+    navigator.clipboard.writeText(absoluteJoinLink);
+
+    var tooltip = document.getElementById("myTooltip");
+    tooltip.innerHTML = "Copied";
 }

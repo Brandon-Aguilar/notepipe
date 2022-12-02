@@ -12,25 +12,6 @@
         <title>NotePipe-Student</title>
     </head>
     <body>
-    
-<!--Old layout     
-        <header style="display: flex; justify-content: space-between;">        
-            <h1>Student Prototype</h1>
-            <div style="margin-right: 10px"> 
-                <div id="markerProperties">
-                    <button class="markerButton" id="markerColor"></button>
-                    <button class="markerButton" id="markerSize"></button>
-                    <button class="markerButton" id="markerShape"></button>
-                    <input type="checkbox" id="drawAnimationsCheckbox" checked>
-                    <label for="drawAnimationsCheckbox">Enable Animations</label>
-                    <button id="download">Download</button>
-                    <button id="TTS">TTS</button>
-                </div>
-                <p id="updateStatus">Content Not Sent</p>     
-                <a id="studentLinkAnchor"><p id="studentLink"></p></a>
-            </div>
-        </header>
-        <br> -->
       
         <div id="header "class="header">
           
@@ -41,27 +22,44 @@
           </div>
           
           <div class="header-middle">
-            <div class="page-navigation-button">
-              <button id="previousPage">
-                  <img class="navigation-icon" src="../icons/left-arrow.svg" alt="Previous Page">
+            <div class="page-navigation-bar">
+              <div class="page-navigation-button">
+                <button id="previousPage">
+                    <img class="navigation-icon" src="../icons/left-arrow.svg" alt="Previous Page">
+                </button>
+              </div>
+              <div class="current-page-counter"> 
+                <p id="currentPageNumber">1/1</p>
+              </div>
+              <div class="page-navigation-button"> 
+                <button id="nextPage">
+                  <img class="navigation-icon" src="../icons/right-arrow.svg" alt="Next Page">
+                </button>
+              </div>
+            </div>
+            <div class="new-page-button">
+              <button id="newpage">
+                <img class="new-page-icon" id="n" src="../icons/new-page-icon.svg" alt="New Page">
               </button>
             </div>
-            <div class="current-page-counter"> 
-              <p id="currentPageNumber">1/1</p>
-            </div>
-            <div class="page-navigation-button"> 
-              <button id="nextPage">
-                <img class="navigation-icon" src="../icons/right-arrow.svg" alt="Next Page">
+            <div class="reset-page-button">
+              <button id="reset">
+                <img class="reset-page-icon" src="../icons/reset-btn.svg" alt="Reset Page">
               </button>
-            </div> 
+            </div>
+            <div class="upload-button">
+              <button>
+                <img class="upload-icon" src="../icons/upload-icon.svg" alt="Upload File">
+              </button>
+            </div>
           </div>
-          
+
           <div class="header-right">
 
             <div class="header-right-dropdown">
-            <button class="save-button">
-              <img class="save-icon" src="../icons/save-icon.svg" alt="Save">
-            </button>
+              <button class="save-button">
+                <img class="save-icon" src="../icons/save-icon.svg" alt="Save">
+              </button>
               <div class="header-right-dropdown-content">
                 <p id="zipFolder">Download All</p>
                 <p id="download">Download Current Page</p>
@@ -69,31 +67,49 @@
             </div>
 
             <div class="header-right-dropdown">
-            <button class="menu-button">
-              <img class="menu-icon" src="../icons/menu-icon.svg" alt="Menu">
-            </button>
+              <button class="link-button">
+                <img class="link-icon" src="../icons/link-icon.svg" alt="Link">
+              </button>
               <div class="header-right-dropdown-content">
                 <p onclick="copyJoinKey()">Copy Room Link</p>
                 <p onclick="openQR()">Show QR Code</p>
               </div>
             </div>
-          </div>
-
-          <!-- Hiding for now, will add as functionality inside menu icon
-            <div>
-              <div class="tooltip">
-                <button onclick="copyJoinKey()" onmouseout="copyKeyOutFunc()">
-                  <span class="tooltiptext" id="myTooltip">Copy to clipboard</span>
-                  Copy text
-                </button>
+            <!--
+              <div class="header-right-dropdown">
+              <button class="users-button">
+                <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
+              </button>
+            </div>
+            -->
+            
+               <!-- <div class="header-right-dropdown">
+              <button class="users-button" type="button">
+                <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
+              </button>
+              <div class="panel-wrap">
+                <div class="panel">
+                  <div class="list">
+                    <div id="Users"></div>
+                  </div>
               </div>
-              <a id="studentLinkAnchor">
-                <p id="studentLink"></p>
-              </a>
-              <div id="qrcode"></div>
             </div>
           </div> -->
-        </div> 
+          
+           
+
+          <!-- Prototype
+            <button class="clicker" type="button" >
+            put button image here
+          </button>
+          <div class="panel-wrap">
+            <div class="panel">
+              <div class="list">
+                <div id="Users"></div>
+              </div>
+          </div>
+          -->
+        </div>     
         
         <div class="left-sidebar">
           <!-- Need to add effects when selected/active -->
@@ -174,7 +190,7 @@
                 <p id="studentLink"></p>
               </a>
               <p id="updateStatus">Content Not Sent</p>
-        </div>       
+      </div>       
     
     </body>
 

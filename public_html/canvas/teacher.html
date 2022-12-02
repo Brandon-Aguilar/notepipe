@@ -108,67 +108,7 @@
               </div>
           </div>
           -->
-          
-    
-          <!-- Hiding for now, will add as functionality inside menu icon
-            <div>
-              <div class="tooltip">
-                <button onclick="copyJoinKey()" onmouseout="copyKeyOutFunc()">
-                  <span class="tooltiptext" id="myTooltip">Copy to clipboard</span>
-                  Copy text
-                </button>
-              </div>
-              <a id="studentLinkAnchor">
-                <p id="studentLink"></p>
-              </a>
-              <div id="qrcode"></div>
-            </div>
-          </div> -->
         </div>        
-
-            <!-- 
-            <p id="currentPageNumber">Current page is 0</p>
-            <div style="margin-right: 10px"> 
-                <button id="newpage">NewPage</button>
-                <button id="reset">Reset</button>
-                <p id="updateStatus">Content Not Sent</p>     
-                <a id="studentLinkAnchor"><p id="studentLink"></p></a>
-            </div> -->
-
-        <!-- Removing dropdown menu for now, uncomment to restore
-     
-        <div class="dropdown">
-            <button onclick="dropdown()" class="dropbtn">Dropdown</button>
-            <div id="myDropdown" class="dropdown-content">
-              <a href="#home">Home</a>
-              <a href="#about">About</a>
-              <a href="#contact">Contact</a>
-            </div>
-        </div>
-          
-          <script>
-          /* When the user clicks on the button, 
-          toggle between hiding and showing the dropdown content */
-          function dropdown() {
-            document.getElementById("myDropdown").classList.toggle("show");
-          }
-          
-          // Close the dropdown if the user clicks outside of it
-          window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn')) {
-              var dropdowns = document.getElementsByClassName("dropdown-content");
-              var i;
-              for (i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('show')) {
-                  openDropdown.classList.remove('show');
-                }
-              }
-            }
-          }
-          </script>
-        <br>
-        -->
 
         <div id="slider-div" class="slider-menu">
           <div id="container" class="slider-container">
@@ -180,6 +120,10 @@
         <div class="left-sidebar">
             <!-- Need to add effects when selected/active -->
             <div id="container" class="drawing-tools-sidebar">
+              <div class="draw-tool">
+                <button class="color-button" onclick="showSlider()" id="slider">
+                </button>
+              </div>
               <div class="draw-tool">
                 <button class="color-button" onclick="changeColor('black')" id="black">
                   <img src="../icons/black-icon.svg" alt="Black">
@@ -203,10 +147,6 @@
               <div class="draw-tool">
                 <button class="highlight-button" id="highligher">
                   <img src="../icons/highlighter-icon.svg" onclick="startHighlight()" alt="highligher">
-                </button>
-              </div>
-              <div class="draw-tool">
-                <button class="color-button" onclick="showSlider()" id="slider">
                 </button>
               </div>
               <div class="draw-tool">
@@ -298,7 +238,7 @@
         <a id="studentLinkAnchor">
           <p id="studentLink"></p>
         </a>
-        <div id="qrcode"></div>
+        <!-- <div id="qrcode"></div> -->
       </div>
       <!-- For user list-->
       <!--
