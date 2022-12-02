@@ -90,10 +90,10 @@ class userList:
             self.users[uuid.UUID(id)].canBroadcast = canBroadcast
         except Exception as e:
             log.warn("Failed to update permission of id %s, %s", id, e)
-        broadcast= updateUserPermissions()
-        broadcast.id= id
-        broadcast.canBroadcast = canBroadcast
-        websockets.broadcast(connected, broadcast.toJson())
+        # broadcast= updateUserPermissions()
+        # broadcast.id= id
+        # broadcast.canBroadcast = canBroadcast
+        # websockets.broadcast(connected, broadcast.toJson())
 
 
     def toJson(self) -> str:

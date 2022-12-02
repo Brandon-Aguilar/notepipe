@@ -622,8 +622,8 @@ function processMessage({ data }) {
             var tmpContent = "";
             for (const [key, value] of Object.entries(newObj)) {
                 tmpContent= "<h4 id='"+value.id+"'> "+value.name+"</h4>"  
-                if(value.canBroadcast)
-                    tmpContent += " <button id='"+value.id+"' class='activeButton'> Broadcasting</button>"
+                // if(value.canBroadcast)
+                //     tmpContent += " <button id='"+value.id+"' class='activeButton'> Broadcasting</button>"
                 if(localUserListID.length == 0)
                     document.getElementById("Users").insertAdjacentHTML("afterend", tmpContent);
                 else{
@@ -693,15 +693,16 @@ function processMessage({ data }) {
                 break
             case "endHighlightStroke":
                 processHighlight = true;
-            case "updateUserPermissions":
-                if(!event.canBroadcast){
-                    document.getElementById(event.id).getElementsByClassName("activeButton").getremove()//delete the button
-                }
-                else{
-                    tmpContent = " <button id='"+event.id+"' class='activeButton'> Broadcasting</button>"  
-                    document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
-                }
                 break;
+            // case "updateUserPermissions":
+            //     if(!event.canBroadcast){
+            //         document.getElementById(event.id).getElementsByClassName("activeButton").getremove()//delete the button
+            //     }
+            //     else{
+            //         tmpContent = " <button id='"+event.id+"' class='activeButton'> Broadcasting</button>"  
+            //         document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
+            //     }
+            //     break;
             }   
 }
 
