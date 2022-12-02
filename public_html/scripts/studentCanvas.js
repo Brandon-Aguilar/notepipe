@@ -621,7 +621,9 @@ function processMessage({ data }) {
             newObj = JSON.parse(event.names);
             var tmpContent = "";
             for (const [key, value] of Object.entries(newObj)) {
-                tmpContent= "<h4 id='"+value.id+"'> "+value.name+"</h4>"   
+                tmpContent= "<h4 id='"+value.id+"'> "+value.name+"</h4>"  
+                if(value.canBroadcast)
+                    tmpContent += " <button id='"+value.id+"' class='activeButton'> Broadcasting</button>"
                 if(localUserListID.length == 0)
                     document.getElementById("Users").insertAdjacentHTML("afterend", tmpContent);
                 else{
@@ -635,6 +637,8 @@ function processMessage({ data }) {
             case "removeUserFromList":
                 if(showUserListBool){
                     document.getElementById(event.id).remove()
+                    document.getElementById(event.id).remove()//delete the button
+
                     //update local arrays
                     found = localUserListID.findIndex(element => element == event.id);
                     localUserListID.splice(found,1)
@@ -689,7 +693,16 @@ function processMessage({ data }) {
                 break
             case "endHighlightStroke":
                 processHighlight = true;
-    }   
+            case "updateUserPermissions":
+                if(!event.canBroadcast){
+                    document.getElementById(event.id).getElementsByClassName("activeButton").getremove()//delete the button
+                }
+                else{
+                    tmpContent = " <button id='"+event.id+"' class='activeButton'> Broadcasting</button>"  
+                    document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
+                }
+                break;
+            }   
 }
 
 function getUserlist(){

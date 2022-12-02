@@ -161,3 +161,11 @@ class endHighlightStroke(response):
     def __init__(self) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
+
+class updateUserPermissions(response):
+    def __init__(self, id=None, canBroadcast=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.id = id
+        self.canBroadcast= canBroadcast
+        self.message = "User permissions changed"
