@@ -594,6 +594,7 @@ function navigateToPage(pageWanted){
 
 var localUserListID=[]
 var localUserListName=[]
+var broadcastingList=[]
 var absoluteJoinLink = "";
 var userListHtmlId= "Users"
 var instructorBroadcasting=undefined
@@ -658,8 +659,11 @@ function processMessage({ data }) {
 
                 if(event.canBroadcast){
                     //student that was broadcasting has left, return privilage to instructor
-                    broadcastingStudent=undefined 
-                    grantBroadcastingPrivilege(instructorBroadcasting)
+                    found =broadcastingList.findIndex(element => element == event.id);
+                    broadcastingList.splice(found,1)
+                    for(i=0; i<broadcastingList.length; i++){
+                        console.log(broadcastingList[i])
+                    }
                 }
             }
             break
@@ -735,29 +739,19 @@ function removeBroadcastingPrivilege(id){
     document.getElementById(id).className = 'inactiveButton'
 }
 
-var broadcastingStudent=undefined;
+//var broadcastingStudent=undefined;
 function canBroadcast(id){
-    if(broadcastingStudent==undefined){
-        //instructor no longer broadcasting 
-        removeBroadcastingPrivilege(instructorBroadcasting)
-        //student can broadcast 
-        broadcastingStudent=id;
+    found =broadcastingList.findIndex(element => element == id);
+    if(found < 0){
         grantBroadcastingPrivilege(id)
-    }
-    else if(broadcastingStudent==id){
-        //student no longer broadcasting 
-        broadcastingStudent=undefined;
-        removeBroadcastingPrivilege(id)
-        //instructor can broadcast now
-        grantBroadcastingPrivilege(instructorBroadcasting)
-
+        broadcastingList.push(id)
     }
     else{
-        //current broadcasting student can no longer broadcast
-        removeBroadcastingPrivilege(broadcastingStudent)
-        //different student can broadcast 
-        grantBroadcastingPrivilege(id)
-        broadcastingStudent=id;
+        removeBroadcastingPrivilege(id)
+        broadcastingList.splice(found,1)
+    }
+    for(i=0; i<broadcastingList.length; i++){
+        console.log(broadcastingList[i])
     }
 }
 
