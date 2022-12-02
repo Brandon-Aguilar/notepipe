@@ -523,14 +523,16 @@
 }
 .panel {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 50px;
+  bottom: 50px;
   left: 0;
   right: 0;
   background: #333;
   color: #eee;
   overflow: auto;
   padding: 1em;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
 }
 
 /* simulate panel state control --
