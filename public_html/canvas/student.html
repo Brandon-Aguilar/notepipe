@@ -25,13 +25,13 @@
             <div class="page-navigation-bar">
               <div class="page-navigation-button">
                 <button id="previousPage">
-                    <img class="navigation-icon" src="../icons/left-arrow.svg" alt="Previous Page">
+                  <img class="navigation-icon" src="../icons/left-arrow.svg" alt="Previous Page">
                 </button>
               </div>
-              <div class="current-page-counter"> 
+              <div class="current-page-counter">
                 <p id="currentPageNumber">1/1</p>
               </div>
-              <div class="page-navigation-button"> 
+              <div class="page-navigation-button">
                 <button id="nextPage">
                   <img class="navigation-icon" src="../icons/right-arrow.svg" alt="Next Page">
                 </button>
@@ -95,21 +95,14 @@
               </div>
             </div>
           </div> -->
-          
-           
+        </div> 
 
-          <!-- Prototype
-            <button class="clicker" type="button" >
-            put button image here
-          </button>
-          <div class="panel-wrap">
-            <div class="panel">
-              <div class="list">
-                <div id="Users"></div>
-              </div>
+        <div id="slider-div" class="slider-menu">
+          <div id="container" class="slider-container">
+            <input onchange='changeWidth(this.value)' type="range" min="1" max="40" value="2">
+            <p style="color:white;">Thickness</p>
           </div>
-          -->
-        </div>     
+        </div>
         
         <div class="left-sidebar">
           <!-- Need to add effects when selected/active -->
@@ -135,6 +128,15 @@
               </button>
             </div>
             <div class="draw-tool">
+              <button class="highlight-button" id="highligher">
+                <img src="../icons/highlighter-icon.svg" onclick="startHighlight()" alt="highligher">
+              </button>
+            </div>
+            <div class="draw-tool">
+              <button class="color-button" onclick="showSlider()" id="slider">
+              </button>
+            </div>
+            <div class="draw-tool">
               <button class="undo-button" id="undo">
                 <img src="../icons/undo-icon.svg" alt="Undo">
               </button>
@@ -145,7 +147,7 @@
               </button>
             </div>
           </div>
-      </div>
+        </div>
     
       <div id="qr-code-overlay" class="overlay">
         <a href="javascript:void(0)" class="close-button" onclick="closeQR()">&times;</a>
@@ -191,7 +193,12 @@
               </a>
               <p id="updateStatus">Content Not Sent</p>
       </div>       
-    
+
+        <div style="position: relative;">
+          <canvas id="viewingCanvas" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+          <canvas id="studentCanvas"  style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+          <canvas id="highlightCanvas" style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>
+        </div>
     </body>
 
 </html>

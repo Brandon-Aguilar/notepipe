@@ -1,6 +1,7 @@
 import logging
 import secrets
 import json
+import websockets
 from Controllers.CanvasController import canvasUpdate, canvasDrawUpdate, retrieveImage, newPageInsert, imageToText, resett, fetchPage, fetchImage, canvasNewPage, textToSpeech
 
 from Models.responses import initializeHostSuccess, initializeStudentSuccess, imageToTextRequest, textToSpeechRequest, pageFetched, imageFetched
@@ -8,6 +9,7 @@ from Models.errorHandler import sendError
 from Models.userList import userList
 from Models.userList import userObject
 from OCR.imageToText import readImage, rearrangeLines, reorderWords
+from Models.responses import endHighlightStroke
 
 log = logging.getLogger(__name__)
 
@@ -87,6 +89,8 @@ async def hostConnection(websocket, hostKey, studentKey):
                 await users.fullUserList(websocket)
             case "updateUserPermission":
                 users.updateUserPermissions(messageJSON["id"], messageJSON["allowBroadcast"])
+            case "endHighlightStroke":
+                websockets.broadcast(JOINED[studentKey], endHighlightStroke().toJson())
 
 
 

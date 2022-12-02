@@ -27,9 +27,9 @@ var newName = '' // what client chooses new username to be
 
 // Copied canvas code
 // create canvas element and append it to document body
-var canvas = document.createElement('canvas');
-canvas.setAttribute("id", "viewingCanvas");
-document.body.appendChild(canvas);
+var canvas = document.getElementById('viewingCanvas')
+var studentCanvas = document.getElementById('studentCanvas');
+var highlightCanvas = document.getElementById('highlightCanvas');
 
 // some hotfixes... ( ≖_≖)
 document.body.style.margin = 0;
@@ -37,7 +37,52 @@ canvas.style.position = 'absolute';
 
 var ctx = canvas.getContext('2d');
 var image = new Image();
+
+var studentCtx = studentCanvas.getContext('2d');
+var highlightCtx = highlightCanvas.getContext('2d');
+
+var minCanvasHeight = 1080;
+var minCanvasWidth = 2160;
+
+studentCtx.canvas.width = Math.max(window.innerWidth, minCanvasWidth);
+studentCtx.canvas.height = Math.max(window.innerHeight, minCanvasHeight);
+highlightCtx.canvas.width = Math.max(window.innerWidth, minCanvasWidth);
+highlightCtx.canvas.height = Math.max(window.innerHeight, minCanvasHeight);
+
 resize();
+
+highlightCanvas.addEventListener('pointermove', move, { capture: true, });
+
+var sentImage = false;
+
+// Release mouse capture when not touching screen
+highlightCanvas.addEventListener('pointerup', (e) => {
+    isPointerDown = false;
+    lastPoint = undefined;
+    if (sentImage == false) {
+        sendStroke(e);
+        sentImage = true;
+    }
+}, { capture: true, });
+highlightCanvas.addEventListener('pointercancel', (e) => {
+    isPointerDown = false;
+    lastPoint = undefined;
+    if (sentImage == false) {
+        sendStroke(e);
+        sentImage = true;
+    }
+}, { capture: true, });
+highlightCanvas.addEventListener('pointerenter', (e) => {
+    isPointerDown = false;
+    lastPoint = undefined;
+    if (sentImage == false) {
+        sendStroke(e);
+        sentImage = true;
+    }
+}, { capture: true, });
+// Disable panning, touch doesn't work if it is on
+highlightCanvas.style.touchAction = 'none';
+highlightCanvas.style.opacity = 0.5;
 
 //Fetch HTML elements that need event listners
 var ocr = document.getElementById("editNote");
@@ -46,7 +91,7 @@ const updateName = document.getElementById('updateName');
 
 
 // Event listeners to trigger functions
-//window.addEventListener('resize', resize);
+window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', createStudentName)
 download.addEventListener('click', downloadbutton);
@@ -58,6 +103,148 @@ window.addEventListener('input', (e) =>{
     //console.log('new name: ', e.target.value);
     newName = e.target.value;
 }) 
+
+function sendStroke(e) {
+    // Need to check if they have broadcast privilege before we allow them to send strokes
+    sendStudentDrawUpdate();//will send strokes to clients
+}
+
+function sendStudentDrawUpdate() {
+    //save updated canvas locally 
+    if (pageNumber == viewingPageNumber) {//saving the most recent page
+        var imageURL = canvas.toDataURL("image/png", 0.2);
+        localImages[pageNumber] = imageURL
+    }
+    else {//editing a previously stored page
+        var imageURL = canvas.toDataURL("image/png", 0.2);
+        localImages[viewingPageNumber] = imageURL
+    }
+
+    websocket.send(JSON.stringify({//send array containing x,y corrdinate of strokes
+        type: 'canvasStudentDrawUpdate',
+        drawData: drawInstructions,
+        page: viewingPageNumber,
+        requestER: eraserState
+    }));
+    drawInstructions = [];//reset the array for next use
+    console.log("Sent Batch Draw Update");
+}
+
+//default settings for marker
+var lastPoint = undefined;
+var force = 1;//marker thickness
+var color = "red";//marker color
+var drawInstructions = [];
+var markerWidth = 5;
+
+var isPointerDown = false;
+var eraserState = false;
+var highlightDraw = false;
+
+// Change width of the marker based on input from a HTML slider
+function changeWidth(newWidth) {
+    markerWidth = newWidth;
+    //eraserState= false;
+    ctx.globalCompositeOperation = 'source-over';
+};
+
+// shows the HTML slider located in slider-div
+function showSlider() {
+    var x = document.getElementById("slider-div");
+    if (x.style.display === "block") {
+        x.style.display = "none";
+    } else {
+        x.style.display = "block";
+    }
+};
+
+//Stroke color selection based off HTML button choice
+function changeColor(newColor) {
+    highlightDraw = false;
+    color = newColor;
+    eraserState = false;
+    ctx.globalCompositeOperation = 'source-over';
+};
+
+function startHighlight() {
+    highlightDraw = true;
+    eraserState = false;
+}
+
+// Eraser
+function eraser() {
+    eraserState = true;
+    highlightDraw = false;
+    // Erasing by using destination image to be on top of the drawn image in source image
+    // ctx.globalCompositeOperation = "destination-out";
+    console.log("Image erased: ", pageNumber)
+};
+
+function move(e) {
+    e.preventDefault();
+    // equation for determinng force, didn't research much, just used feel. Could use improvements.
+    if (e.pointerType === "pen") {
+        force = Math.log10(Math.pow(e.pressure * (Math.abs(e.tiltX || 90) / 90) * 0.2 + 0.15, 1.5)) + 1.2 || 1;
+        force = Math.min(15 * Math.pow(force || 1, 4) * (markerWidth + 2), markerWidth);
+    } else {
+        force = markerWidth;
+    }
+
+    if (e.buttons || isPointerDown) {
+        if (typeof lastPoint == 'undefined') {
+            lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
+            return;
+        }
+
+        draw({
+            lastPoint,//the x,y coordinate of the last stroke
+            x: e.offsetX,//x-coordinate of the mouse pointer relative to the document
+            y: e.offsetY,//y-coordinate of the mouse pointer relative to the document
+            force: force,
+            color: color || 'green',
+            eraserState,
+            highlightDraw
+        }, studentCtx);
+
+
+        
+
+        drawData = JSON.stringify({
+            lastPoint,
+            x: e.offsetX,
+            y: e.offsetY,
+            color: color || 'green',
+            force: force,
+            eraserState,
+            highlightDraw
+        });
+
+        drawInstructions.push(drawData);//store drawData in drawInstructions
+        if (drawInstructions.length >= 100) {//when drawInstruction has 100 entries, send the array
+            sendStudentDrawUpdate();
+        } else {
+            sentImage = false;
+        }
+
+        lastPoint = { x: e.offsetX, y: e.offsetY };//update lastPoint to be the stroke we just processed 
+    } else {
+        if (highlightDraw) {
+            layerHighlightCanvas(studentCtx);
+        }
+        
+        lastPoint = undefined;//mouse button has been released, this will trigger sendStroke so reset lastpoint
+    }
+}
+
+function layerHighlightCanvas(ctx){
+    ctx.globalAlpha = 0.5;
+    //ctx.globalCompositeOperation = "multiply";
+    ctx.drawImage(highlightCanvas, 0, 0);
+    ctx.globalAlpha = 1;
+    //ctx.globalCompositeOperation = "source-over";
+    highlightCtx.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
+}
+
 
 function showTextEditor(){
     ocr.disabled = true;
@@ -145,7 +332,8 @@ image.onload = function() {
 }
 
 //pages saved locally
-const localImages=[];
+var localImages=[];
+var studentLocalImages=[];
 pageNumber = 0;
 viewingPageNumber=0;
 
@@ -191,12 +379,17 @@ function initializeStudent(name) {
 }
 
 //same as teacher draw function
-function draw(data) {
+function draw(data, ctx) {
+    if(data.highlightDraw){
+        ctx = highlightCtx;
+    }
     ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
     ctx.strokeStyle = data.color;//original default stroke color 
     ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
-    if (data.highlightDraw) {ctx.globalCompositeOperation = "overlay"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 0.8; ctx.lineWidth = 40;}
+    if(data.highlightDraw){
+        ctx.globalCompositeOperation = "multiply"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 0.8; ctx.lineWidth = 40;
+    }
 
     ctx.beginPath();
     ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
@@ -294,6 +487,7 @@ showUserListElement.addEventListener('change', () => {
 
 var localUserListID=[]
 var localUserListName=[]
+var processHighlight = false;
 
 // Handle valid messages sent to client
 function processMessage({ data }) {
@@ -317,6 +511,7 @@ function processMessage({ data }) {
             
             // initialize page drawInstructions
             drawInstructions = Array.from({length: pageNumber+1}, () => new Array());
+            studentLocalImages = Array.from({ length: pageNumber + 1 }, () => "");
             createStudentName();
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
@@ -328,7 +523,7 @@ function processMessage({ data }) {
                 } else {
                     event.drawData.forEach((element) => {//loop through each value
                         element = JSON.parse(element);
-                        draw(element);//just output the stroke 
+                        draw(element, ctx);//just output the stroke 
                     });
                 }
             } else {
@@ -347,14 +542,14 @@ function processMessage({ data }) {
             currentDrawInstructions.splice(0, currentInstructionIndex);
             currentDrawInstructions.forEach((element) => {//loop through each value
                 element = JSON.parse(element);
-                draw(element);//just output the stroke 
+                draw(element, ctx);//just output the stroke 
             });
             currentDrawInstructions = [];
             currentInstructionIndex = 0;
 
             //clear page fixed
-            width = window.innerWidth
-            height = window.innerHeight
+            width = canvas.width;
+            height = canvas.height;
             ctx.clearRect(0, 0, width, height)
             break;
         case "newPageCreated":
@@ -370,8 +565,8 @@ function processMessage({ data }) {
 
         case "NewpagesInserted":    
             pageNumber += 1;  
-            width = window.innerWidth
-            height = window.innerHeight
+            width = canvas.width;
+            height = canvas.height;
             
             if(event.insertIndex <= viewingPageNumber){
                 localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
@@ -492,6 +687,8 @@ function processMessage({ data }) {
                     }
                 }
                 break
+            case "endHighlightStroke":
+                processHighlight = true;
     }   
 }
 
@@ -512,6 +709,7 @@ function clearUserList(){
 
 //implement previous and next page requests 
 var image = new Image();
+var studentImage = new Image();
 nextPageElement=document.getElementById('nextPage');
 previousPageElement= document.getElementById('previousPage');
 
@@ -528,14 +726,15 @@ function navigateToPage(pageWanted){
     //acceptable range for pages to load
     if(pageWanted>=0 && pageWanted<=pageNumber){
         //before loading previous/next page, store the current page in local array
-        
+        studentLocalImages[viewingPageNumber] = studentCanvas.toDataURL("image/png");
         localImages[viewingPageNumber]= canvas.toDataURL("image/png", 0.2);
         //check if page wanted has been stord locally (in case where student joins late it might not be)
         if(localImages[pageWanted]!=undefined){
             //clear the current page
-            width = window.innerWidth;
-            height = window.innerHeight;  
+            width = canvas.width;
+            height = canvas.height;  
             ctx.clearRect(0, 0, width, height);
+            studentCtx.clearRect(0, 0, width, height);
             
             //load requested page
             image.src=localImages[pageWanted]
@@ -546,12 +745,17 @@ function navigateToPage(pageWanted){
                     console.log("draw instructions need to execute");
                     drawInstructions[pageWanted].forEach((currInstructions) => {
                         currInstructions.forEach((stroke) => {
-                            draw(stroke);
+                            draw(stroke, ctx);
                         });
                     });
 
                     drawInstructions[pageWanted] = [];
                 }
+            }
+
+            studentImage.src = studentLocalImages[pageWanted];
+            studentImage.onload = () => {
+                studentCtx.drawImage(studentImage, 0, 0);
             }
 
             //update the page number currently being viewed 
@@ -573,12 +777,16 @@ function navigateToPage(pageWanted){
    
 }
 
-currentDrawInstructions = [];
-currentInstructionIndex = 0;
-currentFrames = [];
+var currentDrawInstructions = [];
+var currentInstructionIndex = 0;
+var currentFrames = [];
 
 function animateDraw() {
     if(currentDrawInstructions.length == 0){
+        if(processHighlight){
+            layerHighlightCanvas(ctx);
+            processHighlight = false;
+        }
         return;
     }
     if(currentInstructionIndex >= currentDrawInstructions.length){
@@ -586,7 +794,7 @@ function animateDraw() {
         currentDrawInstructions = [];
     } else {
         var element = JSON.parse(currentDrawInstructions[currentInstructionIndex]);
-        draw(element);
+        draw(element, ctx);
         currentInstructionIndex += 1;
     }
     currentFrames.push(window.requestAnimationFrame(animateDraw));
