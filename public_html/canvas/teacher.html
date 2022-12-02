@@ -154,6 +154,7 @@
         <br>
         -->
         </div> 
+
         <div id="slider-div" class="slider-menu">
           <div id="container" class="slider-container">
             <input onchange='changeWidth(this.value)' type="range" min="1" max="40" value="2">
@@ -161,11 +162,21 @@
           </div>
         </div>
         
+        <div id="color-div" class="color-menu">
+          <div id="container" class="color-container">
+            <canvas id="colorsCanvas" class="canvas_colors" width="150" height="100"></canvas>
+          </div>
+        </div>
+
         <div class="left-sidebar">
             <!-- Need to add effects when selected/active -->
             <div id="container" class="drawing-tools-sidebar">
               <div class="draw-tool">
                 <button class="color-button" onclick="showSlider()" id="slider">
+                </button>
+              </div>
+              <div class="draw-tool">
+                <button class="color-button" onclick="showColors()" id="colors">
                 </button>
               </div>
               <div class="draw-tool">
