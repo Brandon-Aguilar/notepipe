@@ -155,3 +155,9 @@ class NewpagesInserted(response):
         self.__type__ = self.__class__.__name__
         self.insertIndex = insertIndex
         self.message = "New page Inserted"
+
+
+class endHighlightStroke(response):
+    def __init__(self) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__

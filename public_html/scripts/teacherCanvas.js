@@ -19,9 +19,8 @@ console.log("Connected to Websocket");
 
 // Copied canvas code
 // create canvas element and append it to document body
-var canvas = document.createElement('canvas');
-canvas.setAttribute("id", "drawingCanvas");
-document.body.appendChild(canvas);
+var canvas = document.getElementById("drawingCanvas")
+var highlightCanvas = document.getElementById("highlightCanvas");
 
 //grabs the undo button and creates an event if it is clicked
 const testButton = document.getElementById("undo");
@@ -30,9 +29,11 @@ testButton.addEventListener('click', undo);
 // some hotfixes... ( ≖_≖)
 document.body.style.margin = 0;
 canvas.style.position = 'absolute';
+highlightCanvas.style.opacity = 0.5;
 
 // get canvas 2D ctx and set him correct size
 var ctx = canvas.getContext('2d');
+var highlightCtx = highlightCanvas.getContext('2d');
 
 // Make our in-memory canvas stack for undos
 var canvasStack = [canvas];
@@ -41,19 +42,24 @@ var undoHasBeenDone = false;
 
 var highlightDraw = false;
 
-resize();
+var minCanvasHeight = 1080;
+var minCanvasWidth = 2160;
+
+ctx.canvas.width = Math.max(window.innerWidth, minCanvasWidth);
+ctx.canvas.height = Math.max(window.innerHeight, minCanvasHeight);
+highlightCtx.canvas.width = Math.max(window.innerWidth, minCanvasWidth);
+highlightCtx.canvas.height = Math.max(window.innerHeight, minCanvasHeight);
 
 // last known position
 var pos = { x: 0, y: 0 };
 
 var sentImage = false;
 
-//window.addEventListener('resize', resize);
-var drawCanvas=document.getElementById("drawingCanvas");
-drawCanvas.addEventListener('pointermove', move, {capture: true, });
+window.addEventListener('resize', resize);
+highlightCanvas.addEventListener('pointermove', move, {capture: true, });
 
 // Release mouse capture when not touching screen
-drawCanvas.addEventListener('pointerup', (e) => {
+highlightCanvas.addEventListener('pointerup', (e) => {
     isPointerDown = false;
     lastPoint = undefined;
     if(sentImage == false) {
@@ -62,7 +68,7 @@ drawCanvas.addEventListener('pointerup', (e) => {
         
     }
 }, {capture: true, });
-drawCanvas.addEventListener('pointercancel', (e) => {
+highlightCanvas.addEventListener('pointercancel', (e) => {
     isPointerDown = false;
     lastPoint = undefined;
     if(sentImage == false) {
@@ -70,7 +76,7 @@ drawCanvas.addEventListener('pointercancel', (e) => {
         sentImage = true;
     }
 }, {capture: true, });
-drawCanvas.addEventListener('pointerenter', (e) => {
+highlightCanvas.addEventListener('pointerenter', (e) => {
     isPointerDown = false;
     lastPoint = undefined;
     if(sentImage == false) {
@@ -79,7 +85,7 @@ drawCanvas.addEventListener('pointerenter', (e) => {
     }
 }, {capture: true, });
 // Disable panning, touch doesn't work if it is on
-canvas.style.touchAction = 'none';
+highlightCanvas.style.touchAction = 'none';
 
 // Listen for websocket messages and when initialization finished
 websocket.addEventListener('message', processMessage);
@@ -349,33 +355,43 @@ function changeColor(newColor) {
     ctx.globalCompositeOperation = 'source-over';
   };
 
-  // Eraser
-function eraser(){
+// Eraser
+function eraser() {
     eraserState = true;
+    highlightDraw = false;
     // Erasing by using destination image to be on top of the drawn image in source image
-   // ctx.globalCompositeOperation = "destination-out";
+    // ctx.globalCompositeOperation = "destination-out";
     console.log("Image erased: ", pageNumber)
 };
 
 
-function draw(data) {
-    ctx.strokeStyle = data.color;//original default stroke color 
-    ctx.globalAlpha = 1;
-    ctx.lineWidth = data.force;//stroke width
-    ctx.lineCap = 'round';
-
-    if (highlightDraw) {ctx.globalCompositeOperation = "overlay"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 0.8; ctx.lineWidth = 40;}
-    else if (data.eraserState) ctx.globalCompositeOperation = "destination-out";
-    else ctx.globalCompositeOperation = "source-over";
-
-    ctx.beginPath();
-    ctx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
-    ctx.lineTo(data.x, data.y);//add a straight line from last point to current point
-    ctx.stroke();//outlines the current or given path with the current stroke style
-    ctx.globalCompositeOperation = "source-over";
-}
-function startHighlight(){
+function startHighlight() {
     highlightDraw = true;
+    eraserState = false;
+}
+
+var currentlyHighlighting = false;
+
+function draw(data) {
+    var currentCtx = ctx;
+    if (data.highlightDraw) {
+        currentlyHighlighting = true;
+        currentCtx = highlightCtx;
+    }
+    currentCtx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
+    currentCtx.strokeStyle = data.color;//original default stroke color 
+    currentCtx.lineWidth = data.force;//stroke width
+    currentCtx.lineCap = 'round';
+    if (data.highlightDraw) {
+        currentCtx.globalCompositeOperation = "multiply"; currentCtx.strokeStyle = "#FF0"; currentCtx.globalAlpha = 0.8; currentCtx.lineWidth = 40;
+    }
+
+    currentCtx.beginPath();
+    currentCtx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
+    currentCtx.lineTo(data.x, data.y);//add a straight line from last point to current point
+
+    currentCtx.stroke();//outlines the current or given path with the current stroke style
+    currentCtx.globalCompositeOperation = "source-over";
 }
 
 function move(e) {
@@ -400,7 +416,8 @@ function move(e) {
             y: e.offsetY,//y-coordinate of the mouse pointer relative to the document
             force: force,
             color: color || 'green',
-            eraserState
+            eraserState,
+            highlightDraw
         });
 
         drawData = JSON.stringify({
@@ -422,8 +439,26 @@ function move(e) {
 
         lastPoint = { x: e.offsetX, y: e.offsetY };//update lastPoint to be the stroke we just processed 
     } else {
+        if(highlightDraw && currentlyHighlighting){
+            // Send a message that draw has ended, should trigger highlight to be drawn onto canvas
+            websocket.send(JSON.stringify({
+                type: "endHighlightStroke"
+            }))
+            layerHighlightCanvas();
+            currentlyHighlighting = false;
+        }
         lastPoint = undefined;//mouse button has been released, this will trigger sendStroke so reset lastpoint
     }
+}
+
+function layerHighlightCanvas(){
+    ctx.globalAlpha = 0.5;
+    //ctx.globalCompositeOperation = "multiply";
+    ctx.drawImage(highlightCanvas, 0, 0);
+    ctx.globalAlpha = 1;
+    //ctx.globalCompositeOperation = "source-over";
+    highlightCtx.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
+    sendUpdate();
 }
 
 // Initialize connection to host

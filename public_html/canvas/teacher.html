@@ -169,7 +169,7 @@
           </script>
         <br>
         -->
-
+        </div> 
         <div id="slider-div" class="slider-menu">
           <div id="container" class="slider-container">
             <input onchange='changeWidth(this.value)' type="range" min="1" max="40" value="2">
@@ -306,7 +306,10 @@
         <div id="Users"></div>
       </div>
       --> 
-      
+      <div style="position: relative;">
+        <canvas id="drawingCanvas" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+        <canvas id="highlightCanvas" style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+      </div>
     </body>
 
 </html>
