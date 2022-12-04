@@ -893,9 +893,13 @@ function renderPages(pdf_file) {
                 canvasContext: ctx,
                 viewport: viewport
             });
-            pageRender.promise.then(function () {
-                sendDrawUpdate();
-                newpage();
+            pageRender.promise.then(async function () {
+                sendUpdate();
+                var imageURL = canvas.toDataURL("image/png", 0.2);
+                localImages[viewingPageNumber] = imageURL;
+                if(pdf_page < pdf_file.numPages){
+                    newpage();
+                }
                 pdf_page++;
                 renderPages(pdf_file);
             });
@@ -906,5 +910,9 @@ function renderPages(pdf_file) {
 function uploadPDF(pdf_file) {
     console.log("inside uploadPDF function. number of pages in pdf: " + pdf_file.numPages);
     pdf_page = 1;
+    var imageURL = canvas.toDataURL("image/png", 0.2);
+    localImages[viewingPageNumber] = imageURL;
+    newpage();
     renderPages(pdf_file);
+    document.getElementById("upload").value = "";
 }
