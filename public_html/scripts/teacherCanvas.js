@@ -188,8 +188,8 @@ function newpage(){
         }
         websocket.send(JSON.stringify(message));
         //clear the current page
-        width = window.innerWidth;
-        height = window.innerHeight;  
+        width = canvas.width;
+        height = canvas.height;  
         ctx.clearRect(0, 0, width, height);
         
 
@@ -207,8 +207,8 @@ function newpage(){
         console.log("Adding new page number: ",pageNumber)
         var imageURL = canvas.toDataURL("image/png", 0.2);
  
-        width = window.innerWidth;
-        height = window.innerHeight;  
+        width = canvas.width;
+        height = canvas.height;  
         ctx.clearRect(0, 0, width, height);
 
         var message = {
@@ -285,8 +285,8 @@ function reset(){
     }
     websocket.send(JSON.stringify(message));
     //clear the current page
-    width = window.innerWidth;
-    height = window.innerHeight;  
+    width = canvas.width;
+    height = canvas.height;  
     ctx.clearRect(0, 0, width, height);
     imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image  
 
@@ -578,8 +578,8 @@ previousPageElement.addEventListener('click', function (){
 function navigateToPage(pageWanted){
     if(pageWanted>=0 && pageWanted<=pageNumber){
         //clear the current page
-        width = window.innerWidth;
-        height = window.innerHeight;  
+        width = canvas.width;
+        height = canvas.height;  
         ctx.clearRect(0, 0, width, height);
 
         image.src=localImages[pageWanted]
@@ -888,7 +888,7 @@ function renderPages(pdf_file) {
     if (pdf_page <= pdf_file.numPages) {
         var viewport;
         pdf_file.getPage(pdf_page).then(page => {
-            viewport = page.getViewport({scale: 1, rotation: 360});
+            viewport = page.getViewport({ scale: canvas.height / page.getViewport({ scale: 1 }).height });
             var pageRender = page.render({
                 canvasContext: ctx,
                 viewport: viewport

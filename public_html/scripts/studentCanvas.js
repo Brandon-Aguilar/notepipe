@@ -580,8 +580,8 @@ function processMessage({ data }) {
             break;
         case "pageFetched":
             //clear the current page
-            width = window.innerWidth;
-            height = window.innerHeight;  
+            width = canvas.width;
+            height = canvas.height;  
             ctx.clearRect(0, 0, width, height);
 
             //load requested page
