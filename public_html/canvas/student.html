@@ -41,6 +41,36 @@
                 <img class="reset-page-icon" src="../icons/reset-btn.svg" alt="Reset Page">
               </button>
             </div>
+            <div class="upload-button">
+              <button id="uploadFile">
+                <img class="upload-icon" src="../icons/upload-icon.svg" alt="Upload File">
+              </button>
+            </div>
+            <!--my changes-->
+            <div class="header-right-dropdown">
+              <button class="users-button">
+                <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
+              </button>
+              <div class="header-right-dropdown-content">
+                <p>
+                  <input type="button" name="name" value="Update Name" onclick="showEditName()" />
+                  <input class="hide" type="text" id="nameTextBox">
+                  <button class="hide" id="updateName" onclick="hideEditName()">Submit</button>
+                </p>
+              </div>
+            </div>
+            <div>
+              <input id="showUserList" type="checkbox" />
+              <label for="showUserList">Show Users</label>
+              <div class="panel-wrap">
+                <div class="panel">
+                  <div class="list" id="userList">
+                    <div id="Users"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--end my changes-->
           </div>
 
           <div class="header-right">
@@ -149,7 +179,7 @@
       <!-- Place experimental features/buttons here -->
       <div class="feature-testing">
               <!-- temporary solution using checkbox. Implement using button instead -->
-              <div>
+             <!-- <div>
                 <input id="showUserList" type="checkbox" />
                 <label for="showUserList">Userlist</label>
                 <div class="panel-wrap">
@@ -159,17 +189,18 @@
                     </div>
                 </div>
               </div>
-            </div>
+              </div>-->
              <!-- TODO: FIX THIS!!!! NEEDED FOR JAVASCRIPT TEMPORARILY PUTTING HERE-->
               <div class="temporaryfixsomeonefixthislater">
+                
                 <input type="checkbox" id="drawAnimationsCheckbox" checked>
                 <label for="drawAnimationsCheckbox">Enable Animations</label>
                 
-                <!--Update Name-->
+                <!--Update Name
                 <input type="button" name="name" value="Update Name" onclick="showEditName()" />
                 <input class="hide" type="text" id="nameTextBox">
                 <button class="hide" id="updateName" onclick="hideEditName()">Submit</button>
-                <!--End Update Name-->
+                End Update Name-->
               </div>
               <div class="text-to-speech-controls">
                 <button id="editNote">Edit Note</button>

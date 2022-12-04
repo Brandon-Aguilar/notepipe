@@ -685,10 +685,12 @@ input[type="button"], #updateName{
   border-style: none;
   color:white;
   background-color: transparent;
+  z-index: 300;
 }
 #updateName{
   font-family: Arial, Helvetica, sans-serif;
   font-size: small;
   background-color: #3498DB;
   margin-top: 5px;
+  z-index: 300;
 }
