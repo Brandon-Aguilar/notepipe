@@ -56,7 +56,7 @@ resize();
 highlightCanvas.addEventListener('pointermove', move, { capture: true, });
 
 var sentImage = false;
-var allowDraw = true;
+var allowDraw = false;
 
 // Release mouse capture when not touching screen
 highlightCanvas.addEventListener('pointerup', (e) => {
@@ -84,7 +84,7 @@ highlightCanvas.addEventListener('pointerenter', (e) => {
     }
 }, { capture: true, });
 // Disable panning, touch doesn't work if it is on
-highlightCanvas.style.touchAction = 'none';
+highlightCanvas.style.touchAction = 'manipulation';
 highlightCanvas.style.opacity = 0.5;
 
 //Fetch HTML elements that need event listners
@@ -905,7 +905,7 @@ function finishAnimations() {
 
 function disableTouch() {
     if(highlightCanvas.style.touchAction == "none"){
-        highlightCanvas.style.touchAction = "pan-x pan-y";
+        highlightCanvas.style.touchAction = "manipulation";
         allowDraw = false;
     } else{
         highlightCanvas.style.touchAction = "none";

@@ -105,8 +105,8 @@ highlightCanvas.addEventListener('pointerenter', (e) => {
         sentImage = true;
     }
 }, {capture: true, });
-// Disable panning, touch doesn't work if it is on
-highlightCanvas.style.touchAction = 'none';
+
+highlightCanvas.style.touchAction = "manipulation";
 
 // Listen for websocket messages and when initialization finished
 websocket.addEventListener('message', processMessage);
@@ -296,7 +296,7 @@ var force = 1;//marker thickness
 var color = "red";//marker color
 var drawInstructions = [];
 var markerWidth = 5;
-var allowDraw = true;
+var allowDraw = false;
 
 var isPointerDown = false;
 
@@ -923,7 +923,7 @@ function uploadPDF(pdf_file) {
 
 function disableTouch() {
     if (highlightCanvas.style.touchAction == "none") {
-        highlightCanvas.style.touchAction = "pan-x pan-y";
+        highlightCanvas.style.touchAction = "manipulation";
         allowDraw = false;
     } else {
         highlightCanvas.style.touchAction = "none";
