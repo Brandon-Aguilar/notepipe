@@ -506,12 +506,12 @@ function processMessage({ data }) {
             console.log("Successfully initialized Student");
             image.src = event.imageURL;
             image.onload = function() {//wait for image to load before trying to draw to canvas
-                canvas.height = image.height;
-                canvas.width = image.width;
-                studentCtx.canvas.width = image.width;
-                studentCtx.canvas.height = image.height;
-                highlightCtx.canvas.width = image.width;
-                highlightCtx.canvas.height = image.height;
+                canvas.height = Math.max(window.innerWidth, image.width);
+                canvas.width = Math.max(window.innerHeight, image.height);       
+                studentCtx.canvas.width = Math.max(window.innerWidth, image.width);
+                studentCtx.canvas.height = Math.max(window.innerHeight, image.height);
+                highlightCtx.canvas.width = Math.max(window.innerWidth, image.width);
+                highlightCtx.canvas.height = Math.max(window.innerHeight, image.height);
                 ctx.drawImage(image, 0, 0);
                 localImages[event.pageNumber] = event.imageURL;
                 viewingPageNumber=event.pageNumber;
