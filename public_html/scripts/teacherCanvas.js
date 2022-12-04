@@ -13,6 +13,7 @@ function getWebSocketServer() {
     }
 }
 
+
 // DO NOT LAUNCH THIS INTO A PROD ENVIRONMENT WITH "rejectUnauthorized: false"
 var websocket = new WebSocket(serverURL, "json");
 console.log("Connected to Websocket");
@@ -45,10 +46,6 @@ context_colors.fillRect(0, 0, width_colors, height_colors);
 // create canvas element and append it to document body
 var canvas = document.getElementById("drawingCanvas")
 var highlightCanvas = document.getElementById("highlightCanvas");
-
-//grabs the undo button and creates an event if it is clicked
-const testButton = document.getElementById("undo");
-testButton.addEventListener('click', undo);
 
 // some hotfixes... ( ≖_≖)
 document.body.style.margin = 0;
@@ -299,6 +296,7 @@ var force = 1;//marker thickness
 var color = "red";//marker color
 var drawInstructions = [];
 var markerWidth = 5;
+var allowDraw = true;
 
 var isPointerDown = false;
 
@@ -356,6 +354,7 @@ function sendUpdate() {
 
 // Change width of the marker based on input from a HTML slider
 function changeWidth(newWidth) {
+    enableTouch();
     markerWidth = newWidth;
     //eraserState= false;
     ctx.globalCompositeOperation = 'source-over';
@@ -382,6 +381,7 @@ function showColors() {
 
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
+    enableTouch();
     highlightDraw = false;
     color = newColor;
     eraserState= false;
@@ -389,6 +389,7 @@ function changeColor(newColor) {
   };
 
 canvas_colors.addEventListener('click', event => {
+    enableTouch();
     const rect = event.target.getBoundingClientRect();
     const x = event.clientX - rect.left; 
     const y = event.clientY - rect.top;
@@ -408,6 +409,7 @@ canvas_colors.addEventListener('click', event => {
 
 // Eraser
 function eraser() {
+    enableTouch();
     eraserState = true;
     highlightDraw = false;
     // Erasing by using destination image to be on top of the drawn image in source image
@@ -417,6 +419,7 @@ function eraser() {
 
 
 function startHighlight() {
+    enableTouch();
     highlightDraw = true;
     eraserState = false;
 }
@@ -455,7 +458,7 @@ function move(e) {
         force = markerWidth;
     }
     
-    if (e.buttons || isPointerDown) {
+    if ((e.buttons || isPointerDown) && allowDraw) {
         if (typeof lastPoint == 'undefined') {
             lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
             return;
@@ -916,4 +919,19 @@ function uploadPDF(pdf_file) {
     newpage();
     renderPages(pdf_file);
     document.getElementById("upload").value = "";
+}
+
+function disableTouch() {
+    if (highlightCanvas.style.touchAction == "none") {
+        highlightCanvas.style.touchAction = "manipulation";
+        allowDraw = false;
+    } else {
+        highlightCanvas.style.touchAction = "none";
+        allowDraw = true;
+    }
+}
+
+function enableTouch() {
+    highlightCanvas.style.touchAction = "none";
+    allowDraw = true;
 }

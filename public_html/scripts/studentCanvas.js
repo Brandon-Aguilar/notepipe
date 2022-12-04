@@ -17,6 +17,8 @@ if (window.location.host === "localhost:8080") {
     }
 }
 
+
+
 // connect to web socket
 // DO NOT LAUNCH THIS INTO A PROD ENVIRONMENT WITH "rejectUnauthorized: false"
 var websocket = new WebSocket(serverURL, "json");
@@ -54,6 +56,7 @@ resize();
 highlightCanvas.addEventListener('pointermove', move, { capture: true, });
 
 var sentImage = false;
+var allowDraw = true;
 
 // Release mouse capture when not touching screen
 highlightCanvas.addEventListener('pointerup', (e) => {
@@ -143,6 +146,7 @@ var highlightDraw = false;
 
 // Change width of the marker based on input from a HTML slider
 function changeWidth(newWidth) {
+    enableTouch();
     markerWidth = newWidth;
     //eraserState= false;
     ctx.globalCompositeOperation = 'source-over';
@@ -160,6 +164,7 @@ function showSlider() {
 
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
+    enableTouch();
     highlightDraw = false;
     color = newColor;
     eraserState = false;
@@ -167,12 +172,14 @@ function changeColor(newColor) {
 };
 
 function startHighlight() {
+    enableTouch();
     highlightDraw = true;
     eraserState = false;
 }
 
 // Eraser
 function eraser() {
+    enableTouch();
     eraserState = true;
     highlightDraw = false;
     // Erasing by using destination image to be on top of the drawn image in source image
@@ -190,7 +197,7 @@ function move(e) {
         force = markerWidth;
     }
 
-    if (e.buttons || isPointerDown) {
+    if ((e.buttons || isPointerDown) && allowDraw) {
         if (typeof lastPoint == 'undefined') {
             lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
             return;
@@ -894,4 +901,19 @@ function finishAnimations() {
     });
     currentDrawInstructions = [];
     currentInstructionIndex = 0;
+}
+
+function disableTouch() {
+    if(highlightCanvas.style.touchAction == "none"){
+        highlightCanvas.style.touchAction = "manipulation";
+        allowDraw = false;
+    } else{
+        highlightCanvas.style.touchAction = "none";
+        allowDraw = true;
+    }
+}
+
+function enableTouch() {
+    highlightCanvas.style.touchAction = "none";
+    allowDraw = true;
 }
