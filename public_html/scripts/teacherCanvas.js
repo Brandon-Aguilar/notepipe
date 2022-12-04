@@ -923,7 +923,7 @@ function uploadPDF(pdf_file) {
 
 function disableTouch() {
     if (highlightCanvas.style.touchAction == "none") {
-        highlightCanvas.style.touchAction = "manipulation";
+        highlightCanvas.style.touchAction = "pan-x pan-y";
         allowDraw = false;
     } else {
         highlightCanvas.style.touchAction = "none";
