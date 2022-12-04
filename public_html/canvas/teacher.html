@@ -45,15 +45,34 @@
               </button>
             </div>
             <div class="upload-button">
-              <button>
+              <button id="uploadFile">
                 <img class="upload-icon" src="../icons/upload-icon.svg" alt="Upload File">
               </button>
             </div>
-            <div class="header-right-user-dropdown">
+            <div class="header-right-dropdown">
               <button class="users-button">
                 <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
               </button>
+              <div class="header-right-dropdown-content">
+                <p>
+                  <input type="button" name="name" value="Update Name" onclick="showEditName()" />
+                  <input class="hide" type="text" id="nameTextBox">
+                  <button class="hide" id="updateName" onclick="hideEditName()">Submit</button>
+                </p>
+              </div>
             </div>
+            <div>
+              <input id="showUserList" type="checkbox" />
+              <label for="showUserList">Show Users</label>
+              <div class="panel-wrap">
+                <div class="panel">
+                  <div class="list" id="userList">
+                    <div id="Users"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
           </div>
 
 
@@ -236,9 +255,10 @@
       <div class="feature-testing">
 
         <!--TODO: FIX THIS RESTORING THESE BUTTONS FOR NOW-->
+      
         <div class="TMPFIXFIXTHIS">
           <!-- temporary solution using checkbox. Implement using button instead -->
-          <div>
+         <!-- <div>
             <input id="showUserList" type="checkbox" />
             <label for="showUserList">Userlist</label>
             <div class="panel-wrap">
@@ -246,18 +266,20 @@
                 <div class="list" id="userList">
                   <div id="Users"></div>
                 </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </div>-->
 
           <!-- <button id="newpage">NewPage</button> -->
           <!-- <button id="reset">Reset</button> -->
           <!-- <button id="zipFolder">ZipFolder</button>
           <button id="download">Download</button> -->
           <!--Update Name-->
+          <!--
           <input type="button" name="name" value="Update Name" onclick="showEditName()" />
           <input class="hide" type="text" id="nameTextBox">
           <button class="hide" id="updateName" onclick="hideEditName()">Submit</button>
+          -->
           <!--End Update Name-->
           <input type="file" id="upload" onchange="interpretFile()">
         </div>

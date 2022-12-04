@@ -43,6 +43,7 @@
   
   /* Change color of dropdown links on hover */
   .dropdown-content a:hover {background-color: #ddd;}
+
   
   /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
   .show {display:block;}
@@ -63,6 +64,7 @@
   .header-middle button:active{
     opacity: .75;
   }
+  
   
   button:hover{
     cursor: pointer;
@@ -86,8 +88,21 @@
   .header-middle{
     display: flex;
   }
-
-  .header-middle button {
+  
+/*
+  .header-middle button:not(#updateName) {
+    height: 40px;
+    width: 40px;
+    border-radius: 20px;
+    border: none;
+    background-color: #323336;
+    margin-right: 5px;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }*/
+  #previousPage, #nextPage, #newpage, #reset, #uploadFile, .users-button {
     height: 40px;
     width: 40px;
     border-radius: 20px;
@@ -99,7 +114,6 @@
     align-items: center;
     justify-content: center;
   }
-
   .page-navigation-bar button{
     height: 32px;
     width: 32px;
@@ -120,9 +134,11 @@
     align-content: space-between;
     justify-content: space-between;
     width: 200px;
-    height: 40px;
+    height: 45px;
     border-radius: 20px;
     margin-right: 5px;
+    /*test*/
+    margin-left:80px;
   }
   
   .current-page-counter{
@@ -219,6 +235,7 @@
     background-color: #555;
     cursor: pointer;
   }
+  
   .header-right-dropdown:hover button{opacity: .75;}
 
   .overlay {
@@ -644,3 +661,30 @@ for simplicity
 /* [type="button"]:active ~ .panel-wrap {
   transform: translateX(0%);
 } */
+
+input[type="checkbox"]{
+  margin-left: 80px;
+}
+input[type="checkbox"] + label{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: small;
+  font-weight: lighter;
+  color: white;
+  background-color: transparent;
+  z-index: 101;
+}
+
+input[type="button"], #updateName{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: small;
+  font-weight: lighter;
+  border-style: none;
+  color:white;
+  background-color: transparent;
+}
+#updateName{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: small;
+  background-color: #3498DB;
+  margin-top: 5px;
+}
