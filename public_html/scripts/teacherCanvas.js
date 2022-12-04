@@ -514,8 +514,9 @@ function layerHighlightCanvas(){
 
 // Initialize connection to host
 function initializeHost() {
-    const event = { type: "initializeHost" };
+    const event = { type: "initializeHost"};
     websocket.send(JSON.stringify(event))
+    sendUpdate();
 }
 
 const zipfolder = document.getElementById('zipFolder');
@@ -613,7 +614,7 @@ function processMessage({ data }) {
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
 
-            absoluteJoinLink = window.location.host + "/canvas/" + link;
+            absoluteJoinLink = "https://" + window.location.host + "/canvas/" + link;
             generateQRCode(absoluteJoinLink);
             break;
         case "fullUserList":

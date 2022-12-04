@@ -20,7 +20,6 @@ JOINED = {str: list}
 # studentKey: userList
 USERS = {str: userList}
 
-
 async def createStudentKey():
     studentKey = secrets.token_urlsafe(16)
     while studentKey in JOINED:

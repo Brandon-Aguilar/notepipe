@@ -495,6 +495,7 @@ showUserListElement.addEventListener('change', () => {
 var localUserListID=[]
 var localUserListName=[]
 var processHighlight = false;
+var absoluteJoinLink = "";
 
 // Handle valid messages sent to client
 function processMessage({ data }) {
@@ -505,6 +506,12 @@ function processMessage({ data }) {
             console.log("Successfully initialized Student");
             image.src = event.imageURL;
             image.onload = function() {//wait for image to load before trying to draw to canvas
+                canvas.height = image.height;
+                canvas.width = image.width;
+                studentCtx.canvas.width = image.width;
+                studentCtx.canvas.height = image.height;
+                highlightCtx.canvas.width = image.width;
+                highlightCtx.canvas.height = image.height;
                 ctx.drawImage(image, 0, 0);
                 localImages[event.pageNumber] = event.imageURL;
                 viewingPageNumber=event.pageNumber;
@@ -520,6 +527,8 @@ function processMessage({ data }) {
             drawInstructions = Array.from({length: pageNumber+1}, () => new Array());
             studentLocalImages = Array.from({ length: pageNumber + 1 }, () => "");
             createStudentName();
+
+            absoluteJoinLink = "https://" + window.location.host + "/canvas/" + link;
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
