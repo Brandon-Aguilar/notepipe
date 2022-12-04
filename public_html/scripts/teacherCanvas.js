@@ -434,7 +434,7 @@ function draw(data) {
     currentCtx.lineWidth = data.force;//stroke width
     currentCtx.lineCap = 'round';
     if (data.highlightDraw) {
-        currentCtx.globalCompositeOperation = "multiply"; currentCtx.strokeStyle = "#FF0"; currentCtx.globalAlpha = 0.8; currentCtx.lineWidth = 40;
+        currentCtx.globalCompositeOperation = "multiply"; currentCtx.strokeStyle = "#FF0"; currentCtx.globalAlpha = 1; currentCtx.lineWidth = 40;
     }
 
     currentCtx.beginPath();

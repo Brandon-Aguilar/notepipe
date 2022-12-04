@@ -388,7 +388,7 @@ function draw(data, ctx) {
     ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
     if(data.highlightDraw){
-        ctx.globalCompositeOperation = "multiply"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 0.8; ctx.lineWidth = 40;
+        ctx.globalCompositeOperation = "multiply"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 1; ctx.lineWidth = 40;
     }
 
     ctx.beginPath();
