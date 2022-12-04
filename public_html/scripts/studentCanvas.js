@@ -513,8 +513,8 @@ function processMessage({ data }) {
             console.log("Successfully initialized Student");
             image.src = event.imageURL;
             image.onload = function() {//wait for image to load before trying to draw to canvas
-                canvas.height = Math.max(window.innerWidth, image.width);
-                canvas.width = Math.max(window.innerHeight, image.height);       
+                canvas.width = Math.max(window.innerWidth, image.width);
+                canvas.height = Math.max(window.innerHeight, image.height);       
                 studentCtx.canvas.width = Math.max(window.innerWidth, image.width);
                 studentCtx.canvas.height = Math.max(window.innerHeight, image.height);
                 highlightCtx.canvas.width = Math.max(window.innerWidth, image.width);
@@ -603,6 +603,7 @@ function processMessage({ data }) {
             width = canvas.width;
             height = canvas.height;  
             ctx.clearRect(0, 0, width, height);
+            studentCtx.clearRect(0, 0, width, height);
 
             //load requested page
             image.src=event.imageURL
@@ -759,11 +760,13 @@ var drawInstructions=[[]]
 // This was nextOrPrevious, changing name to navigateToPage since we need this for future direct page navs and it more clearly represents what it is doing
 function navigateToPage(pageWanted){
     //acceptable range for pages to load
+    finishAnimations();
+    studentLocalImages[viewingPageNumber] = studentCanvas.toDataURL("image/png");
+    localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
     if(pageWanted>=0 && pageWanted<=pageNumber){
         //before loading previous/next page, store the current page in local array
-        finishAnimations();
-        studentLocalImages[viewingPageNumber] = studentCanvas.toDataURL("image/png");
-        localImages[viewingPageNumber]= canvas.toDataURL("image/png", 0.2);
+        
+        
         //check if page wanted has been stord locally (in case where student joins late it might not be)
         if(localImages[pageWanted]!=undefined){
             //clear the current page
