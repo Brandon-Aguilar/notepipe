@@ -7,6 +7,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         <script src="https://cdn.jsdelivr.net/g/filesaver.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.0.279/build/pdf.min.js"></script>
+        
         <title>NotePipe-Teacher</title>
     </head>
     <body>
@@ -45,9 +46,12 @@
               </button>
             </div>
             <div class="upload-button">
-              <button>
-                <img class="upload-icon" src="../icons/upload-icon.svg" alt="Upload File">
-              </button>
+                <button>
+                  <label for="upload">
+                    <img class="upload-icon" src="../icons/upload-icon.svg" alt="Upload File">
+                  </label>
+                </button>
+              <input type="file" id="upload" onchange="interpretFile()">
             </div>
             <div class="header-right-user-dropdown">
               <button class="users-button">
@@ -259,7 +263,7 @@
           <input class="hide" type="text" id="nameTextBox">
           <button class="hide" id="updateName" onclick="hideEditName()">Submit</button>
           <!--End Update Name-->
-          <input type="file" id="upload" onchange="interpretFile()">
+          
         </div>
 
         <!-- below script is for file upload -->
