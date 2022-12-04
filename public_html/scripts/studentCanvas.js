@@ -122,11 +122,11 @@ function sendStudentDrawUpdate() {
 
     websocket.send(JSON.stringify({//send array containing x,y corrdinate of strokes
         type: 'canvasStudentDrawUpdate',
-        drawData: drawInstructions,
+        drawData: studentSendDrawInstructions,
         page: viewingPageNumber,
         requestER: eraserState
     }));
-    drawInstructions = [];//reset the array for next use
+    studentSendDrawInstructions = [];//reset the array for next use
     console.log("Sent Batch Draw Update");
 }
 
@@ -134,7 +134,7 @@ function sendStudentDrawUpdate() {
 var lastPoint = undefined;
 var force = 1;//marker thickness
 var color = "red";//marker color
-var drawInstructions = [];
+var studentSendDrawInstructions = [];
 var markerWidth = 5;
 
 var isPointerDown = false;
@@ -219,8 +219,8 @@ function move(e) {
             highlightDraw
         });
 
-        drawInstructions.push(drawData);//store drawData in drawInstructions
-        if (drawInstructions.length >= 100) {//when drawInstruction has 100 entries, send the array
+        studentSendDrawInstructions.push(drawData);//store drawData in drawInstructions
+        if (studentSendDrawInstructions.length >= 100) {//when drawInstruction has 100 entries, send the array
             sendStudentDrawUpdate();
         } else {
             sentImage = false;
@@ -424,18 +424,21 @@ function downloadbutton(e) {
 const zipfolder = document.getElementById('zipFolder');
 zipfolder.addEventListener('click', zipFolderbutton);
 
+var zipImages = [];
+
+async function mergeStudentAndLocal(i) {
+    zipImages[i] = await mergeImages([localImages[i], studentLocalImages[i]]);
+}
+
 //Download a zip folder
-function zipFolderbutton(e) {  
+async function zipFolderbutton(e) {  
     for(let i = 0; i <= pageNumber; i++){
-        if(localImages[i]==undefined || pageNumber){
-            console.log("Image not stored locally, fetch from redis", i)
-            const request = { type: "fetchImage", pageNumber:i, studentKey: studentKey};
-            websocket.send(JSON.stringify(request))
-        }
-       else{
-            arrayBuffr();
-       }
+        studentLocalImages[i] = studentCanvas.toDataURL("image/png");
+        console.log("Image not stored locally, fetch from redis", i)
+        const request = { type: "fetchImage", pageNumber:i, studentKey: studentKey};
+        websocket.send(JSON.stringify(request))
     }
+
 }
     
 function arrayBuffr(){ 
@@ -456,7 +459,7 @@ function arrayBuffr(){
 
     (function load() {
         if (index <= pageNumber) {
-            Buffer(localImages[index++], function(buffer, url) {
+            Buffer(zipImages[index++], function(buffer, url) {
                 zip.file(index+"page.png", buffer); 
                 load(); 
             })
@@ -593,7 +596,12 @@ function processMessage({ data }) {
             break;
         case "imageFetched":
             localImages[event.pageNumber] = event.imageURL
-            if(localImages.length-1 == event.pageNumber){
+            if(studentLocalImages[event.pageNumber] == ""){
+                zipImages[event.pageNumber] = localImages[event.pageNumber];
+            } else { 
+                mergeStudentAndLocal(event.pageNumber); 
+            }
+            if(pageNumber == event.pageNumber){
                 arrayBuffr();
             }
             break;
