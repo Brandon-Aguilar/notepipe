@@ -88,7 +88,7 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "retrieveUserList":
                 await users.fullUserList(websocket)
             case "updateUserPermission":
-                users.updateUserPermissions(messageJSON["id"], messageJSON["allowBroadcast"])
+                users.updateUserPermissions(messageJSON["id"], messageJSON["allowBroadcast"], JOINED[studentKey])
             case "endHighlightStroke":
                 websockets.broadcast(JOINED[studentKey], endHighlightStroke().toJson())
 

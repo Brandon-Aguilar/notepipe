@@ -122,11 +122,11 @@ function sendStudentDrawUpdate() {
 
     websocket.send(JSON.stringify({//send array containing x,y corrdinate of strokes
         type: 'canvasStudentDrawUpdate',
-        drawData: drawInstructions,
+        drawData: studentSendDrawInstructions,
         page: viewingPageNumber,
         requestER: eraserState
     }));
-    drawInstructions = [];//reset the array for next use
+    studentSendDrawInstructions = [];//reset the array for next use
     console.log("Sent Batch Draw Update");
 }
 
@@ -134,7 +134,7 @@ function sendStudentDrawUpdate() {
 var lastPoint = undefined;
 var force = 1;//marker thickness
 var color = "red";//marker color
-var drawInstructions = [];
+var studentSendDrawInstructions = [];
 var markerWidth = 5;
 
 var isPointerDown = false;
@@ -219,8 +219,8 @@ function move(e) {
             highlightDraw
         });
 
-        drawInstructions.push(drawData);//store drawData in drawInstructions
-        if (drawInstructions.length >= 100) {//when drawInstruction has 100 entries, send the array
+        studentSendDrawInstructions.push(drawData);//store drawData in drawInstructions
+        if (studentSendDrawInstructions.length >= 100) {//when drawInstruction has 100 entries, send the array
             sendStudentDrawUpdate();
         } else {
             sentImage = false;
@@ -388,7 +388,7 @@ function draw(data, ctx) {
     ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
     if(data.highlightDraw){
-        ctx.globalCompositeOperation = "multiply"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 0.8; ctx.lineWidth = 40;
+        ctx.globalCompositeOperation = "multiply"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 1; ctx.lineWidth = 40;
     }
 
     ctx.beginPath();
@@ -424,18 +424,21 @@ function downloadbutton(e) {
 const zipfolder = document.getElementById('zipFolder');
 zipfolder.addEventListener('click', zipFolderbutton);
 
+var zipImages = [];
+
+async function mergeStudentAndLocal(i) {
+    zipImages[i] = await mergeImages([localImages[i], studentLocalImages[i]]);
+}
+
 //Download a zip folder
-function zipFolderbutton(e) {  
+async function zipFolderbutton(e) {  
     for(let i = 0; i <= pageNumber; i++){
-        if(localImages[i]==undefined || pageNumber){
-            console.log("Image not stored locally, fetch from redis", i)
-            const request = { type: "fetchImage", pageNumber:i, studentKey: studentKey};
-            websocket.send(JSON.stringify(request))
-        }
-       else{
-            arrayBuffr();
-       }
+        studentLocalImages[i] = studentCanvas.toDataURL("image/png");
+        console.log("Image not stored locally, fetch from redis", i)
+        const request = { type: "fetchImage", pageNumber:i, studentKey: studentKey};
+        websocket.send(JSON.stringify(request))
     }
+
 }
     
 function arrayBuffr(){ 
@@ -456,7 +459,7 @@ function arrayBuffr(){
 
     (function load() {
         if (index <= pageNumber) {
-            Buffer(localImages[index++], function(buffer, url) {
+            Buffer(zipImages[index++], function(buffer, url) {
                 zip.file(index+"page.png", buffer); 
                 load(); 
             })
@@ -538,14 +541,7 @@ function processMessage({ data }) {
             break;
         case "clearpage":
             // cancel all the current animations and draw them instantly
-            cancelAllAnimationFrames();
-            currentDrawInstructions.splice(0, currentInstructionIndex);
-            currentDrawInstructions.forEach((element) => {//loop through each value
-                element = JSON.parse(element);
-                draw(element, ctx);//just output the stroke 
-            });
-            currentDrawInstructions = [];
-            currentInstructionIndex = 0;
+            finishAnimations();
 
             //clear page fixed
             width = canvas.width;
@@ -600,7 +596,12 @@ function processMessage({ data }) {
             break;
         case "imageFetched":
             localImages[event.pageNumber] = event.imageURL
-            if(localImages.length-1 == event.pageNumber){
+            if(studentLocalImages[event.pageNumber] == ""){
+                zipImages[event.pageNumber] = localImages[event.pageNumber];
+            } else { 
+                mergeStudentAndLocal(event.pageNumber); 
+            }
+            if(pageNumber == event.pageNumber){
                 arrayBuffr();
             }
             break;
@@ -621,7 +622,9 @@ function processMessage({ data }) {
             newObj = JSON.parse(event.names);
             var tmpContent = "";
             for (const [key, value] of Object.entries(newObj)) {
-                tmpContent= "<h4 id='"+value.id+"'> "+value.name+"</h4>"   
+                tmpContent= "<h4 id='"+value.id+"'> "+value.name+"</h4>"  
+                // if(value.canBroadcast)
+                //     tmpContent += " <button id='"+value.id+"' class='activeButton'> Broadcasting</button>"
                 if(localUserListID.length == 0)
                     document.getElementById("Users").insertAdjacentHTML("afterend", tmpContent);
                 else{
@@ -635,6 +638,8 @@ function processMessage({ data }) {
             case "removeUserFromList":
                 if(showUserListBool){
                     document.getElementById(event.id).remove()
+                    document.getElementById(event.id).remove()//delete the button
+
                     //update local arrays
                     found = localUserListID.findIndex(element => element == event.id);
                     localUserListID.splice(found,1)
@@ -689,7 +694,17 @@ function processMessage({ data }) {
                 break
             case "endHighlightStroke":
                 processHighlight = true;
-    }   
+                break;
+            // case "updateUserPermissions":
+            //     if(!event.canBroadcast){
+            //         document.getElementById(event.id).getElementsByClassName("activeButton").getremove()//delete the button
+            //     }
+            //     else{
+            //         tmpContent = " <button id='"+event.id+"' class='activeButton'> Broadcasting</button>"  
+            //         document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
+            //     }
+            //     break;
+            }   
 }
 
 function getUserlist(){
@@ -726,6 +741,7 @@ function navigateToPage(pageWanted){
     //acceptable range for pages to load
     if(pageWanted>=0 && pageWanted<=pageNumber){
         //before loading previous/next page, store the current page in local array
+        finishAnimations();
         studentLocalImages[viewingPageNumber] = studentCanvas.toDataURL("image/png");
         localImages[viewingPageNumber]= canvas.toDataURL("image/png", 0.2);
         //check if page wanted has been stord locally (in case where student joins late it might not be)
@@ -854,4 +870,15 @@ function copyJoinKey() {
 
     var tooltip = document.getElementById("myTooltip");
     tooltip.innerHTML = "Copied";
+}
+
+function finishAnimations() {
+    cancelAllAnimationFrames();
+    currentDrawInstructions.splice(0, currentInstructionIndex);
+    currentDrawInstructions.forEach((element) => {//loop through each value
+        element = JSON.parse(element);
+        draw(element, ctx);//just output the stroke 
+    });
+    currentDrawInstructions = [];
+    currentInstructionIndex = 0;
 }

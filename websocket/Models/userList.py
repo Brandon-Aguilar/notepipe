@@ -80,7 +80,7 @@ class userList:
         websockets.broadcast(connected, broadcast.toJson())
 
 
-    def updateUserPermissions(self, id:str, canBroadcast: bool):
+    def updateUserPermissions(self, id:str, canBroadcast: bool, connected):
         """Update the write permission of a user by id"""
 
         log.info("Updating id %s with permission %s", id, canBroadcast)
@@ -90,6 +90,11 @@ class userList:
             self.users[uuid.UUID(id)].canBroadcast = canBroadcast
         except Exception as e:
             log.warn("Failed to update permission of id %s, %s", id, e)
+        # broadcast= updateUserPermissions()
+        # broadcast.id= id
+        # broadcast.canBroadcast = canBroadcast
+        # websockets.broadcast(connected, broadcast.toJson())
+
 
     def toJson(self) -> str:
         return jsonpickle.encode(self, unpicklable=False)
