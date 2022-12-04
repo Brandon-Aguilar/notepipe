@@ -538,14 +538,7 @@ function processMessage({ data }) {
             break;
         case "clearpage":
             // cancel all the current animations and draw them instantly
-            cancelAllAnimationFrames();
-            currentDrawInstructions.splice(0, currentInstructionIndex);
-            currentDrawInstructions.forEach((element) => {//loop through each value
-                element = JSON.parse(element);
-                draw(element, ctx);//just output the stroke 
-            });
-            currentDrawInstructions = [];
-            currentInstructionIndex = 0;
+            finishAnimations();
 
             //clear page fixed
             width = canvas.width;
@@ -740,6 +733,7 @@ function navigateToPage(pageWanted){
     //acceptable range for pages to load
     if(pageWanted>=0 && pageWanted<=pageNumber){
         //before loading previous/next page, store the current page in local array
+        finishAnimations();
         studentLocalImages[viewingPageNumber] = studentCanvas.toDataURL("image/png");
         localImages[viewingPageNumber]= canvas.toDataURL("image/png", 0.2);
         //check if page wanted has been stord locally (in case where student joins late it might not be)
@@ -868,4 +862,15 @@ function copyJoinKey() {
 
     var tooltip = document.getElementById("myTooltip");
     tooltip.innerHTML = "Copied";
+}
+
+function finishAnimations() {
+    cancelAllAnimationFrames();
+    currentDrawInstructions.splice(0, currentInstructionIndex);
+    currentDrawInstructions.forEach((element) => {//loop through each value
+        element = JSON.parse(element);
+        draw(element, ctx);//just output the stroke 
+    });
+    currentDrawInstructions = [];
+    currentInstructionIndex = 0;
 }
