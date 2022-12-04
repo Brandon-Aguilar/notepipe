@@ -51,7 +51,7 @@
   .header{
     display: flex;
     justify-content: space-between;
-    position: absolute;
+    position: fixed;
     top: 0px;
     left: 0px;
     right: 0px;
@@ -697,4 +697,24 @@ input[type="button"], #updateName{
 
 #textEditor {
   z-index: 3;
+}
+
+@media only screen and (max-width: 800px) {
+  .header {
+    zoom: 2;
+  }
+
+  .left-sidebar {
+    zoom: 2;
+  }
+}
+
+@media only screen and (max-width: 300px) {
+  .header {
+    zoom: 1.7;
+  }
+
+  .left-sidebar {
+    zoom: 2;
+  }
 }
