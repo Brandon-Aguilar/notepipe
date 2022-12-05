@@ -60,6 +60,7 @@ async def canvasDrawUpdate(websocket, messageJSON, connected, studentKey: str):
     broadcast.drawData = messageJSON["drawData"]#broadcast.drawData=drawInstruction array from teacher
     broadcast.page= messageJSON["page"]
     broadcast.eraser= messageJSON["requestER"]
+    broadcast.srcID = str(websocket.id)
     websockets.broadcast(connected, broadcast.toJson())
 
     response = canvasUpdateSuccess()

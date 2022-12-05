@@ -9,22 +9,24 @@ class response:
 
 
 class initializeHostSuccess(response):
-    def __init__(self, hostKey=None, studentKey=None) -> None:
+    def __init__(self, hostKey=None, studentKey=None, websocketID=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Successfully initialized host"
         self.hostKey = hostKey
         self.studentKey = studentKey
+        self.websocketID = websocketID
 
 
 class initializeStudentSuccess(response):
-    def __init__(self, studentKey=None,  pageNumber=None, imageURL=None) -> None:
+    def __init__(self, studentKey=None,  pageNumber=None, imageURL=None, id=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.message = "Successfully initialized student"
         self.studentKey = studentKey
         self.pageNumber = pageNumber
         self.imageURL= imageURL
+        self.id = id
 
 
 class canvasUpdateSuccess(response):
@@ -43,12 +45,13 @@ class canvasBroadcast(response):
         self.pageNumber = pageNumber
 
 class canvasDrawUpdateBroadcast(response):
-    def __init__(self, drawData=None, eraser=None, page=None) -> None:
+    def __init__(self, drawData=None, eraser=None, page=None, srcID=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.drawData = drawData
         self.page = page
         self.eraser = eraser
+        self.srcID = srcID
 
 class clearpage(response):
     def __init__(self) -> None:
@@ -125,12 +128,13 @@ class fullUserList(response):
         self.message = "Retrieving full user list"
 
 class newUserJoined(response):
-    def __init__(self, name=None, id=None) -> None:
+    def __init__(self, name=None, id=None, user=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
         self.id = id
         self.name = name
         self.message = "New user has joined"
+        self.user = user
 
 class updateUserName(response):
     def __init__(self, name=None, id=None, canBroadcast=None) -> None:
@@ -158,14 +162,15 @@ class NewpagesInserted(response):
 
 
 class endHighlightStroke(response):
-    def __init__(self) -> None:
+    def __init__(self, srcID=None) -> None:
         super().__init__()
         self.__type__ = self.__class__.__name__
+        self.srcID = srcID
 
-# class updateUserPermissions(response):
-#     def __init__(self, id=None, canBroadcast=None) -> None:
-#         super().__init__()
-#         self.__type__ = self.__class__.__name__
-#         self.id = id
-#         self.canBroadcast= canBroadcast
-#         self.message = "User permissions changed"
+class updateUserPermissions(response):
+    def __init__(self, id=None, canBroadcast=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.id = id
+        self.canBroadcast= canBroadcast
+        self.message = "User permissions changed"

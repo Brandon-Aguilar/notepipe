@@ -6,6 +6,7 @@ import websockets
 
 from dataclasses import dataclass
 from Models.responses import fullUserList, updateUserName, removeUserFromList, newUserJoined
+from Models.responses import updateUserPermissions
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +33,8 @@ class userList:
         broadcast= newUserJoined()
         broadcast.id= str(id)
         broadcast.name= user.name
-        websockets.broadcast(connected, broadcast.toJson())        
+        broadcast.user = user;
+        websockets.broadcast(connected, jsonpickle.encode(broadcast, unpicklable=False))        
 
 
     async def fullUserList(self, websocket): 
@@ -90,10 +92,10 @@ class userList:
             self.users[uuid.UUID(id)].canBroadcast = canBroadcast
         except Exception as e:
             log.warn("Failed to update permission of id %s, %s", id, e)
-        # broadcast= updateUserPermissions()
-        # broadcast.id= id
-        # broadcast.canBroadcast = canBroadcast
-        # websockets.broadcast(connected, broadcast.toJson())
+        broadcast= updateUserPermissions()
+        broadcast.id= id
+        broadcast.canBroadcast = canBroadcast
+        websockets.broadcast(connected, broadcast.toJson())
 
 
     def toJson(self) -> str:

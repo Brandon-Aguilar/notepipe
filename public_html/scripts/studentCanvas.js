@@ -58,6 +58,8 @@ highlightCanvas.addEventListener('pointermove', move, { capture: true, });
 var sentImage = false;
 var allowDraw = false;
 
+var isBroadcasting = true;
+
 // Release mouse capture when not touching screen
 highlightCanvas.addEventListener('pointerup', (e) => {
     isPointerDown = false;
@@ -107,24 +109,51 @@ window.addEventListener('input', (e) =>{
     newName = e.target.value;
 }) 
 
+function canBroadcast(){
+    let id = stringToUUID(websocketID);
+    if (localUserObjects === undefined || !localUserObjects[id].canBroadcast) {
+        return false;
+    }
+    return true;
+}
+
+function doBroadcast(){
+    if (!canBroadcast() || !isBroadcasting) {
+        return false;
+    }
+    return true;
+}
+
 function sendStroke(e) {
     // Need to check if they have broadcast privilege before we allow them to send strokes
+    if(!doBroadcast()){
+        return;
+    }
     sendStudentDrawUpdate();//will send strokes to clients
+    sendUpdate();
+}
+
+// Send canvas updates, triggered by click end
+function sendUpdate() {
+    console.log("Sending canvas")
+    var imageURL = canvas.toDataURL("image/png", 0.2);
+    var studentImageURL = studentCanvas.toDataURL("image/png");
+    mergeImages([imageURL, studentImageURL]).then(b64 => {
+        var message = {
+            type: "canvasUpdate",
+            pageNumber: viewingPageNumber,
+            imageURL: b64,
+        }
+
+        websocket.send(JSON.stringify(message))
+    });
 }
 
 function sendStudentDrawUpdate() {
-    //save updated canvas locally 
-    if (pageNumber == viewingPageNumber) {//saving the most recent page
-        var imageURL = canvas.toDataURL("image/png", 0.2);
-        localImages[pageNumber] = imageURL
-    }
-    else {//editing a previously stored page
-        var imageURL = canvas.toDataURL("image/png", 0.2);
-        localImages[viewingPageNumber] = imageURL
-    }
+    
 
     websocket.send(JSON.stringify({//send array containing x,y corrdinate of strokes
-        type: 'canvasStudentDrawUpdate',
+        type: 'canvasDrawUpdate',
         drawData: studentSendDrawInstructions,
         page: viewingPageNumber,
         requestER: eraserState
@@ -187,6 +216,8 @@ function eraser() {
     console.log("Image erased: ", pageNumber)
 };
 
+var currentlyHighlighting = false;
+
 function move(e) {
     e.preventDefault();
     // equation for determinng force, didn't research much, just used feel. Could use improvements.
@@ -203,40 +234,60 @@ function move(e) {
             return;
         }
 
-        draw({
-            lastPoint,//the x,y coordinate of the last stroke
-            x: e.offsetX,//x-coordinate of the mouse pointer relative to the document
-            y: e.offsetY,//y-coordinate of the mouse pointer relative to the document
-            force: force,
-            color: color || 'green',
-            eraserState,
-            highlightDraw
-        }, studentCtx);
+        currentlyHighlighting = highlightDraw;;
 
+        if(doBroadcast()){
+            draw({
+                lastPoint,//the x,y coordinate of the last stroke
+                x: e.offsetX,//x-coordinate of the mouse pointer relative to the document
+                y: e.offsetY,//y-coordinate of the mouse pointer relative to the document
+                force: force,
+                color: color || 'green',
+                eraserState,
+                highlightDraw
+            }, ctx);
 
-        
+            drawData = JSON.stringify({
+                lastPoint,
+                x: e.offsetX,
+                y: e.offsetY,
+                color: color || 'green',
+                force: force,
+                eraserState,
+                highlightDraw
+            });
 
-        drawData = JSON.stringify({
-            lastPoint,
-            x: e.offsetX,
-            y: e.offsetY,
-            color: color || 'green',
-            force: force,
-            eraserState,
-            highlightDraw
-        });
-
-        studentSendDrawInstructions.push(drawData);//store drawData in drawInstructions
-        if (studentSendDrawInstructions.length >= 100) {//when drawInstruction has 100 entries, send the array
-            sendStudentDrawUpdate();
+            studentSendDrawInstructions.push(drawData);//store drawData in drawInstructions
+            if (studentSendDrawInstructions.length >= 100) {//when drawInstruction has 100 entries, send the array
+                sendStudentDrawUpdate();
+            } else {
+                sentImage = false;
+            }
         } else {
-            sentImage = false;
+            draw({
+                lastPoint,//the x,y coordinate of the last stroke
+                x: e.offsetX,//x-coordinate of the mouse pointer relative to the document
+                y: e.offsetY,//y-coordinate of the mouse pointer relative to the document
+                force: force,
+                color: color || 'green',
+                eraserState,
+                highlightDraw
+            }, studentCtx);
         }
 
         lastPoint = { x: e.offsetX, y: e.offsetY };//update lastPoint to be the stroke we just processed 
     } else {
-        if (highlightDraw) {
-            layerHighlightCanvas(studentCtx);
+        if (highlightDraw && currentlyHighlighting) {
+            // Send a message that draw has ended, should trigger highlight to be drawn onto canvas
+            if(doBroadcast()){
+                websocket.send(JSON.stringify({
+                    type: "endHighlightStroke"
+                }))
+                layerHighlightCanvas(ctx);
+            } else {
+                layerHighlightCanvas(studentCtx);
+            }
+            currentlyHighlighting = false;
         }
         
         lastPoint = undefined;//mouse button has been released, this will trigger sendStroke so reset lastpoint
@@ -348,13 +399,14 @@ viewingPageNumber=0;
 var updateMessageElement = document.getElementById("updateStatus");
 var studentLinkElement = document.getElementById("studentLink");
 var studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
-var drawAnimationsCheckboxElement = document.getElementById("drawAnimationsCheckbox");
+var enableBroadcastElement = document.getElementById("enableBroadcast");
 var currentPageNumberElement = document.getElementById('currentPageNumber');
 
-var drawAnimations = drawAnimationsCheckboxElement.checked;
-drawAnimationsCheckboxElement.addEventListener("change", () => {
-    drawAnimations = drawAnimationsCheckboxElement.checked;
-    console.log(drawAnimations);
+var drawAnimations = true;
+
+isBroadcasting = enableBroadcastElement.checked;
+enableBroadcastElement.addEventListener("change", () => {
+    isBroadcasting = enableBroadcastElement.checked;
 });
 
 // resize canvas
@@ -501,8 +553,11 @@ showUserListElement.addEventListener('change', () => {
 
 var localUserListID=[]
 var localUserListName=[]
+var localUserObjects;
 var processHighlight = false;
 var absoluteJoinLink = "";
+
+var websocketID = "";
 
 // Handle valid messages sent to client
 function processMessage({ data }) {
@@ -511,6 +566,7 @@ function processMessage({ data }) {
     switch(event.__type__){
         case "initializeStudentSuccess":
             console.log("Successfully initialized Student");
+            websocketID = event.id;
             image.src = event.imageURL;
             image.onload = function() {//wait for image to load before trying to draw to canvas
                 canvas.width = Math.max(window.innerWidth, image.width);
@@ -531,14 +587,18 @@ function processMessage({ data }) {
             pageNumber = event.pageNumber;
             
             // initialize page drawInstructions
-            drawInstructions = Array.from({length: pageNumber+1}, () => new Array());
+            incomingDrawInstructions = Array.from({length: pageNumber+1}, () => new Array());
             studentLocalImages = Array.from({ length: pageNumber + 1 }, () => "");
             createStudentName();
 
             absoluteJoinLink = "https://" + window.location.host + "/canvas/" + link;
+            getUserlist();
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
+            if (event.srcID == websocketID) {
+                return;
+            }
             if(event.page == viewingPageNumber){
                 if(drawAnimations){
                     currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
@@ -556,7 +616,7 @@ function processMessage({ data }) {
                     parsedInstructions.push(element);
                 });
                 
-                drawInstructions[event.page].push(parsedInstructions);
+                incomingDrawInstructions[event.page].push(parsedInstructions);
             }        
             break;
         case "clearpage":
@@ -575,7 +635,7 @@ function processMessage({ data }) {
             //localImages[event.pageNumber]= imageURL;
         
             pageNumber += 1;
-            drawInstructions.push([]);
+            incomingDrawInstructions.push([]);
             setCurrentPageText();
             break;
 
@@ -588,12 +648,12 @@ function processMessage({ data }) {
                 localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
                 ctx.clearRect(0, 0, width, height);
 
-                drawInstructions.splice(event.insertIndex, 0, []);
+                incomingDrawInstructions.splice(event.insertIndex, 0, []);
                 localImages.splice(event.insertIndex, 0, "");
                 // When we add follow teacher, then don't navigate if following
                 navigateToPage(viewingPageNumber + 1);
             } else {
-                drawInstructions.splice(event.insertIndex, 0, []);
+                incomingDrawInstructions.splice(event.insertIndex, 0, []);
                 localImages.splice(event.insertIndex, 0, "");
             }
             setCurrentPageText();
@@ -641,6 +701,7 @@ function processMessage({ data }) {
             break;
        case "fullUserList":
             newObj = JSON.parse(event.names);
+            localUserObjects = newObj;
             var tmpContent = "";
             for (const [key, value] of Object.entries(newObj)) {
                 tmpContent= "<h4 id='"+value.id+"'> "+value.name+"</h4>"  
@@ -665,6 +726,7 @@ function processMessage({ data }) {
                     found = localUserListID.findIndex(element => element == event.id);
                     localUserListID.splice(found,1)
                     localUserListName.splice(found, 1)
+                    delete localUserObjects[stringToUUID(event.id)];
                 }
                 break
             case "updateUserName":
@@ -682,6 +744,7 @@ function processMessage({ data }) {
                     localUserListName.sort()//sort the list
                     found = localUserListName.findIndex(element => element == event.name);//find index of new name
                     localUserListID.splice(found, 0, event.id)//insert user id in proper index
+                    localUserObjects[stringToUUID(event.id)].name = event.name
     
                     //check if user had broadcasting privilage 
                     tmpContent= "<h4 id='"+event.id+"'> "+event.name+"</h4>" 
@@ -701,6 +764,7 @@ function processMessage({ data }) {
                     localUserListName.sort()//sort the list
                     found = localUserListName.findIndex(element => element == event.name);//find index of new user
                     localUserListID.splice(found, 0, event.id)//insert user id in proper index
+                    localUserObjects[stringToUUID(event.id)] = event.user;
     
                     //create the name and button that needs to be added
                     tmpContent= "<h4 id='"+event.id+"'> "+event.name+"</h4>" 
@@ -714,17 +778,21 @@ function processMessage({ data }) {
                 }
                 break
             case "endHighlightStroke":
+                if (event.srcID == websocketID) {
+                    return;
+                }
                 processHighlight = true;
                 break;
-            // case "updateUserPermissions":
-            //     if(!event.canBroadcast){
-            //         document.getElementById(event.id).getElementsByClassName("activeButton").getremove()//delete the button
-            //     }
-            //     else{
-            //         tmpContent = " <button id='"+event.id+"' class='activeButton'> Broadcasting</button>"  
-            //         document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
-            //     }
-            //     break;
+            case "updateUserPermissions":
+                localUserObjects[stringToUUID(event.id)].canBroadcast = event.canBroadcast;
+                //if(!event.canBroadcast){
+                //    document.getElementById(event.id).getElementsByClassName("activeButton").getremove()//delete the button
+                //}
+                //else{
+                //    tmpContent = " <button id='"+event.id+"' class='activeButton'> Broadcasting</button>"  
+                //    document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
+                //}
+                break;
             }   
 }
 
@@ -755,7 +823,7 @@ previousPageElement.addEventListener('click', function (){
     navigateToPage(viewingPageNumber-1)});
 
 
-var drawInstructions=[[]]
+var incomingDrawInstructions=[[]]
 
 // This was nextOrPrevious, changing name to navigateToPage since we need this for future direct page navs and it more clearly represents what it is doing
 function navigateToPage(pageWanted){
@@ -780,15 +848,15 @@ function navigateToPage(pageWanted){
             image.onload = function() {//wait for image to load before trying to draw to canvas
                 ctx.drawImage(image, 0, 0);
 
-                if (drawInstructions[pageWanted].length != 0) {
+                if (incomingDrawInstructions[pageWanted].length != 0) {
                     console.log("draw instructions need to execute");
-                    drawInstructions[pageWanted].forEach((currInstructions) => {
+                    incomingDrawInstructions[pageWanted].forEach((currInstructions) => {
                         currInstructions.forEach((stroke) => {
                             draw(stroke, ctx);
                         });
                     });
 
-                    drawInstructions[pageWanted] = [];
+                    incomingDrawInstructions[pageWanted] = [];
                 }
             }
 
@@ -904,6 +972,11 @@ function finishAnimations() {
     });
     currentDrawInstructions = [];
     currentInstructionIndex = 0;
+
+    if (processHighlight) {
+        layerHighlightCanvas(ctx);
+        processHighlight = false;
+    }
 }
 
 function disableTouch() {
@@ -919,4 +992,8 @@ function disableTouch() {
 function enableTouch() {
     highlightCanvas.style.touchAction = "none";
     allowDraw = true;
+}
+
+function stringToUUID(str) {
+    return "UUID('" + str + "')"
 }

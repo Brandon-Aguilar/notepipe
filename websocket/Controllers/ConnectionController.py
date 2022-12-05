@@ -49,6 +49,7 @@ async def initializeHost(websocket):
     response = initializeHostSuccess()
     response.hostKey = hostKey
     response.studentKey = studentKey
+    response.id = str(websocket.id)
 
     try:
         await websocket.send(response.toJson())
@@ -89,7 +90,8 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "updateUserPermission":
                 users.updateUserPermissions(messageJSON["id"], messageJSON["allowBroadcast"], JOINED[studentKey])
             case "endHighlightStroke":
-                websockets.broadcast(JOINED[studentKey], endHighlightStroke().toJson())
+                websockets.broadcast(JOINED[studentKey], endHighlightStroke(
+                    str(websocket.id)).toJson())
 
 
 
@@ -109,6 +111,7 @@ async def initializeStudent(websocket, studentKey, image, name):
 
     response = initializeStudentSuccess()
     response.studentKey = studentKey
+    response.id = str(websocket.id)
     await retrieveImage(studentKey,response)
 
     try:
@@ -178,3 +181,12 @@ async def studentConnection(websocket, studentKey):
             case "retrieveUserList":
                 #get the whole user's list
                 await users.fullUserList(websocket)
+            case "canvasUpdate":  # image
+                await canvasUpdate(websocket, messageJSON, JOINED[studentKey], studentKey)
+            case "canvasDrawUpdate":  # array
+                await canvasDrawUpdate(websocket, messageJSON, JOINED[studentKey], studentKey)
+            case "endHighlightStroke":
+                websockets.broadcast(
+                    JOINED[studentKey], endHighlightStroke(str(websocket.id)).toJson())
+
+

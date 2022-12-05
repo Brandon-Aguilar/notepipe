@@ -163,18 +163,21 @@ function clearUserList(){
 }
 
 //instructor image saved locally
-const localImages=[];
+var localImages=[];
 const TemplocalImages= [];
+var incomingDrawInstructions = [[]];
 
 //save button
 var updateSaveoption=document.getElementById('newpage')
 updateSaveoption.addEventListener('click', newpage)
 
 function newpage(){
+    localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
     //for now teacher cannot go to previous page and use save function
     if(pageNumber==viewingPageNumber){
         pageNumber++;
         viewingPageNumber++;
+        incomingDrawInstructions.push([]);
         console.log("Adding new page number: ",pageNumber)
         var imageURL = canvas.toDataURL("image/png", 0.2);
         
@@ -219,7 +222,8 @@ function newpage(){
         imageURL = canvas.toDataURL("image/png", 0.2);//updating canvas image
        
         localImages.splice(viewingPageNumber,0,imageURL)
-         setCurrentPageText();
+        incomingDrawInstructions.splice(viewingPageNumber, 0, [])
+        setCurrentPageText();
     }
 
 }
@@ -307,16 +311,6 @@ function sendStroke(e){
 var eraserState = false;
 
 function sendDrawUpdate(){
-    //save updated canvas locally 
-    if(pageNumber==viewingPageNumber){//saving the most recent page
-        var imageURL = canvas.toDataURL("image/png", 0.2);
-        localImages[pageNumber]=imageURL
-    }
-    else{//editing a previously stored page
-        var imageURL = canvas.toDataURL("image/png", 0.2);
-        localImages[viewingPageNumber]=imageURL
-    }
-
     websocket.send(JSON.stringify({//send array containing x,y corrdinate of strokes
         type: 'canvasDrawUpdate',
         drawData: drawInstructions,
@@ -429,7 +423,6 @@ var currentlyHighlighting = false;
 function draw(data) {
     var currentCtx = ctx;
     if (data.highlightDraw) {
-        currentlyHighlighting = true;
         currentCtx = highlightCtx;
     }
     currentCtx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
@@ -463,6 +456,8 @@ function move(e) {
             lastPoint = { x: e.offsetX, y: e.offsetY };//this is the inital stroke, we are storing it's x,y coordinate
             return;
         }
+
+        currentlyHighlighting = highlightDraw;;
         
         draw({
             lastPoint,//the x,y coordinate of the last stroke
@@ -498,14 +493,14 @@ function move(e) {
             websocket.send(JSON.stringify({
                 type: "endHighlightStroke"
             }))
-            layerHighlightCanvas();
+            layerHighlightCanvas(ctx);
             currentlyHighlighting = false;
         }
         lastPoint = undefined;//mouse button has been released, this will trigger sendStroke so reset lastpoint
     }
 }
 
-function layerHighlightCanvas(){
+function layerHighlightCanvas(ctx){
     ctx.globalAlpha = 0.5;
     //ctx.globalCompositeOperation = "multiply";
     ctx.drawImage(highlightCanvas, 0, 0);
@@ -569,6 +564,7 @@ function downloadbutton(e) {
     link.delete;
 };     
 
+
 //implement previous and next page requests 
 var image = new Image();
 nextPageElement=document.getElementById('nextPage');
@@ -580,6 +576,7 @@ previousPageElement.addEventListener('click', function (){
     navigateToPage(viewingPageNumber-1)});
 
 function navigateToPage(pageWanted){
+    localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
     if(pageWanted>=0 && pageWanted<=pageNumber){
         //clear the current page
         width = canvas.width;
@@ -589,6 +586,17 @@ function navigateToPage(pageWanted){
         image.src=localImages[pageWanted]
         image.onload = function() {//wait for image to load before trying to draw to canvas
             ctx.drawImage(image, 0, 0);
+
+            if (incomingDrawInstructions[pageWanted].length != 0) {
+                console.log("draw instructions need to execute");
+                incomingDrawInstructions[pageWanted].forEach((currInstructions) => {
+                    currInstructions.forEach((stroke) => {
+                        draw(stroke, ctx);
+                    });
+                });
+
+                incomingDrawInstructions[pageWanted] = [];
+            }
         }
         viewingPageNumber = pageWanted;
         setCurrentPageText();
@@ -602,6 +610,8 @@ var broadcastingList=[]
 var absoluteJoinLink = "";
 var userListHtmlId= "Users"
 var instructorBroadcasting=undefined
+
+var websocketID = "";
 // Handle messages sent to client
 function processMessage({ data }) {
     const event = JSON.parse(data);
@@ -613,6 +623,7 @@ function processMessage({ data }) {
         case "initializeHostSuccess": 
             console.log("Successfully initialized host");
 
+            websocketID = event.id;
             link = "student.html?key=" + event.studentKey;
             studentLinkElement.textContent="\tJoin Key: " + event.studentKey;
             studentLinkAnchorElement.href=link;
@@ -722,7 +733,38 @@ function processMessage({ data }) {
                     document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
                 }
             }
-            break
+            break;
+        case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
+            console.log("Updating Draw Instructions");
+            if (event.srcID == websocketID) {
+                return;
+            }
+            if (event.page == viewingPageNumber) {
+                if (drawAnimations) {
+                    currentDrawInstructions = currentDrawInstructions.concat(event.drawData);
+                    currentFrames.push(window.requestAnimationFrame(animateDraw));
+                } else {
+                    event.drawData.forEach((element) => {//loop through each value
+                        element = JSON.parse(element);
+                        draw(element, ctx);//just output the stroke 
+                    });
+                }
+            } else {
+                parsedInstructions = []
+                event.drawData.forEach((element) => {//loop through each value
+                    element = JSON.parse(element);
+                    parsedInstructions.push(element);
+                });
+
+                incomingDrawInstructions[event.page].push(parsedInstructions);
+            }
+            break;
+        case "endHighlightStroke":
+            if(event.srcID == websocketID){
+                return;
+            }
+            processHighlight = true;
+            break;
     }
 }
 function grantBroadcastingPrivilege(id){
@@ -934,4 +976,58 @@ function disableTouch() {
 function enableTouch() {
     highlightCanvas.style.touchAction = "none";
     allowDraw = true;
+}
+
+function stringToUUID(str) {
+    return "UUID('" + str + "')"
+}
+
+
+var currentDrawInstructions = [];
+var currentInstructionIndex = 0;
+var currentFrames = [];
+
+var drawAnimations = true;
+var processHighlight = false;
+
+function animateDraw() {
+    if (currentDrawInstructions.length == 0) {
+        if (processHighlight) {
+            layerHighlightCanvas(ctx);
+            processHighlight = false;
+        }
+        return;
+    }
+    if (currentInstructionIndex >= currentDrawInstructions.length) {
+        currentInstructionIndex = 0;
+        currentDrawInstructions = [];
+    } else {
+        var element = JSON.parse(currentDrawInstructions[currentInstructionIndex]);
+        draw(element, ctx);
+        currentInstructionIndex += 1;
+    }
+    currentFrames.push(window.requestAnimationFrame(animateDraw));
+}
+
+function cancelAllAnimationFrames() {
+    currentFrames.forEach((frameID) => {
+        window.cancelAnimationFrame(frameID);
+    });
+    currentFrames = [];
+}
+
+function finishAnimations() {
+    cancelAllAnimationFrames();
+    currentDrawInstructions.splice(0, currentInstructionIndex);
+    currentDrawInstructions.forEach((element) => {//loop through each value
+        element = JSON.parse(element);
+        draw(element, ctx);//just output the stroke 
+    });
+    currentDrawInstructions = [];
+    currentInstructionIndex = 0;
+
+    if (processHighlight) {
+        layerHighlightCanvas(ctx);
+        processHighlight = false;
+    }
 }
