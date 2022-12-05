@@ -745,13 +745,21 @@ function processMessage({ data }) {
             localUserObjects = newObj;
             var tmpContent = "";
             for (const [key, value] of Object.entries(newObj)) {
+                var tmpButton = "";
                 tmpContent= "<h4 id='"+value.id+"'> "+value.name+"</h4>"  
-                // if(value.canBroadcast)
-                //     tmpContent += " <button id='"+value.id+"' class='activeButton'> Broadcasting</button>"
-                if(localUserListID.length == 0)
+                if(value.canBroadcast)
+                    tmpButton += "<button id='"+value.id+"button"+"' class='activeButton'> Broadcasting</button>";
+                if(localUserListID.length == 0){
                     document.getElementById("Users").insertAdjacentHTML("afterend", tmpContent);
+                    document.getElementById(value.id).insertAdjacentHTML("afterend", tmpButton);
+                }
+
                 else{
-                    document.getElementById(localUserListID[localUserListID.length-1]).insertAdjacentHTML("afterend", tmpContent);
+                    if(document.getElementById(localUserListID[localUserListID.length-1]+"button"))
+                        document.getElementById(localUserListID[localUserListID.length-1]+"button").insertAdjacentHTML("afterend", tmpContent);
+                    else
+                        document.getElementById(localUserListID[localUserListID.length-1]).insertAdjacentHTML("afterend", tmpContent);
+                    document.getElementById(value.id).insertAdjacentHTML("afterend", tmpButton);
                 }
                 //store into local arrays
                 localUserListID.push(value.id)
@@ -761,7 +769,7 @@ function processMessage({ data }) {
             case "removeUserFromList":
                 if(showUserListBool){
                     document.getElementById(event.id).remove()
-                    document.getElementById(event.id).remove()//delete the button
+                    document.getElementById(event.id+"button").remove()//delete the button
 
                     //update local arrays
                     found = localUserListID.findIndex(element => element == event.id);
@@ -826,13 +834,15 @@ function processMessage({ data }) {
                 break;
             case "updateUserPermissions":
                 localUserObjects[stringToUUID(event.id)].canBroadcast = event.canBroadcast;
-                //if(!event.canBroadcast){
-                //    document.getElementById(event.id).getElementsByClassName("activeButton").getremove()//delete the button
-                //}
-                //else{
-                //    tmpContent = " <button id='"+event.id+"' class='activeButton'> Broadcasting</button>"  
-                //    document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
-                //}
+                if(event.canBroadcast && !document.getElementById(event.id+"button")){ // if they can broadcast and button doesn't exits already
+                   tmpContent = " <button id='"+event.id+"button" + "' class='activeButton'> Broadcasting</button>"  
+                   document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
+                }
+                
+                else{
+                    if(document.getElementById((event.id+"button")))
+                        document.getElementById((event.id+"button")).remove()//delete the button
+                }
                 break;
             }   
 }
