@@ -398,15 +398,11 @@ viewingPageNumber=0;
 var updateMessageElement = document.getElementById("updateStatus");
 var studentLinkElement = document.getElementById("studentLink");
 var studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
-var enableBroadcastElement = document.getElementById("enableBroadcast");
 var currentPageNumberElement = document.getElementById('currentPageNumber');
 
 var drawAnimations = true;
 
-isBroadcasting = enableBroadcastElement.checked;
-enableBroadcastElement.addEventListener("change", () => {
-    isBroadcasting = enableBroadcastElement.checked;
-});
+isBroadcasting = false;
 
 // resize canvas
 function resize() {
@@ -1021,16 +1017,6 @@ function finishAnimations() {
     }
 }
 
-function disableTouch() {
-    if(highlightCanvas.style.touchAction == "none"){
-        highlightCanvas.style.touchAction = "manipulation";
-        allowDraw = false;
-    } else{
-        highlightCanvas.style.touchAction = "none";
-        allowDraw = true;
-    }
-}
-
 function enableTouch() {
     highlightCanvas.style.touchAction = "none";
     allowDraw = true;
@@ -1038,4 +1024,18 @@ function enableTouch() {
 
 function stringToUUID(str) {
     return "UUID('" + str + "')"
+}
+
+var broadcastToggleElement = document.getElementById("broadcastToggle");
+
+
+function toggleBroadcast() {
+    if(isBroadcasting){
+        broadcastToggleElement.style.background = "#323336";
+        isBroadcasting = false;
+    } else {
+        broadcastToggleElement.style.background = "red";
+        isBroadcasting = true;
+    }
+
 }

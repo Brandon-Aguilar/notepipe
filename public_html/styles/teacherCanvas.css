@@ -102,7 +102,7 @@
     align-items: center;
     justify-content: center;
   }*/
-  #previousPage, #nextPage, #newpage, #reset, #uploadFile, .users-button {
+  #previousPage, #nextPage, #newpage, #reset, #uploadFile, #broadcastToggle, .users-button {
     height: 40px;
     width: 40px;
     border-radius: 20px;
@@ -281,7 +281,7 @@
     display: none;
     flex-direction: column;
     position: fixed;
-    top: 62%;
+    top: 35%;
     left: 80px;
     width: 150px;
     z-index: 101;
@@ -302,8 +302,8 @@
     display: none;
     flex-direction: column;
     position: fixed;
-    top: 20%;
-    left: 150px;
+    top: 40%;
+    left: 80px;
     width: 300x;
     height: 200px;
     z-index: 105;
@@ -708,6 +708,14 @@ input[type="button"], #updateName{
   .left-sidebar {
     zoom: 2;
   }
+
+  .color-menu {
+    zoom: 2;
+  }
+
+  .slider-menu {
+    zoom: 2;
+  }
 }
 
 @media only screen and (max-width: 300px) {
@@ -718,6 +726,14 @@ input[type="button"], #updateName{
   .left-sidebar {
     zoom: 2;
   }
+
+  .color-menu {
+    zoom: 2;
+  }
+
+  .slider-menu {
+    zoom: 2;
+  }
 }
 
 * {
@@ -726,4 +742,8 @@ input[type="button"], #updateName{
 
 #showUserList {
   visibility: hidden;
+}
+
+#gestureToggle {
+  background-color: #FFF;
 }

@@ -5,6 +5,8 @@
         <link rel="stylesheet" href="../styles/teacherCanvas.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
         <script type="text/javascript" src="../scripts/studentCanvas.js" defer></script>
+        <script type="text/javascript" src="../scripts/sharedCanvas.js" defer></script>
+        <link rel="stylesheet" href="../styles/normalize.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         <script src="https://cdn.jsdelivr.net/g/filesaver.js"></script>
         <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -12,6 +14,7 @@
         <script src="../scripts/printThis.js"></script>
         <script src="https://unpkg.com/merge-images"></script>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jost">
+        <link rel="icon" type="image/x-icon" href="/icons/notepipe.svg">
         <title>NotePipe-Student</title>
     </head>
     <body>
@@ -37,15 +40,13 @@
                   <img class="navigation-icon" src="../icons/right-arrow.svg" alt="Next Page">
                 </button>
               </div>
+              
+              
             </div>
-            <div class="reset-page-button">
-              <button id="reset">
-                <img class="reset-page-icon" src="../icons/reset-btn.svg" alt="Reset Page">
-              </button>
-            </div>
-            <div class="upload-button">
-              <button id="uploadFile">
-                <img class="upload-icon" src="../icons/upload-icon.svg" alt="Upload File">
+
+            <div>
+              <button id="broadcastToggle" onclick="toggleBroadcast()">
+                <img class="link-icon" src="../icons/antenna.svg" alt="Link">
               </button>
             </div>
             <!--my changes-->
@@ -125,9 +126,36 @@
           </div>
         </div>
         
+        <div id="slider-div" class="slider-menu">
+          <div id="container" class="slider-container">
+            <input onchange='changeWidth(this.value)' type="range" min="1" max="40" value="2">
+            <p style="color:white;">Thickness</p>
+          </div>
+        </div>
+        
+        <div id="color-div" class="color-menu">
+          <div id="container" class="color-container">
+            <canvas id="colorsCanvas" class="canvas_colors" width="150" height="100"
+              style="left: 0; z-index: 1; position: absolute;"></canvas>
+            <canvas id="colorsIndicatorCanvas" class="canvas_colors" width="150" height="100"
+              style="left: 0; z-index: 2; position: absolute;"></canvas>
+        
+          </div>
+        </div>
+        
         <div class="left-sidebar">
           <!-- Need to add effects when selected/active -->
           <div id="container" class="drawing-tools-sidebar">
+            <div class="draw-tool">
+              <button class="color-button" onclick="showSlider()" id="slider">
+                <img src="/icons/line-weight.svg" alt="Line Weight">
+              </button>
+            </div>
+            <div class="draw-tool">
+              <button class="color-button" onclick="showColors()" id="colors">
+                <img src="/icons/color-circle.svg" alt="Color Picker">
+              </button>
+            </div>
             <div class="draw-tool">
               <button class="color-button" onclick="changeColor('black')" id="black">
                 <img src="../icons/black-icon.svg" alt="Black">
@@ -154,17 +182,13 @@
               </button>
             </div>
             <div class="draw-tool">
-              <button class="color-button" onclick="showSlider()" id="slider">
-              </button>
-            </div>
-            <div class="draw-tool">
               <button class="eraser-button" onclick="eraser()" id="eraser">
                 <img src="../icons/eraser-icon.svg" alt="Eraser">
               </button>
             </div>
-
             <div class="draw-tool mobile-only">
-              <button class="disable-touch" onclick="disableTouch()" id="eraser">
+              <button class="disable-touch" id="gestureToggle" onclick="disableTouch()" id="eraser">
+                <img src="../icons/pan-hand.svg" alt="Enable Gestures" width="30px">
               </button>
             </div>
           </div>
@@ -195,7 +219,6 @@
              <!-- TODO: FIX THIS!!!! NEEDED FOR JAVASCRIPT TEMPORARILY PUTTING HERE-->
               <div class="temporaryfixsomeonefixthislater">
                 
-                <input type="checkbox" id="enableBroadcast" checked>
                 <label for="enableBroadcast">Enable Animations</label>
                 
                 <!--Update Name

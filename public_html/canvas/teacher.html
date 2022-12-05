@@ -5,10 +5,12 @@
         <script type="text/javascript" src="../scripts/teacherCanvas.js" defer></script>
         <link rel="stylesheet" href="../styles/teacherCanvas.css">
         <link rel="stylesheet" href="../styles/normalize.css">
+        <script type="text/javascript" src="../scripts/sharedCanvas.js" defer></script>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jost">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         <script src="https://cdn.jsdelivr.net/g/filesaver.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.0.279/build/pdf.min.js"></script>
+        <link rel="icon" type="image/x-icon" href="/icons/notepipe.svg">
         
         <title>NotePipe-Teacher</title>
     </head>
@@ -40,11 +42,6 @@
             <div class="new-page-button">
               <button id="newpage">
                 <img class="new-page-icon" id="n" src="../icons/new-page-icon.svg" alt="New Page">
-              </button>
-            </div>
-            <div class="reset-page-button">
-              <button id="reset">
-                <img class="reset-page-icon" src="../icons/reset-btn.svg" alt="Reset Page">
               </button>
             </div>
             <div class="upload-button">
@@ -194,7 +191,9 @@
         
         <div id="color-div" class="color-menu">
           <div id="container" class="color-container">
-            <canvas id="colorsCanvas" class="canvas_colors" width="150" height="100"></canvas>
+            <canvas id="colorsCanvas" class="canvas_colors" width="150" height="100" style="left: 0; z-index: 1; position: absolute;"></canvas>
+            <canvas id="colorsIndicatorCanvas" class="canvas_colors" width="150" height="100" style="left: 0; z-index: 2; position: absolute;"></canvas>
+
           </div>
         </div>
 
@@ -203,10 +202,12 @@
             <div id="container" class="drawing-tools-sidebar">
               <div class="draw-tool">
                 <button class="color-button" onclick="showSlider()" id="slider">
+                  <img src="/icons/line-weight.svg" alt="Line Weight">
                 </button>
               </div>
               <div class="draw-tool">
                 <button class="color-button" onclick="showColors()" id="colors">
+                  <img src="/icons/color-circle.svg" alt="Color Picker">
                 </button>
               </div>
               <div class="draw-tool">
@@ -240,7 +241,8 @@
                 </button>
               </div>
               <div class="draw-tool mobile-only">
-                <button class="disable-touch" onclick="disableTouch()" id="eraser">
+                <button class="disable-touch" id="gestureToggle" onclick="disableTouch()" id="eraser">
+                  <img src = "../icons/pan-hand.svg" alt = "Enable Gestures" width="30px">
                 </button>
               </div>
             </div>

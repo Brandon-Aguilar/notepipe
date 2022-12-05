@@ -18,29 +18,7 @@ function getWebSocketServer() {
 var websocket = new WebSocket(serverURL, "json");
 console.log("Connected to Websocket");
 
-var canvas_colors = document.getElementById("colorsCanvas");
-var context_colors = canvas_colors.getContext('2d');
-var width_colors = canvas_colors.width;
-var height_colors = canvas_colors.height;
 
-const gradientH = context_colors.createLinearGradient(0, 0, width_colors, 0);
-gradientH.addColorStop(0, "rgb(255, 0, 0)"); // red
-gradientH.addColorStop(1/6, "rgb(255, 255, 0)"); // yellow
-gradientH.addColorStop(2/6, "rgb(0, 255, 0)"); // green
-gradientH.addColorStop(3/6, "rgb(0, 255, 255)");
-gradientH.addColorStop(4/6, "rgb(0, 0, 255)"); // blue
-gradientH.addColorStop(5/6, "rgb(255, 0, 255)");
-gradientH.addColorStop(1, "rgb(255, 0, 0)"); // red
-context_colors.fillStyle = gradientH;
-context_colors.fillRect(0, 0, width_colors, height_colors);
-
-const gradientV = context_colors.createLinearGradient(0, 0, 0, height_colors);
-gradientV.addColorStop(0, "rgba(255, 255, 255, 1)"); // white
-gradientV.addColorStop(0.5, "rgba(255, 255, 255, 0)");
-gradientV.addColorStop(0.5, "rgba(0, 0, 0, 0)"); // transparent
-gradientV.addColorStop(1, "rgba(0, 0, 0, 1)"); // black
-context_colors.fillStyle = gradientV;
-context_colors.fillRect(0, 0, width_colors, height_colors);
 
 // Copied canvas code
 // create canvas element and append it to document body
@@ -273,8 +251,8 @@ function undo(){
     }
 }
 
-var updatereset=document.getElementById('reset')
-updatereset.addEventListener('click', reset)
+//var updatereset=document.getElementById('reset')
+//updatereset.addEventListener('click', reset)
 
 function reset(){
     console.log("reset page : ",pageNumber)
@@ -347,32 +325,10 @@ function sendUpdate() {
     websocket.send(JSON.stringify(message))
 }
 
-// Change width of the marker based on input from a HTML slider
-function changeWidth(newWidth) {
-    enableTouch();
-    markerWidth = newWidth;
-    //eraserState= false;
-    ctx.globalCompositeOperation = 'source-over';
-};
 
-// shows the HTML slider located in slider-div
-function showSlider() {
-    var x = document.getElementById("slider-div");
-    if (x.style.display === "block") {
-      x.style.display = "none";
-    } else {
-      x.style.display = "block";
-    }
-  };
 
-function showColors() {
-    var x = document.getElementById("color-div");
-    if (x.style.display === "block") {
-      x.style.display = "none";
-    } else {
-      x.style.display = "block";
-    }
-};
+
+
 
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
@@ -383,24 +339,6 @@ function changeColor(newColor) {
     ctx.globalCompositeOperation = 'source-over';
   };
 
-canvas_colors.addEventListener('click', event => {
-    enableTouch();
-    const rect = event.target.getBoundingClientRect();
-    const x = event.clientX - rect.left; 
-    const y = event.clientY - rect.top;
-    const context = canvas_colors.getContext('2d');
-    const imgData = context.getImageData(x, y, 1, 1);
-    const [r, g, b] = imgData.data;
-
-    var colorString = "rgb(" + r + "," + g + "," + b + ")";
-
-    highlightDraw = false;
-    color = colorString;
-    eraserState= false;
-    ctx.globalCompositeOperation = 'source-over';
-
-    return {r, g, b};
-  });
 
 // Eraser
 function eraser() {
@@ -965,20 +903,9 @@ function uploadPDF(pdf_file) {
     document.getElementById("upload").value = "";
 }
 
-function disableTouch() {
-    if (highlightCanvas.style.touchAction == "none") {
-        highlightCanvas.style.touchAction = "manipulation";
-        allowDraw = false;
-    } else {
-        highlightCanvas.style.touchAction = "none";
-        allowDraw = true;
-    }
-}
 
-function enableTouch() {
-    highlightCanvas.style.touchAction = "none";
-    allowDraw = true;
-}
+
+
 
 function stringToUUID(str) {
     return "UUID('" + str + "')"
