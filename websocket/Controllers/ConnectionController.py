@@ -44,7 +44,7 @@ async def initializeHost(websocket):
     # Store list of connections to be broadcasted to
     HOST_KEYS[hostKey] = studentKey
     JOINED[studentKey] = {websocket}
-    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(str(websocket.id), "defaultTeacher", True, True)})
+    USERS[studentKey] = userList(studentKey, {websocket.id: userObject(str(websocket.id), "Instructor", True, True)})
 
     response = initializeHostSuccess()
     response.hostKey = hostKey

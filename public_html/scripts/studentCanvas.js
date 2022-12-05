@@ -425,10 +425,53 @@ function resize() {
   ctx.drawImage(inMemCanvas, 0, 0);
 }
 
+function getRandomIndex(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+function capitalizeName(string){
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 function createStudentName(){
-    let name =  Math.random().toString(16).slice(2); 
-    console.log('default name is:', name)
-    initializeStudent(name)
+  var firstNames = ["DANIEL","JAMES","EMILY","JACK","CONOR","AMELIA","ADAM","LIAM","NOAH","EMMA","MIA","ANNA","OLIVIA","CILLIAN","HANNAH", "OLIVER",
+                  "OLIVER","SOPHIE","AOIFE","HARRY","CHARLIE","GRACE","AVA","FINN","LILY","THOMAS","FIONN","PATRICK","CHLOE","DAVID","LUKE","MICHAEL",
+                  "CIAN","SARAH","DYLAN","ELLA","SOPHIA","LUCY","ALEX","ALEXANDER","MATTHEW","JULIA","RYAN","BEN","SAOIRSE","ETHAN","KATE", 
+                  "NATHAN","SOFIA","CARA","ERIN","DARRAGH","LEO","ROBYN","BENJAMIN","LEON","AARON","LENA","ZOE","FILIP","MAX","MAYA","MOLLY",
+                  "JESSICA","ELLIE","WILLIAM","JACOB","SEAN","ELIZABETH","SENAN","HANNA","JAKUB","MARIA","EVA","FIADH","ISABELLA","JAMIE","JOSHUA",
+                  "SAM","CAOIMHE","HUGO","LAURA","RUBY","CHARLOTTE","FREYA","LEAH","MUHAMMAD","NIAMH","SEBASTIAN","TOM","ISAAC","RONAN","HENRY",
+                  "CLARA","HOLLY","KATIE","AMY","ANTONI","MAJA","ROBERT","ISLA","KYLE","LILIANA","LUCAS","CALLUM","RACHEL",
+                  "SIENNA","VICTORIA","ALEXANDRA","ANDREW","BOBBY","LUCA","NINA","ELLEN","ROSE","ZARA","CLODAGH","MARK","MILA","REBECCA",
+                  "DARA","GABRIEL","GEORGE","ALEKSANDER","ALICIA","ALICJA","ANNIE","CAITLIN", "SADIE","OLLIE","ZOFIA","ZUZANNA","ARTHUR","CHARLES",
+                  "EVE","OSKAR","SARA","ALAN","ALANNAH","CHRISTOPHER","DOMINIK","EVIE","JAN","MEGAN","NIALL","NICHOLAS","NICOLE","OISIN","THEO",
+                  "AISLING","CATHAL","LAYLA","MAISIE","MILLIE","NATALIA","ABIGAIL","EDWARD","ERIC","KEVIN","KIAN","MAEVE","ORLA","SADHBH","ALFIE",
+                  "KAI","PETER","RIAN","RORY","ANNABELLE","CORMAC","EOGHAN","LARA","LOGAN","MAIA","MASON","MOLLIE","SHANE","CATHERINE","ISABEL",
+                  "JAYDEN","PHILIP","AIDAN","EOIN","EVAN","ALICE","JAKE","EMILIA","ISABELLE","SAMUEL","JOSEPH","CIARA","JOHN","OSCAR","LAUREN"]
+  var lastNames = ["SMITH","BROWN","WILSON","CAMPBELL","STEWART","THOMSON","ROBERTSON", "ANDERSON",  "TAYLOR","SCOTT","REID", "MURRAY","CLARK","MOONEY",
+                  "WATSON","ROSS","YOUNG","MITCHELL","WALKER","MORRISON","PATERSON","GRAHAM","HAMILTON","FRASER","MARTIN","GRAY", "HENDERSON", "KERR",
+                  "FERGUSON","MILLER","CAMERON", "DAVIDSON","JOHNSTON","BELL","KELLY","DUNCAN", "HUNTER","SIMPSON", "ALLAN","GRANT","FITZPATRICK",
+                  "WALLACE","BLACK","RUSSELL","JONES","MARSHALL","SUTHERLAND","WRIGHT","GIBSON","BURNS","KENNEDY","HUGHES","GORDON","ROONEY", "LAMONT",
+                  "WHITE", "MURPHY", "WOOD", "CRAIG", "STEVENSON", "JOHNSTONE", "CUNNINGHAM", "WILLIAMSON", "MILNE", "SINCLAIR", "MUIR", "RITCHIE", 
+                  "WATT", "DOCHERTY","CRAWFORD","MILLAR","MOORE", "DOUGLAS","FLEMING","THOMPSON","KING", "MUNRO","WILLIAMS","CHRISTIE", "JACKSON","KAY",
+                  "SHAW","JAMIESON", "LINDSAY","HILL", "BOYLE", "BRUCE", "GREEN", "WARD", "RICHARDSON", "CURRIE", "QUINN", "REILLY", "ALEXANDER", "COOPER", 
+                  "DAVIES", "FORBES","WHYTE","HAY","HALL", "RAE","AITKEN" ,"RAMSAY","STRACHAN","BOYD","FINDLAY","HUTCHISON","CHALMERS","JOHNSON","PAUL",
+                  "IRVINE","PATON","ARMSTRONG","GALLACHER","BEATTIE","DUFFY","TAIT","ADAMS","COLLINS","GALLAGHER","DONALDSON","ROBINSON","BAIN","RENNIE", 
+                  "ROBERTS","BUCHANAN","MORGAN","LOGAN","MORRIS","DUNN","NICOL","CAIRNS","EVANS","TURNER" ,"ALI", "BLAIR","COOK","DONALD","DONNELLY",
+                  "HARRIS", "HIGGINS","BAIRD","GILMOUR","COWAN","THOMAS","CLARKE","MAXWELL", "MOFFAT","KANE","HENDRY","NELSON","LAWSON","KHAN","GILLESPIE",
+                  "HARRISON","LEE","SHARP","WELSH","BARCLAY","BARR","PARK","MURDOCH","INNES","TODD", "HARVEY","POLLOCK","EDWARDS", "PARKER","SPEIRS","BURGESS",
+                  "STEPHEN","BAXTER","CASSIDY","JACK","DRUMMOND","FISHER","LITTLE","STEELE","SPENCE","BENNETT","GILLIES", "MASON","LAING","MILLIGAN","BUCHAN",
+                  "COCHRANE","DAWSON","HOUSTON","MONTGOMERY","ALLISON","FORREST","TURNBULL","AHMED","BAILLIE","DICK","LYNCH","STUART","ADAM","CARSON","MATHESON",
+                  "WEBSTER","COWIE","LEWIS","NOBLE","GALLOWAY","HOWIE","MULLEN","LESLIE","MILLS","ORR","SHIELDS","SNEDDON","DOWNIE","HARPER","LAIRD", "LAMB",
+                  "MORTON","ROBB" ,"LAW","SWEENEY","O'BRIEN","PATTERSON" ,"PEARSON" ,"PHILLIPS","DEVLIN","DOHERTY","CARR","ELLIOTT","GARDNER","SINGH","GREIG",
+                  "HART","RODGER","STIRLING","GARDINER", "SMART","ADAMSON","BURNETT","LAWRIE","MAIR","SHEPHERD","FALCONER","GIBB","LOVE", "MOIR","CONNOR",
+                  "DAVIS","DUFF","FLETCHER","FULTON","GUNN","JAMES","LIVINGSTONE","MAIN","BRADLEY","CONNELLY","KIRK","BRYCE","HANNAH","WYLIE","CARROLL","HOOD",
+                  "CONNOLLY","HOLMES","BRADY","FARRELL","MALCOLM","NICHOLSON","WILKIE","GILL","WILKINSON","SHEARER","SWAN","COYLE","JENKINS","SIM","BYRNE","FORD",
+                  "FOSTER","GEDDES","LOW","HUTTON","LANG","MANN","WOODS","CALDER","CALDWELL","DEVINE","JEFFREY","O'CONNOR", "PORTER","RUTHERFORD","SLOAN","FLYNN",
+                  "ELLIS","WALSH","ROBSON","DOYLE","FOX","ROSE","ROY","STEEL","HENRY","REYNOLDS", "ALLEN", "CARMICHAEL","CHISHOLM","GEMMELL","HALLIDAY","NEIL",
+                  "PRICE","RYAN","BRYSON","COX","KEENAN","OLIVER","PIRIE","BALLANTYNE","BRENNAN","CHAPMAN","CULLEN","KNOX","MIDDLETON","BAKER","GRIEVE","HUSSAIN"];
+    var firstName= firstNames[getRandomIndex(0, firstNames.length + 1)].toLowerCase()
+    var lastName= lastNames[getRandomIndex(0, lastNames.length + 1)].toLowerCase()
+    var fullName = capitalizeName(firstName) + ' ' + capitalizeName(lastName); 
+    initializeStudent(fullName)
 }
 
 // Initialize connection
@@ -474,11 +517,10 @@ function textToSpeech(targetText){
 async function downloadbutton(e) {
     console.log(canvas.toDataURL());
     //merge two canvas contentes to one
-   // ctx.drawImage(document.getElementById('studentCanvas'),0,0);
-   zipImages[viewingPageNumber] = await mergeImages([localImages[viewingPageNumber], studentLocalImages[viewingPageNumber]]);
+    ctx.drawImage(document.getElementById('studentCanvas'),0,0);
     const link = document.createElement('a');
     link.download = 'download.png';
-    link.href = zipImages[viewingPageNumber];
+    link.href = canvas.toDataURL();
     link.click();
     link.delete;
 };
@@ -496,7 +538,7 @@ async function mergeStudentAndLocal(i) {
 async function zipFolderbutton(e) {  
     for(let i = 0; i <= pageNumber; i++){
         
-       // studentLocalImages[i] = studentCanvas.toDataURL("image/png");
+        studentLocalImages[viewingPageNumber] = studentCanvas.toDataURL("image/png");
         console.log("Image not stored locally, fetch from redis", i)
         const request = { type: "fetchImage", pageNumber:i, studentKey: studentKey};
         websocket.send(JSON.stringify(request))
