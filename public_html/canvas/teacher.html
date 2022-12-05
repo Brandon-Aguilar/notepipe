@@ -5,6 +5,7 @@
         <script type="text/javascript" src="../scripts/teacherCanvas.js" defer></script>
         <link rel="stylesheet" href="../styles/teacherCanvas.css">
         <link rel="stylesheet" href="../styles/normalize.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jost">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         <script src="https://cdn.jsdelivr.net/g/filesaver.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.0.279/build/pdf.min.js"></script>
@@ -55,10 +56,11 @@
               <input type="file" id="upload" onchange="interpretFile()">
             </div>
             <div class="header-right-dropdown">
-              <button class="users-button">
+              <button class="users-button" onclick="triggerUserList()">
                 <img class="users-icon" src="../icons/users-icon.svg" alt="Users">
               </button>
               <div class="header-right-dropdown-content">
+                <p onclick="triggerUserList()">Show User List</p>
                 <p>
                   <input type="button" name="name" value="Update Name" onclick="showEditName()" />
                   <input class="hide" type="text" id="nameTextBox">
@@ -68,7 +70,6 @@
             </div>
             <div>
               <input id="showUserList" type="checkbox" />
-              <label for="showUserList">Show Users</label>
               <div class="panel-wrap">
                 <div class="panel">
                   <div class="list" id="userList">
@@ -85,7 +86,7 @@
           <div class="header-right">
 
             <div class="header-right-dropdown">
-              <button class="save-button">
+              <button class="save-button" onclick="zipFolderbutton()">
                 <img class="save-icon" src="../icons/save-icon.svg" alt="Save">
               </button>
               <div class="header-right-dropdown-content">
@@ -95,7 +96,7 @@
             </div>
 
             <div class="header-right-dropdown">
-              <button class="link-button">
+              <button class="link-button" onclick="copyJoinKey()">
                 <img class="link-icon" src="../icons/link-icon.svg" alt="Link">
               </button>
               <div class="header-right-dropdown-content">

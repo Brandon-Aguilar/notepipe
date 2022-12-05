@@ -135,17 +135,18 @@ currentPageNumberElement = document.getElementById('currentPageNumber');
 showUserListElement = document.getElementById("showUserList");
 
 var showUserListBool=false;
-showUserListElement.addEventListener('change', () => {
-    if(showUserListElement.checked){
+
+function triggerUserList(){
+    if(showUserListBool){
+        clearUserList()
+        showUserListBool = false
+    } else {
         console.log("user list has been requested ")
         getUserlist()
-        showUserListBool=true
+        showUserListBool = true
     }
-    else{
-        clearUserList()
-        showUserListBool=false
-    }
-});
+    showUserListElement.checked = showUserListBool;
+}
 
 function getUserlist(){
     clearUserList()
@@ -596,6 +597,7 @@ function navigateToPage(pageWanted){
                 });
 
                 incomingDrawInstructions[pageWanted] = [];
+                layerHighlightCanvas(ctx);
             }
         }
         viewingPageNumber = pageWanted;

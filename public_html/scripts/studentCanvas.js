@@ -136,17 +136,16 @@ function sendStroke(e) {
 // Send canvas updates, triggered by click end
 function sendUpdate() {
     console.log("Sending canvas")
+    layerHighlightCanvas(ctx);
     var imageURL = canvas.toDataURL("image/png", 0.2);
-    var studentImageURL = studentCanvas.toDataURL("image/png");
-    mergeImages([imageURL, studentImageURL]).then(b64 => {
-        var message = {
-            type: "canvasUpdate",
-            pageNumber: viewingPageNumber,
-            imageURL: b64,
-        }
+    
+    var message = {
+        type: "canvasUpdate",
+        pageNumber: viewingPageNumber,
+        imageURL: imageURL,
+    }
 
-        websocket.send(JSON.stringify(message))
-    });
+    websocket.send(JSON.stringify(message))
 }
 
 function sendStudentDrawUpdate() {
@@ -580,18 +579,18 @@ function arrayBuffr(){
 showUserListElement = document.getElementById("showUserList");
 
 var showUserListBool=false;
-showUserListElement.addEventListener('change', () => {
-    if(showUserListElement.checked){
 
-        getUserlist()
-        showUserListBool=true
-    }
-    else{
-
+function triggerUserList() {
+    if (showUserListBool) {
         clearUserList()
-        showUserListBool=false
+        showUserListBool = false
+    } else {
+        console.log("user list has been requested ")
+        getUserlist()
+        showUserListBool = true
     }
-});
+    showUserListElement.checked = showUserListBool;
+}
 
 var localUserListID=[]
 var localUserListName=[]
@@ -899,6 +898,7 @@ function navigateToPage(pageWanted){
                     });
 
                     incomingDrawInstructions[pageWanted] = [];
+                    layerHighlightCanvas(ctx);
                 }
             }
 
