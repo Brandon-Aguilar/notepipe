@@ -465,11 +465,10 @@ function textToSpeech(targetText){
 async function downloadbutton(e) {
     console.log(canvas.toDataURL());
     //merge two canvas contentes to one
-   // ctx.drawImage(document.getElementById('studentCanvas'),0,0);
-   zipImages[viewingPageNumber] = await mergeImages([localImages[viewingPageNumber], studentLocalImages[viewingPageNumber]]);
+    ctx.drawImage(document.getElementById('studentCanvas'),0,0);
     const link = document.createElement('a');
     link.download = 'download.png';
-    link.href = zipImages[viewingPageNumber];
+    link.href = canvas.toDataURL();
     link.click();
     link.delete;
 };
@@ -487,7 +486,7 @@ async function mergeStudentAndLocal(i) {
 async function zipFolderbutton(e) {  
     for(let i = 0; i <= pageNumber; i++){
         
-       // studentLocalImages[i] = studentCanvas.toDataURL("image/png");
+        studentLocalImages[viewingPageNumber] = studentCanvas.toDataURL("image/png");
         console.log("Image not stored locally, fetch from redis", i)
         const request = { type: "fetchImage", pageNumber:i, studentKey: studentKey};
         websocket.send(JSON.stringify(request))
