@@ -549,7 +549,6 @@ var localUserListName=[]
 var broadcastingList=[]
 var absoluteJoinLink = "";
 var userListHtmlId= "Users"
-var instructorBroadcasting=undefined
 
 var websocketID = "";
 // Handle messages sent to client
@@ -577,12 +576,8 @@ function processMessage({ data }) {
             var headerId="";
             for (const [key, value] of Object.entries(newObj)) {
                 headerId=value.id+"#"
-                if(value.name== "defaultTeacher"){
-                    if(value.canBroadcast)
-                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' class='activeButton'> Broadcasting</button>"
-                    else
-                        tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' class='inactiveButton'> Not Broadcasting</button>"
-                    instructorBroadcasting=value.id
+                if(value.name== "Instructor"){
+                    tmpContent= "<h4 id='"+headerId+"'>"+value.name+"</h4> <button id='"+value.id+"' class='activeButton'> Broadcasting</button>"
                 }  
                 else{
                     if(value.canBroadcast)
@@ -613,7 +608,6 @@ function processMessage({ data }) {
                 localUserListName.splice(found, 1)
 
                 if(event.canBroadcast){
-                    //student that was broadcasting has left, return privilage to instructor
                     found =broadcastingList.findIndex(element => element == event.id);
                     broadcastingList.splice(found,1)
                     for(i=0; i<broadcastingList.length; i++){
@@ -717,11 +711,7 @@ function grantBroadcastingPrivilege(id){
 function removeBroadcastingPrivilege(id){
     removePermission = { type: "updateUserPermission", id: id, allowBroadcast:false};
     websocket.send(JSON.stringify(removePermission))
-
-    if(id==instructorBroadcasting)
-        document.getElementById(id).innerHTML="Not Broadcasting"
-    else
-        document.getElementById(id).innerHTML="Allow Broadcast"    
+    document.getElementById(id).innerHTML="Allow Broadcast"    
     document.getElementById(id).className = 'inactiveButton'
 }
 

@@ -420,52 +420,29 @@ function resize() {
   ctx.drawImage(inMemCanvas, 0, 0);
 }
 
+
 function getRandomIndex(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
-function capitalizeName(string){
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
 function createStudentName(){
-  var firstNames = ["DANIEL","JAMES","EMILY","JACK","CONOR","AMELIA","ADAM","LIAM","NOAH","EMMA","MIA","ANNA","OLIVIA","CILLIAN","HANNAH", "OLIVER",
-                  "OLIVER","SOPHIE","AOIFE","HARRY","CHARLIE","GRACE","AVA","FINN","LILY","THOMAS","FIONN","PATRICK","CHLOE","DAVID","LUKE","MICHAEL",
-                  "CIAN","SARAH","DYLAN","ELLA","SOPHIA","LUCY","ALEX","ALEXANDER","MATTHEW","JULIA","RYAN","BEN","SAOIRSE","ETHAN","KATE", 
-                  "NATHAN","SOFIA","CARA","ERIN","DARRAGH","LEO","ROBYN","BENJAMIN","LEON","AARON","LENA","ZOE","FILIP","MAX","MAYA","MOLLY",
-                  "JESSICA","ELLIE","WILLIAM","JACOB","SEAN","ELIZABETH","SENAN","HANNA","JAKUB","MARIA","EVA","FIADH","ISABELLA","JAMIE","JOSHUA",
-                  "SAM","CAOIMHE","HUGO","LAURA","RUBY","CHARLOTTE","FREYA","LEAH","MUHAMMAD","NIAMH","SEBASTIAN","TOM","ISAAC","RONAN","HENRY",
-                  "CLARA","HOLLY","KATIE","AMY","ANTONI","MAJA","ROBERT","ISLA","KYLE","LILIANA","LUCAS","CALLUM","RACHEL",
-                  "SIENNA","VICTORIA","ALEXANDRA","ANDREW","BOBBY","LUCA","NINA","ELLEN","ROSE","ZARA","CLODAGH","MARK","MILA","REBECCA",
-                  "DARA","GABRIEL","GEORGE","ALEKSANDER","ALICIA","ALICJA","ANNIE","CAITLIN", "SADIE","OLLIE","ZOFIA","ZUZANNA","ARTHUR","CHARLES",
-                  "EVE","OSKAR","SARA","ALAN","ALANNAH","CHRISTOPHER","DOMINIK","EVIE","JAN","MEGAN","NIALL","NICHOLAS","NICOLE","OISIN","THEO",
-                  "AISLING","CATHAL","LAYLA","MAISIE","MILLIE","NATALIA","ABIGAIL","EDWARD","ERIC","KEVIN","KIAN","MAEVE","ORLA","SADHBH","ALFIE",
-                  "KAI","PETER","RIAN","RORY","ANNABELLE","CORMAC","EOGHAN","LARA","LOGAN","MAIA","MASON","MOLLIE","SHANE","CATHERINE","ISABEL",
-                  "JAYDEN","PHILIP","AIDAN","EOIN","EVAN","ALICE","JAKE","EMILIA","ISABELLE","SAMUEL","JOSEPH","CIARA","JOHN","OSCAR","LAUREN"]
-  var lastNames = ["SMITH","BROWN","WILSON","CAMPBELL","STEWART","THOMSON","ROBERTSON", "ANDERSON",  "TAYLOR","SCOTT","REID", "MURRAY","CLARK","MOONEY",
-                  "WATSON","ROSS","YOUNG","MITCHELL","WALKER","MORRISON","PATERSON","GRAHAM","HAMILTON","FRASER","MARTIN","GRAY", "HENDERSON", "KERR",
-                  "FERGUSON","MILLER","CAMERON", "DAVIDSON","JOHNSTON","BELL","KELLY","DUNCAN", "HUNTER","SIMPSON", "ALLAN","GRANT","FITZPATRICK",
-                  "WALLACE","BLACK","RUSSELL","JONES","MARSHALL","SUTHERLAND","WRIGHT","GIBSON","BURNS","KENNEDY","HUGHES","GORDON","ROONEY", "LAMONT",
-                  "WHITE", "MURPHY", "WOOD", "CRAIG", "STEVENSON", "JOHNSTONE", "CUNNINGHAM", "WILLIAMSON", "MILNE", "SINCLAIR", "MUIR", "RITCHIE", 
-                  "WATT", "DOCHERTY","CRAWFORD","MILLAR","MOORE", "DOUGLAS","FLEMING","THOMPSON","KING", "MUNRO","WILLIAMS","CHRISTIE", "JACKSON","KAY",
-                  "SHAW","JAMIESON", "LINDSAY","HILL", "BOYLE", "BRUCE", "GREEN", "WARD", "RICHARDSON", "CURRIE", "QUINN", "REILLY", "ALEXANDER", "COOPER", 
-                  "DAVIES", "FORBES","WHYTE","HAY","HALL", "RAE","AITKEN" ,"RAMSAY","STRACHAN","BOYD","FINDLAY","HUTCHISON","CHALMERS","JOHNSON","PAUL",
-                  "IRVINE","PATON","ARMSTRONG","GALLACHER","BEATTIE","DUFFY","TAIT","ADAMS","COLLINS","GALLAGHER","DONALDSON","ROBINSON","BAIN","RENNIE", 
-                  "ROBERTS","BUCHANAN","MORGAN","LOGAN","MORRIS","DUNN","NICOL","CAIRNS","EVANS","TURNER" ,"ALI", "BLAIR","COOK","DONALD","DONNELLY",
-                  "HARRIS", "HIGGINS","BAIRD","GILMOUR","COWAN","THOMAS","CLARKE","MAXWELL", "MOFFAT","KANE","HENDRY","NELSON","LAWSON","KHAN","GILLESPIE",
-                  "HARRISON","LEE","SHARP","WELSH","BARCLAY","BARR","PARK","MURDOCH","INNES","TODD", "HARVEY","POLLOCK","EDWARDS", "PARKER","SPEIRS","BURGESS",
-                  "STEPHEN","BAXTER","CASSIDY","JACK","DRUMMOND","FISHER","LITTLE","STEELE","SPENCE","BENNETT","GILLIES", "MASON","LAING","MILLIGAN","BUCHAN",
-                  "COCHRANE","DAWSON","HOUSTON","MONTGOMERY","ALLISON","FORREST","TURNBULL","AHMED","BAILLIE","DICK","LYNCH","STUART","ADAM","CARSON","MATHESON",
-                  "WEBSTER","COWIE","LEWIS","NOBLE","GALLOWAY","HOWIE","MULLEN","LESLIE","MILLS","ORR","SHIELDS","SNEDDON","DOWNIE","HARPER","LAIRD", "LAMB",
-                  "MORTON","ROBB" ,"LAW","SWEENEY","O'BRIEN","PATTERSON" ,"PEARSON" ,"PHILLIPS","DEVLIN","DOHERTY","CARR","ELLIOTT","GARDNER","SINGH","GREIG",
-                  "HART","RODGER","STIRLING","GARDINER", "SMART","ADAMSON","BURNETT","LAWRIE","MAIR","SHEPHERD","FALCONER","GIBB","LOVE", "MOIR","CONNOR",
-                  "DAVIS","DUFF","FLETCHER","FULTON","GUNN","JAMES","LIVINGSTONE","MAIN","BRADLEY","CONNELLY","KIRK","BRYCE","HANNAH","WYLIE","CARROLL","HOOD",
-                  "CONNOLLY","HOLMES","BRADY","FARRELL","MALCOLM","NICHOLSON","WILKIE","GILL","WILKINSON","SHEARER","SWAN","COYLE","JENKINS","SIM","BYRNE","FORD",
-                  "FOSTER","GEDDES","LOW","HUTTON","LANG","MANN","WOODS","CALDER","CALDWELL","DEVINE","JEFFREY","O'CONNOR", "PORTER","RUTHERFORD","SLOAN","FLYNN",
-                  "ELLIS","WALSH","ROBSON","DOYLE","FOX","ROSE","ROY","STEEL","HENRY","REYNOLDS", "ALLEN", "CARMICHAEL","CHISHOLM","GEMMELL","HALLIDAY","NEIL",
-                  "PRICE","RYAN","BRYSON","COX","KEENAN","OLIVER","PIRIE","BALLANTYNE","BRENNAN","CHAPMAN","CULLEN","KNOX","MIDDLETON","BAKER","GRIEVE","HUSSAIN"];
-    var firstName= firstNames[getRandomIndex(0, firstNames.length + 1)].toLowerCase()
-    var lastName= lastNames[getRandomIndex(0, lastNames.length + 1)].toLowerCase()
-    var fullName = capitalizeName(firstName) + ' ' + capitalizeName(lastName); 
+    var firstNames = ["Unique", "Memorable", "Creative", "Funny", "Cute", "Cool", "Strong", "Independent", "Bold",
+                    "Smart", "Successful", "Driven", "Determined", "Persistent", "Resourceful", "Remarkable", "Extraordinary",
+                    "Confident", "Reliable", "Relaxed", "Easygoing", "Friendly", "Approachable", "Understanding",
+                    "Patient", "Generous", "Trustworthy", "Supportive", "Creative", "Unique", "Intuitive", "Perceptive",
+                    "Analytical", "Charming", "Confident", "Imaginative", "Daring", "Innovative", "Adorable", "Angelic",
+                    "Delightful", "Clever", "Bright", "Insightful", "Intelligent", "Sweet", "Artistic", "Poetic", "Gentle", 
+                    "Dreamy", "Graceful", "Peaceful", "Pretty", "Lovely", "Witty", "Elegant", "Adventurous", "Cheerful",
+                    "Cautious", "Courageous", "Curious", "Enthusiastic", "Friendly", "Glamorous", "Graceful", "Kind",
+                    "Jolly", "Magnificent", "Talented", "Mysterious", "Lovely", "Inquisitive", "Glorious", "Gorgeous"];
+
+    var lastNames = ["Dog", "Cat", "Panther", "Tiger", "Lion", "Leopard", "Cheetah", "Bear", "Elephant", "Turtle", 
+                    "Crocodile", "Rabbit", "Fish", "Alligator", "Frog", "Dolphin", "Eagle", "Ostrich", "Fox", "Emu", 
+                    "Wolf", "Beaver", "Giraffe", "Panda", "Hamster", "Cobra", "Shark", "Camel", "Deer", "Chameleon", 
+                    "Tortoise", "Armadillo", "Hippopotamus", "Jaguar", "Kangaroo", "Iguana", "Koala", "Lizard", 
+                    "Llama", "Jellyfish", "Zebra", "Hedgehog", "Buffalo", "Sheep", "Meerkat", "Mouse", "Flamingo",
+                    "Vulture", "Owl", "Sloth", "Racoon", "Duck", "Swan", "Lizard", "Peacock", "Crab", "Salmon", "Eel"];
+    var fullName= firstNames[getRandomIndex(0, firstNames.length)]  + ' ' + lastNames[getRandomIndex(0, lastNames.length)]
     initializeStudent(fullName)
 }
 
@@ -675,7 +652,6 @@ function processMessage({ data }) {
             incomingDrawInstructions.push([]);
             setCurrentPageText();
             break;
-
         case "NewpagesInserted":    
             pageNumber += 1;  
             width = canvas.width;
@@ -736,101 +712,111 @@ function processMessage({ data }) {
             audio.controls = true;
             audio.play();
             break;
-       case "fullUserList":
+        case "fullUserList":
             newObj = JSON.parse(event.names);
             localUserObjects = newObj;
             var tmpContent = "";
             for (const [key, value] of Object.entries(newObj)) {
+                var tmpButton = "";
                 tmpContent= "<h4 id='"+value.id+"'> "+value.name+"</h4>"  
-                // if(value.canBroadcast)
-                //     tmpContent += " <button id='"+value.id+"' class='activeButton'> Broadcasting</button>"
-                if(localUserListID.length == 0)
+                if(value.canBroadcast)
+                    tmpButton += "<button id='"+value.id+"button"+"' class='activeButton'> Broadcasting</button>";
+                if(localUserListID.length == 0){
                     document.getElementById("Users").insertAdjacentHTML("afterend", tmpContent);
+                    document.getElementById(value.id).insertAdjacentHTML("afterend", tmpButton);
+                }
+
                 else{
-                    document.getElementById(localUserListID[localUserListID.length-1]).insertAdjacentHTML("afterend", tmpContent);
+                    if(document.getElementById(localUserListID[localUserListID.length-1]+"button"))
+                        document.getElementById(localUserListID[localUserListID.length-1]+"button").insertAdjacentHTML("afterend", tmpContent);
+                    else
+                        document.getElementById(localUserListID[localUserListID.length-1]).insertAdjacentHTML("afterend", tmpContent);
+                    document.getElementById(value.id).insertAdjacentHTML("afterend", tmpButton);
                 }
                 //store into local arrays
                 localUserListID.push(value.id)
                 localUserListName.push(value.name)
             }
             break
-            case "removeUserFromList":
-                if(showUserListBool){
-                    document.getElementById(event.id).remove()
-                    document.getElementById(event.id).remove()//delete the button
+        case "removeUserFromList":
+            if(showUserListBool){
+                document.getElementById(event.id).remove()
+                document.getElementById(event.id+"button").remove()//delete the button
 
-                    //update local arrays
-                    found = localUserListID.findIndex(element => element == event.id);
-                    localUserListID.splice(found,1)
-                    localUserListName.splice(found, 1)
-                    delete localUserObjects[stringToUUID(event.id)];
+                //update local arrays
+                found = localUserListID.findIndex(element => element == event.id);
+                localUserListID.splice(found,1)
+                localUserListName.splice(found, 1)
+                delete localUserObjects[stringToUUID(event.id)];
+            }
+            break
+        case "updateUserName":
+            if(showUserListBool){
+                //delete current user name from user list html
+                document.getElementById(event.id).remove()//delete the button
+
+                //delete from user name from local arrays
+                found = localUserListID.findIndex(element => element == event.id);
+                localUserListID.splice(found,1)
+                localUserListName.splice(found, 1)
+
+                //add updated name to local arrays 
+                localUserListName.push(event.name)//add name to list
+                localUserListName.sort()//sort the list
+                found = localUserListName.findIndex(element => element == event.name);//find index of new name
+                localUserListID.splice(found, 0, event.id)//insert user id in proper index
+                localUserObjects[stringToUUID(event.id)].name = event.name
+
+                //check if user had broadcasting privilage 
+                tmpContent= "<h4 id='"+event.id+"'> "+event.name+"</h4>" 
+
+                //insert alphabetical location
+                if(found == 0){//insert at the beginning of the list
+                    document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
                 }
-                break
-            case "updateUserName":
-                if(showUserListBool){
-                    //delete current user name from user list html
-                    document.getElementById(event.id).remove()//delete the button
-    
-                    //delete from user name from local arrays
-                    found = localUserListID.findIndex(element => element == event.id);
-                    localUserListID.splice(found,1)
-                    localUserListName.splice(found, 1)
-    
-                    //add updated name to local arrays 
-                    localUserListName.push(event.name)//add name to list
-                    localUserListName.sort()//sort the list
-                    found = localUserListName.findIndex(element => element == event.name);//find index of new name
-                    localUserListID.splice(found, 0, event.id)//insert user id in proper index
-                    localUserObjects[stringToUUID(event.id)].name = event.name
-    
-                    //check if user had broadcasting privilage 
-                    tmpContent= "<h4 id='"+event.id+"'> "+event.name+"</h4>" 
-    
-                    //insert alphabetical location
-                    if(found == 0){//insert at the beginning of the list
-                        document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
-                    }
-                    else{//insert anywhere else 
-                        document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
-                    }
+                else{//insert anywhere else 
+                    document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
                 }
-                break;
-            case "newUserJoined":
-                if(showUserListBool){
-                    localUserListName.push(event.name)//add name to list
-                    localUserListName.sort()//sort the list
-                    found = localUserListName.findIndex(element => element == event.name);//find index of new user
-                    localUserListID.splice(found, 0, event.id)//insert user id in proper index
-                    localUserObjects[stringToUUID(event.id)] = event.user;
-    
-                    //create the name and button that needs to be added
-                    tmpContent= "<h4 id='"+event.id+"'> "+event.name+"</h4>" 
-    
-                    if(found == 0){//insert at the beginning of the list
-                        document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
-                    }
-                    else{//insert anywhere else 
-                        document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
-                    }
+            }
+            break;
+        case "newUserJoined":
+            if(showUserListBool){
+                localUserListName.push(event.name)//add name to list
+                localUserListName.sort()//sort the list
+                found = localUserListName.findIndex(element => element == event.name);//find index of new user
+                localUserListID.splice(found, 0, event.id)//insert user id in proper index
+                localUserObjects[stringToUUID(event.id)] = event.user;
+
+                //create the name and button that needs to be added
+                tmpContent= "<h4 id='"+event.id+"'> "+event.name+"</h4>" 
+
+                if(found == 0){//insert at the beginning of the list
+                    document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
                 }
-                break
-            case "endHighlightStroke":
-                if (event.srcID == websocketID) {
-                    return;
+                else{//insert anywhere else 
+                    document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
                 }
-                processHighlight = true;
-                break;
-            case "updateUserPermissions":
+            }
+            break
+        case "endHighlightStroke":
+            if (event.srcID == websocketID) {
+                return;
+            }
+            processHighlight = true;
+            break;
+        case "updateUserPermissions":
                 localUserObjects[stringToUUID(event.id)].canBroadcast = event.canBroadcast;
-                //if(!event.canBroadcast){
-                //    document.getElementById(event.id).getElementsByClassName("activeButton").getremove()//delete the button
-                //}
-                //else{
-                //    tmpContent = " <button id='"+event.id+"' class='activeButton'> Broadcasting</button>"  
-                //    document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
-                //}
+                if(event.canBroadcast && !document.getElementById(event.id+"button")){ // if they can broadcast and button doesn't exits already
+                   tmpContent = " <button id='"+event.id+"button" + "' class='activeButton'> Broadcasting</button>"  
+                   document.getElementById(event.id).insertAdjacentHTML("afterend", tmpContent);
+                }
+                
+                else{
+                    if(document.getElementById((event.id+"button")))
+                        document.getElementById((event.id+"button")).remove()//delete the button
+                }
                 break;
-            }   
+    }   
 }
 
 function getUserlist(){
