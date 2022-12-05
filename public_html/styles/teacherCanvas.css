@@ -366,7 +366,7 @@
     opacity: .75;
   }
 
-  .color-button{
+  .color-button, .highlight-button, .eraser-button{
     margin-top: 5px;
   }
 
@@ -374,7 +374,7 @@
     margin-top: 15px;
   }
 
-  .eraser-button{
+  .disable-touch{
     margin-top: 5px;
     margin-bottom: 5px;
   }
