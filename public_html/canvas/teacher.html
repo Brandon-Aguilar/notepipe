@@ -184,12 +184,23 @@
 
         <div id="slider-div" class="slider-menu">
           <div id="container" class="slider-container">
-            <input onchange='changeWidth(this.value)' type="range" min="1" max="40" value="2">
-            <p style="color:white;">Thickness</p>
+            <input onchange='changeWidth(this.value)' type="range" min="1" max="40" value="5">
+            <p style="color:white;">Pen Thickness</p>
+            <input onchange='changeEraserWidth(this.value)' type="range" min="1" max="40" value="5">
+            <p style="color:white;">Eraser Thickness</p>
           </div>
         </div>
-        
-        <div id="color-div" class="color-menu">
+
+        <!--
+        <div id="eraser-div" class="eraser-menu">
+          <div id="container" class="eraser-container">
+            <input onchange='changeEraserWidth(this.value)' type="range" min="1" max="40" value="5">
+            <p style="color:white;">Eraser Thickness</p>
+          </div>
+        </div>
+        -->
+
+        <div id="color-div" class="color-menu" style="top:65%">
           <div id="container" class="color-container">
             <canvas id="colorsCanvas" class="canvas_colors" width="150" height="100" style="left: 0; z-index: 1; position: absolute;"></canvas>
             <canvas id="colorsIndicatorCanvas" class="canvas_colors" width="150" height="100" style="left: 0; z-index: 2; position: absolute;"></canvas>
@@ -203,11 +214,6 @@
               <div class="draw-tool">
                 <button class="color-button" onclick="showSlider()" id="slider">
                   <img src="/icons/line-weight.svg" alt="Line Weight">
-                </button>
-              </div>
-              <div class="draw-tool">
-                <button class="color-button" onclick="showColors()" id="colors">
-                  <img src="/icons/color-circle.svg" alt="Color Picker">
                 </button>
               </div>
               <div class="draw-tool">
@@ -228,6 +234,11 @@
               <div class="draw-tool">
                 <button class="color-button" onclick="changeColor('green')" id="green">
                   <img src="../icons/green-icon.svg" alt="Green">
+                </button>
+              </div>
+              <div class="draw-tool">
+                <button class="color-button" onclick="showColors()" id="colors">
+                  <img src="/icons/color-circle.svg" alt="Color Picker">
                 </button>
               </div>
               <div class="draw-tool">

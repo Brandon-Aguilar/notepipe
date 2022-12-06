@@ -29,6 +29,7 @@ context_colors.fillRect(0, 0, width_colors, height_colors);
 
 canvas_indicator_colors.addEventListener('click', event => {
     enableTouch();
+    markerWidth = drawWidth;
     const rect = event.target.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -74,7 +75,17 @@ function showSlider() {
 // Change width of the marker based on input from a HTML slider
 function changeWidth(newWidth) {
     enableTouch();
-    markerWidth = newWidth;
+    drawWidth = newWidth;
+    //markerWidth = drawWidth;
+    //eraserState= false;
+    ctx.globalCompositeOperation = 'source-over';
+};
+
+// Change width of the eraser based on input from a HTML slider
+function changeEraserWidth(newWidth) {
+    enableTouch();
+    eraserWidth = newWidth;
+    //markerWidth = eraserWidth;
     //eraserState= false;
     ctx.globalCompositeOperation = 'source-over';
 };

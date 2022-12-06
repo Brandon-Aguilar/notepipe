@@ -279,6 +279,8 @@ var force = 1;//marker thickness
 var color = "red";//marker color
 var drawInstructions = [];
 var markerWidth = 5;
+var eraserWidth = 5;
+var drawWidth = 5;
 var allowDraw = false;
 
 var isPointerDown = false;
@@ -333,6 +335,7 @@ function sendUpdate() {
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
     enableTouch();
+    markerWidth = drawWidth;
     highlightDraw = false;
     color = newColor;
     eraserState= false;
@@ -342,6 +345,7 @@ function changeColor(newColor) {
 
 // Eraser
 function eraser() {
+    markerWidth = eraserWidth;
     enableTouch();
     eraserState = true;
     highlightDraw = false;
@@ -366,11 +370,22 @@ function draw(data) {
     }
     currentCtx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
     currentCtx.strokeStyle = data.color;//original default stroke color 
-    currentCtx.lineWidth = data.force;//stroke width
+    //currentCtx.lineWidth = data.force;
+    
+    //stroke width
+    if (data.eraserState === true) {
+        currentCtx.lineWidth = eraserWidth;
+    }
+    else {
+        currentCtx.lineWidth = drawWidth;
+    }
+
     currentCtx.lineCap = 'round';
     if (data.highlightDraw) {
         currentCtx.globalCompositeOperation = "multiply"; currentCtx.strokeStyle = "#FF0"; currentCtx.globalAlpha = 1; currentCtx.lineWidth = 40;
     }
+
+
 
     currentCtx.beginPath();
     currentCtx.moveTo(data.lastPoint.x, data.lastPoint.y);//the x,y corrdinate of the last point
