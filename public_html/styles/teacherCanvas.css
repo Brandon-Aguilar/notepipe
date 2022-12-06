@@ -102,7 +102,7 @@
     align-items: center;
     justify-content: center;
   }*/
-  #previousPage, #nextPage, #newpage, #reset, #uploadFile, #broadcastToggle, .users-button, .follow-teacher-button {
+  #previousPage, #nextPage, #newpage, #reset, #uploadFile, #broadcastToggle, #followToggle, .users-button, .follow-teacher-button {
     height: 40px;
     width: 40px;
     border-radius: 20px;
@@ -786,4 +786,11 @@ input[type="button"], #updateName{
 
 #gestureToggle {
   background-color: #FFF;
+}
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 48
 }
