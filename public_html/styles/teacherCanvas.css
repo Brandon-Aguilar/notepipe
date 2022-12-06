@@ -422,7 +422,15 @@
     height: 24px;
   }
 
-  
+  .text-to-speech-button {
+    margin-top: 5px;
+  }
+
+  .text-to-speech-button img{
+    height: 24px;
+    fill: #FFF;
+}
+
   .text-to-speech-controls{
     display: flex;
     justify-content: center;
