@@ -90,7 +90,8 @@ highlightCanvas.style.touchAction = 'manipulation';
 highlightCanvas.style.opacity = 0.5;
 
 //Fetch HTML elements that need event listners
-var ocr = document.getElementById("editNote");
+$('#floatingEditorButton').draggable();
+var ocr = document.getElementById('floatingEditorButton');
 const download = document.getElementById('download');
 const updateName = document.getElementById('updateName');
 
@@ -100,7 +101,6 @@ window.addEventListener('resize', resize);
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', createStudentName)
 download.addEventListener('click', downloadbutton);
-ocr.addEventListener('click', showTextEditor);
 updateName.addEventListener('click', editName);
 
 //listen for input for edit name using input box in student.html
@@ -302,9 +302,16 @@ function layerHighlightCanvas(ctx){
     highlightCtx.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
 }
 
+var dragged = false;
+ocr.addEventListener('mousedown', function () { dragged = false })
+ocr.addEventListener('mousemove', function () { dragged = true })
+ocr.addEventListener('mouseup', function() {
+        if (dragged == true) { return }
+        showTextEditor();
+})
 
 function showTextEditor(){
-    ocr.disabled = true;
+    ocr.style.display = "none";
 
     // Create editor container
     var html = [
@@ -360,7 +367,7 @@ function showTextEditor(){
     // Event listener for 'X' button
     xBtn.addEventListener('click', function(){
         document.getElementById('textEditor').remove();
-        ocr.disabled = false;
+        ocr.style.display = "";
     });
 
     // Event listener for 'Download' button
