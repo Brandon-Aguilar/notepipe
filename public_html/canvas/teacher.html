@@ -29,6 +29,9 @@
                 <button id="previousPage">
                     <img class="navigation-icon" src="../icons/left-arrow.svg" alt="Previous Page">
                 </button>
+                <div class="button-tooltip">
+                  Previous Page
+                </div>
               </div>
               <div class="current-page-counter"> 
                 <p id="currentPageNumber">1/1</p>
@@ -37,12 +40,18 @@
                 <button id="nextPage">
                   <img class="navigation-icon" src="../icons/right-arrow.svg" alt="Next Page">
                 </button>
+                <div class="button-tooltip">
+                  Next Page
+                </div>
               </div>
             </div>
             <div class="new-page-button">
               <button id="newpage">
                 <img class="new-page-icon" id="n" src="../icons/new-page-icon.svg" alt="New Page">
               </button>
+              <div class="button-tooltip">
+                  Create New Page
+              </div>
             </div>
             <div class="upload-button">
                 <button id = "uploadFile">
@@ -51,6 +60,9 @@
                   </label>
                 </button>
               <input type="file" id="upload" onchange="interpretFile()">
+              <div class="button-tooltip">
+                Upload
+              </div>
             </div>
             <div class="header-right-dropdown">
               <button class="users-button" onclick="triggerUserList()">

@@ -102,7 +102,7 @@
     align-items: center;
     justify-content: center;
   }*/
-  #previousPage, #nextPage, #newpage, #reset, #uploadFile, #broadcastToggle, #followToggle, .users-button, .follow-teacher-button {
+  #previousPage, #nextPage, #newpage, #reset, #uploadFile, #broadcastToggle, #followToggle, .users-button, #followTeacher {
     height: 40px;
     width: 40px;
     border-radius: 20px;
@@ -113,7 +113,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
   }
+
+  .button-tooltip{
+    position: absolute;
+    background-color:gray;
+    color: white;
+    font-size: smaller;
+
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
+
+    border-radius: 4px;
+    bottom: -25px;
+
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .new-page-button:hover .button-tooltip, .upload-button:hover .button-tooltip, .page-navigation-button:hover .button-tooltip, .follow-teacher-button:hover .button-tooltip, .broadcast-button:hover .button-tooltip{
+    opacity: 1;
+  }
+
   .page-navigation-bar button{
     height: 32px;
     width: 32px;
@@ -149,11 +173,11 @@
     align-items: center;
   }
 
-  .follow-teacher-button button{
+  /* .follow-teacher-button button{
     background: none;
     border: none;
     padding-top: 5px;
-  }
+  } */
 
   .follow-teacher-icon{
     height: 24px;
@@ -192,9 +216,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .header-right button{
     margin-right: 5px;
   }
 
