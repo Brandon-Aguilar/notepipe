@@ -314,7 +314,7 @@
     display: none;
     flex-direction: column;
     position: fixed;
-    top: 35%;
+    top: 25%;
     left: 80px;
     width: 150px;
     z-index: 101;
@@ -331,34 +331,14 @@
     align-items: center;
   }
 
-  .eraser-menu{
-    display: none;
-    flex-direction: column;
-    position: fixed;
-    top: 50%;
-    left: 80px;
-    width: 150px;
-    z-index: 101;
-  }
-
-  .eraser-container{
-    display: flex;
-    flex-direction: column;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    background-color: #323336;
-    align-items: center;
-  }
-
   .color-menu{
     display: none;
     flex-direction: column;
-    top: 10px;
+    position: fixed;
+    top: 55%;
     left: 80px;
-    width: 300x;
-    height: 200px;
+    width: 150px;
+    height: 100px;
     z-index: 105;
   }
 
