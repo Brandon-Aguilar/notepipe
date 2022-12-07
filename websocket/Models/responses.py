@@ -167,6 +167,12 @@ class endHighlightStroke(response):
         self.__type__ = self.__class__.__name__
         self.srcID = srcID
 
+class followHost(response):
+    def __init__(self, pageNumber=None) -> None:
+        super().__init__()
+        self.__type__ = self.__class__.__name__
+        self.pageNumber = pageNumber
+
 class updateUserPermissions(response):
     def __init__(self, id=None, canBroadcast=None) -> None:
         super().__init__()

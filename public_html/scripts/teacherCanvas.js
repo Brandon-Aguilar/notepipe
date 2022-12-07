@@ -555,6 +555,8 @@ function navigateToPage(pageWanted){
         }
         viewingPageNumber = pageWanted;
         setCurrentPageText();
+        const event= {type: "followHost", pageNumber: viewingPageNumber}
+        websocket.send(JSON.stringify(event))
     }
         
 }

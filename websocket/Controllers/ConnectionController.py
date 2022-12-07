@@ -9,7 +9,7 @@ from Models.errorHandler import sendError
 from Models.userList import userList
 from Models.userList import userObject
 from OCR.imageToText import readImage, rearrangeLines, reorderWords
-from Models.responses import endHighlightStroke
+from Models.responses import endHighlightStroke, followHost
 
 log = logging.getLogger(__name__)
 
@@ -92,6 +92,10 @@ async def hostConnection(websocket, hostKey, studentKey):
             case "endHighlightStroke":
                 websockets.broadcast(JOINED[studentKey], endHighlightStroke(
                     str(websocket.id)).toJson())
+            case "followHost":
+                response = followHost()
+                response.pageNumber= messageJSON["pageNumber"]
+                websockets.broadcast(JOINED[studentKey], response.toJson())
 
 
 

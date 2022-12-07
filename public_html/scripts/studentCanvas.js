@@ -407,6 +407,21 @@ var studentLinkElement = document.getElementById("studentLink");
 var studentLinkAnchorElement = document.getElementById("studentLinkAnchor");
 var currentPageNumberElement = document.getElementById('currentPageNumber');
 
+//for host following 
+var followHsot=false;
+function triggerFollowHost(){
+    //followHsot? followHsot=false: followHsot=true
+    if(followHsot){
+        followHsot=false   
+    }
+    else{
+        followHsot=true
+        navigateToPage(hostViewingPage)
+        console.log("following teacher to page "+hostViewingPage)
+    }
+        
+}
+
 var drawAnimations = true;
 
 isBroadcasting = false;
@@ -577,6 +592,7 @@ var localUserListName=[]
 var localUserObjects;
 var processHighlight = false;
 var absoluteJoinLink = "";
+var hostViewingPage=undefined;
 
 var websocketID = "";
 
@@ -639,6 +655,7 @@ function processMessage({ data }) {
                 
                 incomingDrawInstructions[event.page].push(parsedInstructions);
             }        
+            hostViewingPage=event.page
             break;
         case "clearpage":
             // cancel all the current animations and draw them instantly
@@ -656,8 +673,11 @@ function processMessage({ data }) {
             //localImages[event.pageNumber]= imageURL;
         
             pageNumber += 1;
+            hostViewingPage=pageNumber;
             incomingDrawInstructions.push([]);
             setCurrentPageText();
+            if(followHsot)
+                navigateToPage(pageNumber)
             break;
         case "NewpagesInserted":    
             pageNumber += 1;  
@@ -677,6 +697,9 @@ function processMessage({ data }) {
                 localImages.splice(event.insertIndex, 0, "");
             }
             setCurrentPageText();
+            hostViewingPage=event.insertIndex;
+            if(followHsot)
+                navigateToPage(event.insertIndex)
             break;
         case "pageFetched":
             //clear the current page
@@ -838,7 +861,12 @@ function processMessage({ data }) {
                         document.getElementById((event.id+"button")).remove()//delete the button
                 }
                 break;
-    }   
+        case "followHost":
+            hostViewingPage=event.pageNumber
+            if(followHsot)
+                navigateToPage(event.pageNumber)
+    }
+
 }
 
 function getUserlist(){
@@ -922,11 +950,8 @@ function navigateToPage(pageWanted){
             websocket.send(JSON.stringify(request))
         }
         console.log("1) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+localImages.length);
-    } else {
-        //currentPageNumberElement.textContent="The page requested "+pageWanted+" does not exist "
-        // Probably dont need to show this in prod
-        console.log("the page requested ("+pageWanted+") is out of bound")
     }
+
    
 }
 
