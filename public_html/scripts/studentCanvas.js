@@ -762,6 +762,9 @@ function processMessage({ data }) {
                 //delete current user name from user list html
                 document.getElementById(event.id).remove()//delete the button
 
+                if(document.getElementById(event.id+"button"))// remove the button if exits
+                    document.getElementById(event.id+"button").remove();
+
                 //delete from user name from local arrays
                 found = localUserListID.findIndex(element => element == event.id);
                 localUserListID.splice(found,1)
@@ -774,15 +777,24 @@ function processMessage({ data }) {
                 localUserListID.splice(found, 0, event.id)//insert user id in proper index
                 localUserObjects[stringToUUID(event.id)].name = event.name
 
-                //check if user had broadcasting privilage 
+                //creating the element to place the name in
                 tmpContent= "<h4 id='"+event.id+"'> "+event.name+"</h4>" 
+                 //check if user had broadcasting privilage 
+
+                if(event.canBroadcast){
+                    tmpContent += "<button id='"+event.id+"button"+"' class='activeButton'> Broadcasting</button>";
+                }
+
 
                 //insert alphabetical location
                 if(found == 0){//insert at the beginning of the list
                     document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
                 }
                 else{//insert anywhere else 
-                    document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
+                    if(document.getElementById(localUserListID[found-1]+"button"))
+                        document.getElementById(localUserListID[found-1]+"button").insertAdjacentHTML("afterend",tmpContent);
+                    else
+                        document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);               
                 }
             }
             break;
@@ -801,7 +813,10 @@ function processMessage({ data }) {
                     document.getElementById("Users").insertAdjacentHTML("afterend",tmpContent);
                 }
                 else{//insert anywhere else 
-                    document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
+                    if(document.getElementById(localUserListID[found-1]+"button"))
+                        document.getElementById(localUserListID[found-1]+"button").insertAdjacentHTML("afterend",tmpContent);
+                    else
+                        document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
                 }
             }
             break
