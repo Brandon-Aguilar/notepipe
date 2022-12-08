@@ -72,15 +72,6 @@ function showSlider() {
     }
 };
 
-// Change width of the marker based on input from a HTML slider
-function changeWidth(newWidth) {
-    enableTouch();
-    drawWidth = newWidth;
-    //markerWidth = drawWidth;
-    //eraserState= false;
-    ctx.globalCompositeOperation = 'source-over';
-};
-
 // Change width of the eraser based on input from a HTML slider
 function changeEraserWidth(newWidth) {
     enableTouch();

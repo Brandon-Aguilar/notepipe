@@ -142,15 +142,10 @@
 
         <div id="slider-div" class="slider-menu">
           <div id="container" class="slider-container">
-            <input onchange='changeWidth(this.value)' type="range" min="1" max="40" value="2">
-            <p style="color:white;">Thickness</p>
-          </div>
-        </div>
-        
-        <div id="slider-div" class="slider-menu">
-          <div id="container" class="slider-container">
-            <input onchange='changeWidth(this.value)' type="range" min="1" max="40" value="2">
-            <p style="color:white;">Thickness</p>
+            <input onchange='changeWidth(this.value)' type="range" min="1" max="40" value="5">
+            <p style="color:white;">Pen Thickness</p>
+            <input onchange='changeEraserWidth(this.value)' type="range" min="1" max="40" value="5">
+            <p style="color:white;">Eraser Thickness</p>
           </div>
         </div>
         
@@ -173,11 +168,6 @@
               </button>
             </div>
             <div class="draw-tool">
-              <button class="color-button" onclick="showColors()" id="colors">
-                <img src="/icons/color-circle.svg" alt="Color Picker">
-              </button>
-            </div>
-            <div class="draw-tool">
               <button class="color-button" onclick="changeColor('black')" id="black">
                 <img src="../icons/black-icon.svg" alt="Black">
               </button>
@@ -195,6 +185,11 @@
             <div class="draw-tool">
               <button class="color-button" onclick="changeColor('green')" id="green">
                 <img src="../icons/green-icon.svg" alt="Green">
+              </button>
+            </div>
+            <div class="draw-tool">
+              <button class="color-button" onclick="showColors()" id="colors">
+                <img src="/icons/color-circle.svg" alt="Color Picker">
               </button>
             </div>
             <div class="draw-tool">

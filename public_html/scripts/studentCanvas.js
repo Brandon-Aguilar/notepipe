@@ -167,18 +167,12 @@ var force = 1;//marker thickness
 var color = "red";//marker color
 var studentSendDrawInstructions = [];
 var markerWidth = 5;
+var eraserWidth = 5;
+var drawWidth = 5;
 
 var isPointerDown = false;
 var eraserState = false;
 var highlightDraw = false;
-
-// Change width of the marker based on input from a HTML slider
-function changeWidth(newWidth) {
-    enableTouch();
-    markerWidth = newWidth;
-    //eraserState= false;
-    ctx.globalCompositeOperation = 'source-over';
-};
 
 // shows the HTML slider located in slider-div
 function showSlider() {
@@ -188,6 +182,20 @@ function showSlider() {
     } else {
         x.style.display = "block";
     }
+};
+
+// Change width of the marker based on input from a HTML slider
+function changeWidth(newWidth) {
+    enableTouch();
+    drawWidth = newWidth;
+    ctx.globalCompositeOperation = 'source-over';
+};
+
+// Change width of the marker based on input from a HTML slider
+function changeWidth(newWidth) {
+    enableTouch();
+    markerWidth = newWidth;
+    ctx.globalCompositeOperation = 'source-over';
 };
 
 //Stroke color selection based off HTML button choice
@@ -481,7 +489,15 @@ function draw(data, ctx) {
     }
     ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
     ctx.strokeStyle = data.color;//original default stroke color 
-    ctx.lineWidth = data.force;//stroke width
+
+     //stroke width
+    if (data.eraserState === true) {
+        ctx.lineWidth = eraserWidth;
+    }
+    else {
+        ctx.lineWidth = drawWidth;
+    }
+
     ctx.lineCap = 'round';
     if(data.highlightDraw){
         ctx.globalCompositeOperation = "multiply"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 1; ctx.lineWidth = 40;

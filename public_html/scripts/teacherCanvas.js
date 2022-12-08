@@ -327,10 +327,19 @@ function sendUpdate() {
     websocket.send(JSON.stringify(message))
 }
 
+// Change width of the marker based on input from a HTML slider
+function changeWidth(newWidth) {
+    enableTouch();
+    drawWidth = newWidth;
+    ctx.globalCompositeOperation = 'source-over';
+};
 
-
-
-
+// Change width of the marker based on input from a HTML slider
+function changeWidth(newWidth) {
+    enableTouch();
+    markerWidth = newWidth;
+    ctx.globalCompositeOperation = 'source-over';
+};
 
 //Stroke color selection based off HTML button choice
 function changeColor(newColor) {
@@ -345,7 +354,6 @@ function changeColor(newColor) {
 
 // Eraser
 function eraser() {
-    markerWidth = eraserWidth;
     enableTouch();
     eraserState = true;
     highlightDraw = false;
@@ -370,8 +378,7 @@ function draw(data) {
     }
     currentCtx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
     currentCtx.strokeStyle = data.color;//original default stroke color 
-    //currentCtx.lineWidth = data.force;
-    
+
     //stroke width
     if (data.eraserState === true) {
         currentCtx.lineWidth = eraserWidth;
