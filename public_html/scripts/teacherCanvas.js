@@ -691,6 +691,7 @@ function processMessage({ data }) {
                     document.getElementById(localUserListID[found-1]).insertAdjacentHTML("afterend",tmpContent);
                 }
             }
+            sendHostViewingPage(viewingPageNumber);
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
@@ -725,6 +726,12 @@ function processMessage({ data }) {
             break;
     }
 }
+
+function sendHostViewingPage(viewingPageNumber){
+    const message= {type: "followHost", pageNumber: viewingPageNumber}
+    websocket.send(JSON.stringify(message))
+}
+
 function grantBroadcastingPrivilege(id){
     grantPermission = { type: "updateUserPermission", id: id, allowBroadcast:true};
     websocket.send(JSON.stringify(grantPermission))

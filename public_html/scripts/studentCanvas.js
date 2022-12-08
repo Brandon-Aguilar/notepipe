@@ -645,7 +645,6 @@ function processMessage({ data }) {
             createStudentName();
 
             absoluteJoinLink = "https://" + window.location.host + "/canvas/" + link;
-            getUserlist();
             break;
         case "canvasDrawUpdateBroadcast"://event.__type__= "canvasDrawUpdateBroadcast"
             console.log("Updating Draw Instructions");
