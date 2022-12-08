@@ -475,6 +475,7 @@ function createStudentName(){
 function initializeStudent(name) {
     const event = { type: "initializeStudent",  studentKey: studentKey, image: image, name: name};
     websocket.send(JSON.stringify(event))
+    getUserlist();
 }
 
 //same as teacher draw function
