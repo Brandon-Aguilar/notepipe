@@ -186,7 +186,7 @@ function showSlider() {
 // Change width of the marker based on input from a HTML slider
 function changeWidth(newWidth) {
     enableTouch();
-    markerWidth = newWidth;
+    drawWidth = newWidth;
     ctx.globalCompositeOperation = 'source-over';
 };
 
