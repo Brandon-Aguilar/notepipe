@@ -90,8 +90,7 @@ highlightCanvas.style.touchAction = 'manipulation';
 highlightCanvas.style.opacity = 0.5;
 
 //Fetch HTML elements that need event listners
-$('#floatingEditorButton').draggable();
-var ocr = document.getElementById('floatingEditorButton');
+var ocr = document.getElementById("editNote");
 const download = document.getElementById('download');
 const updateName = document.getElementById('updateName');
 
@@ -182,13 +181,6 @@ function showSlider() {
     } else {
         x.style.display = "block";
     }
-};
-
-// Change width of the marker based on input from a HTML slider
-function changeWidth(newWidth) {
-    enableTouch();
-    drawWidth = newWidth;
-    ctx.globalCompositeOperation = 'source-over';
 };
 
 // Change width of the marker based on input from a HTML slider
@@ -311,12 +303,7 @@ function layerHighlightCanvas(ctx){
 }
 
 var dragged = false;
-ocr.addEventListener('mousedown', function () { dragged = false })
-ocr.addEventListener('mousemove', function () { dragged = true })
-ocr.addEventListener('mouseup', function() {
-        if (dragged == true) { return }
-        showTextEditor();
-})
+ocr.addEventListener('click', showTextEditor);
 
 function showTextEditor(){
     ocr.style.display = "none";
@@ -704,12 +691,12 @@ function processMessage({ data }) {
                 ctx.clearRect(0, 0, width, height);
 
                 incomingDrawInstructions.splice(event.insertIndex, 0, []);
-                localImages.splice(event.insertIndex, 0, "");
+                localImages.splice(event.insertIndex, 0, undefined);
                 // When we add follow teacher, then don't navigate if following
                 navigateToPage(viewingPageNumber + 1);
             } else {
                 incomingDrawInstructions.splice(event.insertIndex, 0, []);
-                localImages.splice(event.insertIndex, 0, "");
+                localImages.splice(event.insertIndex, 0, undefined);
             }
             setCurrentPageText();
             hostViewingPage=event.insertIndex;
