@@ -17,7 +17,7 @@ if (window.location.host === "localhost:8080") {
     }
 }
 
-
+window.addEventListener("beforeunload",function(e) {e.returnValue ='Are you sure you want to leave?'});
 
 // connect to web socket
 // DO NOT LAUNCH THIS INTO A PROD ENVIRONMENT WITH "rejectUnauthorized: false"

@@ -89,6 +89,7 @@ highlightCanvas.style.touchAction = "manipulation";
 // Listen for websocket messages and when initialization finished
 websocket.addEventListener('message', processMessage);
 websocket.addEventListener('open', initializeHost)
+window.addEventListener("beforeunload",function(e) {e.returnValue ='Are you sure you want to leave?'});
 
 var pageNumber = 0;
 var viewingPageNumber=0; //will keep track of current page being displayed (next/prev function)
