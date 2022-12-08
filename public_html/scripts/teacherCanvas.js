@@ -372,15 +372,7 @@ function draw(data) {
     }
     currentCtx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
     currentCtx.strokeStyle = data.color;//original default stroke color 
-
-    //stroke width
-    if (data.eraserState === true) {
-        currentCtx.lineWidth = eraserWidth;
-    }
-    else {
-        currentCtx.lineWidth = drawWidth;
-    }
-
+    currentCtx.lineWidth = data.force;//stroke width
     currentCtx.lineCap = 'round';
     if (data.highlightDraw) {
         currentCtx.globalCompositeOperation = "multiply"; currentCtx.strokeStyle = "#FF0"; currentCtx.globalAlpha = 1; currentCtx.lineWidth = 40;
@@ -403,7 +395,13 @@ function move(e) {
         force = Math.log10(Math.pow(e.pressure * (Math.abs(e.tiltX || 90) / 90) * 0.2 + 0.15, 1.5)) + 1.2 || 1;
         force = Math.min(15 * Math.pow(force || 1, 4) * (markerWidth + 2), markerWidth);
     } else {
-        force = markerWidth;
+        //force = markerWidth;
+        if (eraserState === true) {
+            force = eraserWidth;
+        }
+        else {
+            force = drawWidth;
+        }
     }
     
     if ((e.buttons || isPointerDown) && allowDraw) {
@@ -414,6 +412,8 @@ function move(e) {
 
         currentlyHighlighting = highlightDraw;;
         
+
+
         draw({
             lastPoint,//the x,y coordinate of the last stroke
             x: e.offsetX,//x-coordinate of the mouse pointer relative to the document

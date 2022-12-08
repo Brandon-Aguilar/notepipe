@@ -224,7 +224,13 @@ function move(e) {
         force = Math.log10(Math.pow(e.pressure * (Math.abs(e.tiltX || 90) / 90) * 0.2 + 0.15, 1.5)) + 1.2 || 1;
         force = Math.min(15 * Math.pow(force || 1, 4) * (markerWidth + 2), markerWidth);
     } else {
-        force = markerWidth;
+        //force = markerWidth;
+        if (eraserState === true) {
+            force = eraserWidth;
+        }
+        else {
+            force = drawWidth;
+        }
     }
 
     if ((e.buttons || isPointerDown) && allowDraw) {
@@ -234,6 +240,8 @@ function move(e) {
         }
 
         currentlyHighlighting = highlightDraw;;
+
+
 
         if(doBroadcast()){
             draw({
@@ -476,15 +484,7 @@ function draw(data, ctx) {
     }
     ctx.globalCompositeOperation = data.eraserState ? "destination-out" : "source-over"
     ctx.strokeStyle = data.color;//original default stroke color 
-
-     //stroke width
-    if (data.eraserState === true) {
-        ctx.lineWidth = eraserWidth;
-    }
-    else {
-        ctx.lineWidth = drawWidth;
-    }
-
+    ctx.lineWidth = data.force;//stroke width
     ctx.lineCap = 'round';
     if(data.highlightDraw){
         ctx.globalCompositeOperation = "multiply"; ctx.strokeStyle = "#FF0"; ctx.globalAlpha = 1; ctx.lineWidth = 40;
