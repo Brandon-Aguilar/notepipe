@@ -686,22 +686,27 @@ function processMessage({ data }) {
             width = canvas.width;
             height = canvas.height;
             
-            if(event.insertIndex <= viewingPageNumber){
-                localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
-                ctx.clearRect(0, 0, width, height);
-
-                incomingDrawInstructions.splice(event.insertIndex, 0, []);
-                localImages.splice(event.insertIndex, 0, undefined);
-                // When we add follow teacher, then don't navigate if following
-                navigateToPage(viewingPageNumber + 1);
-            } else {
-                incomingDrawInstructions.splice(event.insertIndex, 0, []);
-                localImages.splice(event.insertIndex, 0, undefined);
+            if(event.insertIndex<=viewingPageNumber){
+                viewingPageNumber++
             }
+            incomingDrawInstructions.splice(event.insertIndex, 0, []);
+            localImages.splice(event.insertIndex, 0, undefined);
             setCurrentPageText();
             hostViewingPage=event.insertIndex;
             if(followHsot)
                 navigateToPage(event.insertIndex)
+            // if(event.insertIndex <= viewingPageNumber){
+            //     localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
+            //     ctx.clearRect(0, 0, width, height);
+
+            //     incomingDrawInstructions.splice(event.insertIndex, 0, []);
+            //     localImages.splice(event.insertIndex, 0, undefined);
+            //     // When we add follow teacher, then don't navigate if following
+            //     navigateToPage(viewingPageNumber + 1);
+            // } else {
+            //     incomingDrawInstructions.splice(event.insertIndex, 0, []);
+            //     localImages.splice(event.insertIndex, 0, undefined);
+            // }
             break;
         case "pageFetched":
             //clear the current page
@@ -867,6 +872,7 @@ function processMessage({ data }) {
             hostViewingPage=event.pageNumber
             if(followHsot)
                 navigateToPage(event.pageNumber)
+            break;
     }
 
 }
@@ -902,7 +908,6 @@ var incomingDrawInstructions=[[]]
 
 // This was nextOrPrevious, changing name to navigateToPage since we need this for future direct page navs and it more clearly represents what it is doing
 function navigateToPage(pageWanted){
-    //acceptable range for pages to load
     finishAnimations();
     studentLocalImages[viewingPageNumber] = studentCanvas.toDataURL("image/png");
     localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
