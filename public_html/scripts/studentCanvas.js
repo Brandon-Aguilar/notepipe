@@ -708,6 +708,8 @@ function processMessage({ data }) {
             //     incomingDrawInstructions.splice(event.insertIndex, 0, []);
             //     localImages.splice(event.insertIndex, 0, undefined);
             // }
+            const request = { type: "fetchPage", pageNumber: pageWanted, studentKey: studentKey };
+            websocket.send(JSON.stringify(request));
             break;
         case "pageFetched":
             //clear the current page
