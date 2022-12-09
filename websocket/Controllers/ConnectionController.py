@@ -138,12 +138,15 @@ async def studentConnection(websocket, studentKey):
         match messageJSON["type"]:
             # Button events
             case "imageToText":
-                response = imageToTextRequest()
-                response.studentKey = studentKey
-                await imageToText(websocket, studentKey, response,messageJSON["pageNumber"])
-                response.convertedText = rearrangeLines(reorderWords(readImage(response.imageURL)))
-                await websocket.send(response.toJson())
-                log.info("image was retrieved %s", response.imageURL)
+                try:
+                    response = imageToTextRequest()
+                    response.studentKey = studentKey
+                    await imageToText(websocket, studentKey, response,messageJSON["pageNumber"])
+                    response.convertedText = rearrangeLines(reorderWords(readImage(response.imageURL)))
+                    await websocket.send(response.toJson())
+                    log.info("image was retrieved %s", response.imageURL)
+                except Exception as e:
+                    log.error("Failed to convert image to text")
 
             case "textToSpeech":
                 response = textToSpeechRequest()
