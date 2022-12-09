@@ -877,11 +877,12 @@ function uploadImageFile() {
         var img = new Image();
         img.src = e.target.result;
         img.onload = function () {
+            newpage();
            ctx.drawImage(img, 10, 10);
            sendUpdate();
            var imageURL = canvas.toDataURL("image/png", 0.2);
            localImages[viewingPageNumber] = imageURL;
-           newpage();
+           
         };
     }
 } 

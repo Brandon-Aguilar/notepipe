@@ -73,6 +73,8 @@ def breakLines(unwrapped_text):
     Returns:
         wrapped_text (list); wrapped block of list of text
     """
+    if unwrapped_text is None:
+        return
     LINE_TOLERANCE = 20
     wrapped_text = [[unwrapped_text[0]]]
     prev_text_pos_y = unwrapped_text[0][1][1]
