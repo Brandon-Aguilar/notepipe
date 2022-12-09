@@ -878,7 +878,9 @@ function uploadImageFile() {
         img.src = e.target.result;
         img.onload = function () {
            ctx.drawImage(img, 10, 10);
-           sendDrawUpdate();
+           sendUpdate();
+           var imageURL = canvas.toDataURL("image/png", 0.2);
+           localImages[viewingPageNumber] = imageURL;
         };
     }
 } 
