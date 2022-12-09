@@ -911,6 +911,8 @@ var incomingDrawInstructions=[[]]
 
 // This was nextOrPrevious, changing name to navigateToPage since we need this for future direct page navs and it more clearly represents what it is doing
 function navigateToPage(pageWanted){
+    nextPageElement.disabled = true;
+    previousPageElement.disabled = true;
     finishAnimations();
     studentLocalImages[viewingPageNumber] = studentCanvas.toDataURL("image/png");
     localImages[viewingPageNumber] = canvas.toDataURL("image/png", 0.2);
@@ -962,7 +964,8 @@ function navigateToPage(pageWanted){
         console.log("1) The page wanted is "+ pageWanted+ " current page is "+ viewingPageNumber+" page number is "+localImages.length);
     }
 
-   
+   nextPageElement.disabled = false;
+    previousPageElement.disabled = false;
 }
 
 var currentDrawInstructions = [];
